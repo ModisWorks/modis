@@ -1,37 +1,39 @@
-## Welcome to GitHub Pages
+## About Modis
+Modis is a Discord bot that runs with a GUI and is designed to be as modular as possible so that anyone with some Python knowledge can quickly and easily create new modules that run on the bot.
 
-You can use the [editor on GitHub](https://github.com/Infraxion/modis/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+## Currently available modules
+There are currently 5 modules in Modis:
+- music
+- replies
+- tableflip
+- chatbot
+- rocketleague
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Information about each module is detailed below.
 
-### Markdown
+### music
+A music player with an interactive GUI using reactions as buttons.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+**Commands:**
+- `!play [YouTube search OR url]`: Creates the player GUI if it doesn't yet exist and queues either the first result of a YouTube search or the audio from the url.
+- `!pause`: Pauses the player.
+- `!skip [n]`: Skips `n` songs, or skips one if `n` is not included.
+- `!shuffle`: Shuffles the songs in the queue.
+- `!stop`: Stops the player and clears the queue.
+- `!volume [n]`: Sets the volume to `n`%. `n` can be any integer from 0 to 200.
+- `!destroy`: Removes the GUI and resets everything. Handy if something is messed up, or if you want to move the GUI to a different channel.
 
-```markdown
-Syntax highlighted code block
+### replies
+Replies uses a json file to make it easy for users to make the bot say things in reply to specific messages.
 
-# Header 1
-## Header 2
-### Header 3
+### tableflip
+A fun module that puts the table back whenever someone flips it.
 
-- Bulleted
-- List
+### chatbot
+Whenever the bot is mentioned this module can connect to either cleverbot.io or Mitsuku and get a chatbot reply to the message it was mentioned in.
 
-1. Numbered
-2. List
+### rocketleague
+Gets Rocket League stats of players using Rocket League Tracker Network. Currently only works for Steam players.
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Infraxion/modis/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+**Commands:**
+- `!rl [steamid]` Shows the Rocket League stats of the Steam user `steamid`.
