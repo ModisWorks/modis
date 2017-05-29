@@ -3,15 +3,16 @@ import threading
 import sys
 import traceback
 import datetime
+import os
 
 import bot_modules
 import bot_console.main_console as console
 
-token = "MjgyNzc4MTQ1ODMwOTkzOTIw.C4rdLg.48NCMphD4uiBJS39MCnC6IWDgis"
-client_id = "282778145830993920"
-game = "music"
-prefix = '!'
-name = 'Modis'
+token = os.environ['token']
+client_id = os.environ['client_id']
+game = None
+prefix = "!"
+name = "Modis"
 
 client = discord.Client()
 
@@ -52,11 +53,12 @@ async def on_ready():
           + "To add this bot to a server, use this link:\n"
           + discord.utils.oauth_url(client_id) + "\n"
           + "---")
-    await client.change_presence(game=discord.Game(name=game,
-                                                   url="https://infraxion.github.io/modis/",
-                                                   type=0),
-                                 status=discord.Status.online,
-                                 afk=False)
+    if game:
+        await client.change_presence(game=discord.Game(name=game,
+                                                       url="https://infraxion.github.io/modis/",
+                                                       type=0),
+                                     status=discord.Status.online,
+                                     afk=False)
 
 
 @client.event

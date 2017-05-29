@@ -97,7 +97,7 @@ def create_gui(stats, dp, name):
 
 
 def init(iclient, iprefix):
-    print("Loading rankbot...")
+    print("Loading rocketleague...")
 
     global client
     client = iclient

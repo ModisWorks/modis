@@ -4,7 +4,7 @@ client = None
 
 
 def init(iclient):
-    print("Loading rplybot...")
+    print("Loading replies...")
 
     global client
     client = iclient

@@ -13,7 +13,7 @@ class CleverBotIO:
     def __init__(self):
         self.user = 'PIspeR8IQDBhZjVw'
         self.key = 'oCMB8W70esq2VFEHEhtP4lKt3wzcuaQE'
-        self.nick = 'Infraxion'
+        self.nick = 'Modis'
 
         body = {
             'user': self.user,
@@ -102,7 +102,7 @@ class Mitsuku:
 
 
 def init(iclient):
-    print("Loading clvrbot...")
+    print("Loading chatbot...")
 
     global client
     client = iclient

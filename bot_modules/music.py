@@ -560,7 +560,7 @@ class ServerLock:
 def init(iclient, iprefix):
     log("################################")
     log("musibot.init")
-    print("Loading musibot...")
+    print("Loading music...")
 
     global client
     client = iclient

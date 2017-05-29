@@ -7,7 +7,7 @@ flipdict = None
 
 
 def init(iclient):
-    print("Loading flipbot...")
+    print("Loading tableflip...")
 
     global client
     client = iclient
