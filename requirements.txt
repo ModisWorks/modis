@@ -1,0 +1,29 @@
+All Modis external packages:
+    discord.py
+    youtube_dl
+    pynacl
+    google-api-python-client
+    requests
+    lxml
+
+music module:
+    discord.py
+    youtube_dl
+    pynacl
+    google-api-python-client
+
+replies module:
+    discord.py
+
+tableflip module:
+    discord.py
+
+chatbot module:
+    discord.py
+    requests
+    lxml
+
+rocketleague module:
+    discord.py
+    requests
+    lxml
