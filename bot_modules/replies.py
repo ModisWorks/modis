@@ -2,9 +2,12 @@ import json
 
 client = None
 
+modulename = "rocketleague"
+creator = "Infraxion"
+
 
 def init(iclient):
-    print("Loading replies...")
+    print("Loading {} by {}".format(modulename, creator))
 
     global client
     client = iclient

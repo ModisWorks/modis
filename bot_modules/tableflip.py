@@ -5,9 +5,12 @@ client = None
 tamperdict = None
 flipdict = None
 
+modulename = "tableflip"
+creator = "Infraxion"
+
 
 def init(iclient):
-    print("Loading tableflip...")
+    print("Loading {} by {}".format(modulename, creator))
 
     global client
     client = iclient

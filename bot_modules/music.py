@@ -20,6 +20,11 @@ cache = {}
 
 logging = False
 
+modulename = "music"
+creator = "Infraxion"
+creatordp = "http://menangorie.ddns.net/modis/infraxion128.jpg"
+modisdp = "http://menangorie.ddns.net/modis/logo128t.png"
+
 
 class MessageUI:
     def __init__(self, channel):
@@ -27,7 +32,6 @@ class MessageUI:
         self.gui_message = None
         self.gui = None
         self.channel = channel
-        self.thumbnail = "http://i.imgur.com/cZwFexf.jpg"
         self.queue_length = 9
 
         self.init_gui()
@@ -42,11 +46,11 @@ class MessageUI:
             description="Press the buttons!",
             colour=0x88FF00
         )
-        self.gui.set_thumbnail(url=self.thumbnail)
+        self.gui.set_thumbnail(url=modisdp)
         self.gui.set_author(
             name="Modis",
             url="https://infraxion.github.io/modis/",
-            icon_url=self.thumbnail
+            icon_url=modisdp
         )
         self.gui.add_field(
             name="Now Playing",
@@ -55,10 +59,10 @@ class MessageUI:
         )
         display_queue = []
         for i in range(self.queue_length):
-            display_queue.append(str(i + 1) + ": ---\n")
+            display_queue.append("{}: ---\n".format(str(i + 1)))
         self.gui.add_field(
             name="Queue",
-            value="```" + ''.join(display_queue) + "```",
+            value="```{}```".format(''.join(display_queue)),
             inline=False
         )
         self.gui.add_field(
@@ -75,8 +79,8 @@ class MessageUI:
             inline=False
         )
         self.gui.set_footer(
-            text="Modis Discord music player by Infraxion",
-            icon_url=self.thumbnail
+            text="{} module by {}".format(modulename, creator),
+            icon_url=creatordp
         )
 
     async def say(self, message):
@@ -145,7 +149,7 @@ class MessageUI:
         await self.update()
 
     async def set_queue(self, queue):
-        log("MessageUI.set_queue", "list of length " + str(len(queue)))
+        log("MessageUI.set_queue", "list of length {}".format(str(len(queue))))
         display_queue = []
 
         for i in range(self.queue_length):
@@ -156,12 +160,12 @@ class MessageUI:
                     songname = queue[i][1]
             except IndexError:
                 songname = "---"
-            display_queue.append(str(i + 1) + ": " + songname + "\n")
+            display_queue.append("{}: {}\n".format(str(i + 1), songname))
 
         self.gui.set_field_at(
             1,
             name="Queue",
-            value="```" + ''.join(display_queue) + "```",
+            value="```{}```".format(''.join(display_queue)),
             inline=False
         )
 
@@ -179,7 +183,7 @@ class MessageUI:
         self.gui.set_field_at(
             3,
             name="Volume",
-            value=str(volume) + "%",
+            value="{}%".format(str(volume)),
             inline=True
         )
 
@@ -188,11 +192,11 @@ class MessageUI:
     async def set_status(self, message):
         log("MessageUI.set_status", message)
         if len(message) > 43:
-            message = message[:40] + "..."
+            message = "{}...".format(message[:40])
         self.gui.set_field_at(
             4,
             name="Status",
-            value="```" + message + "```",
+            value="```{}```".format(message),
             inline=False
         )
         await self.update()
@@ -200,11 +204,11 @@ class MessageUI:
     async def set_tempstatus(self, message):
         log("MessageUI.set_status", message)
         if len(message) > 43:
-            message = message[:40] + "..."
+            message = "{}...".format(message[:40])
         self.gui.set_field_at(
             4,
             name="Status",
-            value="```" + message + "```",
+            value="```{}```".format(message),
             inline=False
         )
         await self.update()
@@ -257,12 +261,12 @@ class VoiceUI:
 
             title = ytget["items"][0]["snippet"]["title"]
             if self.messageui:
-                await self.messageui.set_tempstatus("Queueing " + title)
+                await self.messageui.set_tempstatus("Queueing {}".format(title))
 
             # Videos
             if ytget["items"][0]["id"]["kind"] == "youtube#video":
                 videoid = ytget["items"][0]["id"]["videoId"]
-                self.queue.append(["https://www.youtube.com/watch?v=" + videoid, title])
+                self.queue.append(["https://www.youtube.com/watch?v={}".format(videoid), title])
 
             # Playlists
             elif ytget["items"][0]["id"]["kind"] == "youtube#playlist":
@@ -276,14 +280,14 @@ class VoiceUI:
                 for entry in plget["items"]:
                     videoid = entry["snippet"]["resourceId"]["videoId"]
                     songname = entry["snippet"]["title"]
-                    self.queue.append(["https://www.youtube.com/watch?v=" + videoid, songname])
+                    self.queue.append(["https://www.youtube.com/watch?v={}".format(videoid), songname])
 
                 # For playlists with more than 50 entries
                 if "nextPageToken" in plget:
                     counter = 2
                     while "nextPageToken" in plget:
                         if self.messageui:
-                            await self.messageui.set_tempstatus("Queueing " + title + " (page " + str(counter) + ")")
+                            await self.messageui.set_tempstatus("Queueing {} (page {})".format(title, str(counter)))
                         counter += 1
                         plget = youtube.playlistItems().list(
                             playlistId=playlistid,
@@ -295,7 +299,7 @@ class VoiceUI:
                         for entry in plget["items"]:
                             videoid = entry["snippet"]["resourceId"]["videoId"]
                             songname = entry["snippet"]["title"]
-                            self.queue.append(["https://www.youtube.com/watch?v=" + videoid, songname])
+                            self.queue.append(["https://www.youtube.com/watch?v={}".format(videoid), songname])
 
         if self.messageui:
             await self.messageui.set_queue(self.queue)
@@ -560,7 +564,7 @@ class ServerLock:
 def init(iclient, iprefix):
     log("################################")
     log("musibot.init")
-    print("Loading music...")
+    print("Loading {} by {}".format(modulename, creator))
 
     global client
     client = iclient

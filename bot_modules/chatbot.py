@@ -8,6 +8,9 @@ client = None
 cleverbotio = None
 mitsuku = None
 
+modulename = "chatbot"
+creator = "Infraxion"
+
 
 class CleverBotIO:
     def __init__(self):
@@ -102,7 +105,7 @@ class Mitsuku:
 
 
 def init(iclient):
-    print("Loading chatbot...")
+    print("Loading {} by {}".format(modulename, creator))
 
     global client
     client = iclient

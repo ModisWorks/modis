@@ -7,6 +7,11 @@ import io
 client = None
 prefix = '/'
 
+modulename = "rocketleague"
+creator = "Infraxion"
+creatordp = "http://menangorie.ddns.net/modis/infraxion128.jpg"
+modisdp = "http://menangorie.ddns.net/modis/logo128t.png"
+
 
 def rl(player):
     response = requests.get('https://rocketleague.tracker.network/profile/steam/' + player)
@@ -47,9 +52,9 @@ def rl(player):
         try:
             int(player)
         except ValueError:
-            response = requests.get('http://steamcommunity.com/id/' + player)
+            response = requests.get('http://steamcommunity.com/id/{}'.format(player))
         else:
-            response = requests.get('http://steamcommunity.com/profile/' + player)
+            response = requests.get('http://steamcommunity.com/profile/{}'.format(player))
         parsed = html.parse(io.StringIO(response.text)).getroot()
         try:
             dp = parsed[0][29].attrib['href']
@@ -62,7 +67,7 @@ def rl(player):
 
 def create_gui(stats, dp, name):
     gui = discord.Embed(
-        title="Rocket League Stats: " + name,
+        title="Rocket League Stats: {}".format(name),
         type='rich',
         description="*Stats obtained from [Rocket League Tracker Network](https://rocketleague.tracker.network/)*",
         colour=0x0088FF)
@@ -72,7 +77,7 @@ def create_gui(stats, dp, name):
     gui.set_author(
         name="Modis",
         url="https://infraxion.github.io/modis/",
-        icon_url="https://rocketleague.tracker.network/favicon.ico")
+        icon_url=modisdp)
 
     for stat in stats:
         if stat[0] in ["Duel 1v1", "Doubles 2v2", "Solo Standard 3v3", "Standard 3v3"]:
@@ -90,14 +95,14 @@ def create_gui(stats, dp, name):
             value=value)
 
     gui.set_footer(
-        text="Modis Rocket League stats by Infraxion",
-        icon_url='https://www.google.com/s2/favicons?domain=www.rocketleaguegame.com')
+        text="{} module by {}".format(modulename, creator),
+        icon_url=creatordp)
 
     return gui
 
 
 def init(iclient, iprefix):
-    print("Loading rocketleague...")
+    print("Loading {} by {}".format(modulename, creator))
 
     global client
     client = iclient
