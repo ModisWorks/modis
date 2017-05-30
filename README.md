@@ -1,3 +1,5 @@
+{% include favicon.html %}
+
 ## About Modis
 Modis is a Discord bot that runs with a GUI and is designed to be as modular as possible so that anyone with some Python knowledge can quickly and easily create new modules that run on the bot.
 
@@ -37,5 +39,3 @@ Gets Rocket League stats of players using Rocket League Tracker Network. Current
 
 **Commands:**
 - `!rl [steamid]` Shows the Rocket League stats of the Steam user `steamid`.
-
-<li> {% include favicon.html %} </li>
