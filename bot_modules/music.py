@@ -18,7 +18,7 @@ prefix = '/'
 
 cache = {}
 
-logging = False
+logging = True
 
 modulename = "music"
 creator = "Infraxion"
@@ -120,15 +120,21 @@ class MessageUI:
     async def update(self):
         log("MessageUI.update")
         if self.gui_message:
-            await client.edit_message(self.gui_message, embed=self.gui)
+            try:
+                await client.edit_message(self.gui_message, embed=self.gui)
+            except discord.NotFound:
+                pass
 
     async def destroy(self, reason=None):
         log("MessageUI.destroy", reason)
         if self.gui_message:
-            await client.delete_message(self.gui_message)
+            try:
+                await client.delete_message(self.gui_message)
+            except discord.NotFound:
+                pass
         if reason:
             await self.say(reason)
-
+        self.gui_message = None
         self.init_gui()
 
         self.ready = False
@@ -336,15 +342,18 @@ class VoiceUI:
             await self.play()
         else:
             await self.destroy()
-            await self.messageui.reset("Encountered an error while playing :/")
+            if self.messageui:
+                await self.messageui.reset("Encountered an error while playing :/")
 
     async def destroy(self):
         log("VoiceUI.destroy")
         self.queue = []
         try:
-            self.player.stop()
             await self.speaker.disconnect()
+            self.player.stop()
         except AttributeError:
+            pass
+        except discord.NotFound:
             pass
 
         self.ready = False
@@ -464,16 +473,7 @@ class ServerLock:
 
     async def create_ui(self, author, text_channel):
         log("ServerLock.create_ui")
-        if self.voiceui is None:
-            if self.messageui is None:
-                self.messageui = MessageUI(text_channel)
-            await self.messageui.create()
-
-            self.voiceui = VoiceUI(author.voice_channel, self.messageui)
-            await self.voiceui.create()
-
-            self.ready = all((self.messageui.ready, self.voiceui.ready))
-        elif not self.voiceui.ready:
+        if self.voiceui is None or not self.voiceui.ready:
             if self.messageui is None:
                 self.messageui = MessageUI(text_channel)
             await self.messageui.create()
@@ -512,13 +512,13 @@ class ServerLock:
 
     async def destroy(self, reason=None):
         log("ServerLock.destroy", reason)
-        if self.voiceui:
-            if self.voiceui.ready:
+        if self.voiceui and self.voiceui.ready:
                 await self.voiceui.destroy()
+                self.voiceui = None
 
-        if self.messageui:
-            if self.messageui.ready:
+        if self.messageui and self.messageui.ready:
                 await self.messageui.destroy(reason)
+                self.voiceui = None
 
     async def skip(self, num=1):
         log("ServerLock.skip", num)
@@ -585,6 +585,7 @@ def log(name, *args):
         sys.stdout = open("musibot.log", 'a')
         print('\n'.join(log_package))
         sys.stdout = sys.__stdout__
+        print('\n'.join(log_package))
 
 
 async def on_message(message):
