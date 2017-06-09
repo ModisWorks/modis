@@ -51,28 +51,28 @@ async def on_ready():
     print("Ready.\n"
           + "---\n"
           + "To add this bot to a server, use this link:\n"
-          + discord.utils.oauth_url(client_id) + "\n"
-          + "---")
+          + "{}\n"
+          + "---".format(discord.utils.oauth_url(client_id)))
     if game:
-        await client.change_presence(game=discord.Game(name=game,
-                                                       url="https://infraxion.github.io/modis/",
-                                                       type=0),
-                                     status=discord.Status.online,
-                                     afk=False)
+        await client.change_presence(
+            game=discord.Game(
+                name=game,
+                url="https://infraxion.github.io/modis/",
+                type=0),
+            status=discord.Status.online,
+            afk=False)
 
 
 @client.event
 async def on_message(message):
-    await bot_modules.music.on_message(message)
-    await bot_modules.replies.on_message(message)
-    await bot_modules.tableflip.on_message(message)
-    await bot_modules.chatbot.on_message(message)
-    await bot_modules.rocketleague.on_message(message)
+    for _module in bot_modules.reactors['on_message']:
+        _module.on_message(message)
 
 
 @client.event
 async def on_reaction_add(reaction, user):
-    await bot_modules.music.on_reaction_add(reaction, user)
+    for _module in bot_modules.reactors['on_reaction_add']:
+        _module.on_reaction_add(reaction, user)
 
 
 @client.event
