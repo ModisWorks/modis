@@ -7,8 +7,8 @@ import traceback
 from globalvars import *
 
 
-# import modis_console.main_console as console
-# import threading
+import modis_console.main_console as console
+import threading
 
 
 def run(client_id=None, game=None, prefix="!"):
@@ -23,10 +23,10 @@ def run(client_id=None, game=None, prefix="!"):
     import module_database
 
     # Start GUI console
-    # print("Starting console...")
-    # console_thread = threading.Thread(target=console.main, args=[])
-    # console_thread.start()
-    # console.init(client, "Modis Console")
+    print("Starting console...")
+    console_thread = threading.Thread(target=console.main, args=[])
+    console_thread.start()
+    console.init(client, "Modis Console")
 
     @client.event
     async def on_ready():
