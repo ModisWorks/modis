@@ -1,6 +1,6 @@
 ######## MODIS ########
 *.log
-OfficialModis.py
+OfficialModisLauncher.py
 
 ######## PYCHARM ########
 .idea
