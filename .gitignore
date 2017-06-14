@@ -1,9 +1,6 @@
 ######## MODIS ########
-musibot.log
-ytdl.log
-Modis.py
-Tester1.py
-Tester2.py
+*.log
+OfficialModis.py
 
 ######## PYCHARM ########
 .idea
