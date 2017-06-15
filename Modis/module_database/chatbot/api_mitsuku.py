@@ -2,6 +2,9 @@ import requests as _requests
 import lxml.html as _html
 import io as _io
 
+from share import *
+import datetime
+
 url = 'https://kakko.pandorabots.com/pandora/talk?botid=f6a012073e345a08&amp;skin=chat'
 
 
@@ -31,6 +34,7 @@ def get_botcust2():
     }
 
     # Get response from http POST request to url
+    # module_pipes["chatbot"].set("HTTP POST", str(datetime.datetime.now()).split('.')[0])
     response = _requests.post(
         url,
         params=params,

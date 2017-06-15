@@ -140,6 +140,7 @@ class Log(ui_window.Frame):
             pady=4,
             sticky="W E N S"
         )
+        log.insert("end", "Welcome to Modis Beta v2.2\n")
 
         # Scrollbar
         scrollbar = ttk.Scrollbar(
@@ -161,8 +162,8 @@ class Log(ui_window.Frame):
                 self.text_widget = text_widget
 
             def write(self, string):
-                self.text_widget.insert('end', string)
-                self.text_widget.see('end')
+                self.text_widget.insert("end", string)
+                self.text_widget.see("end")
 
         sys.stdout = StdoutRedirector(log)
 

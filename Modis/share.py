@@ -16,6 +16,7 @@ client = discord.Client()
 tkgui = None
 moduletabs = None
 tkstatus = None
+module_pipes = {}
 
 
 def get_serverdata():
