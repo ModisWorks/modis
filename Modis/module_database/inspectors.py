@@ -13,7 +13,8 @@ def get_event_handlers():
         "on_ready": [],
         "on_message": [],
         "on_reaction_add": [],
-        "on_error": []
+        "on_error": [],
+        "ui_window": []
     }
 
     # Get list of all modules
@@ -36,6 +37,9 @@ def get_event_handlers():
 
         if "on_error" in dir(m):
             event_handlers["on_error"].append(m.on_error)
+
+        if "ui_window" in dir(m):
+            event_handlers["ui_window"].append(m.ui_window)
 
     return event_handlers
 

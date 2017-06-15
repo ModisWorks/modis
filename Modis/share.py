@@ -1,18 +1,23 @@
+import discord
+import tkinter as tk
+from tkinter import ttk
+
 import json as _json
 import os as _os
 import asyncio as _asyncio
 
-# Globally register the Discord API and module database
-import discord
+apikeys = {}
+client_id = ""
+game = ""
+prefix = ""
 
-# Globally register Discord client
 client = discord.Client()
 
-# Globally register API keys
-apikeys = {}
+tkgui = None
+moduletabs = None
+tkstatus = None
 
 
-# Globally register essential functions
 def get_serverdata():
     """Gets the current serverdata dict from the serverdata.json file
 
@@ -40,5 +45,6 @@ def runcoro(async_function):
     Args:
         async_function (Coroutine): The asynchronous function to run
     """
-
-    _asyncio.run_coroutine_threadsafe(async_function, client.loop)
+    future = _asyncio.run_coroutine_threadsafe(async_function, client.loop)
+    result = future.result()
+    return result

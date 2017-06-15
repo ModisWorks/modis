@@ -1,4 +1,4 @@
-from globalvars import *
+from share import *
 from ._constants import *
 
 

@@ -1,4 +1,4 @@
 # Setup module databse
-import module_database.inspectors as _inspectors
-event_handlers = _inspectors.get_event_handlers()
-required_perms = _inspectors.get_required_perms()
+import module_database.inspectors
+event_handlers = inspectors.get_event_handlers()
+required_perms = inspectors.get_required_perms()

@@ -1,7 +1,5 @@
-# from . import on_ready
 from . import on_message
-# from . import on_reaction_add
-# from . import on_error
+from . import ui_window
 
 from ._constants import *
 

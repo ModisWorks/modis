@@ -1,6 +1,5 @@
-from globalvars import *
-
-from .._tools import ui_embed
+from tools import ui_embed
+from share import *
 from ._constants import *
 
 
