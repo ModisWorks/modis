@@ -1,4 +1,4 @@
-from share import *
+from ...share import *
 from ._constants import *
 
 from . import musicplayer

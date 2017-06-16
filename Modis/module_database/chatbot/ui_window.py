@@ -1,7 +1,7 @@
-from tools import ui_window
-from share import *
+from ...tools import ui_window
+from ...share import *
 
-pagename = "Chatbot"
+pagename = "chatbot"
 pad_element = 2
 
 
@@ -31,7 +31,8 @@ class Page(ui_window.Page):
         self.rowconfigure(0, weight=1)
 
         # Register dynamic elements globally
-        module_pipes["chatbot"] = apicalls.display
+        from . import _constants
+        _constants.pipe_api_mitsuku = apicalls.display
 
 
 class APICalls(ui_window.Frame):
@@ -48,14 +49,13 @@ class APICalls(ui_window.Frame):
         self.display = ttk.Treeview(
             self,
             columns=[
-                "call",
+                "date",
                 "time"
             ],
             displaycolumns=[
-                "call",
+                "date",
                 "time"
-            ],
-            show=["headings"]
+            ]
         )
         self.display.grid(
             column=0,
@@ -64,10 +64,10 @@ class APICalls(ui_window.Frame):
             pady=pad_element,
             sticky="W E N S"
         )
-        self.display.column('call', width=128, anchor='e')
-        self.display.heading('call', text='Call')
-        self.display.column('time', anchor='w')
-        self.display.heading('time', text='Timestamp')
+        self.display.column('date', width=80, anchor='center')
+        self.display.heading('date', text='Date')
+        self.display.column('time', width=60, anchor='center')
+        self.display.heading('time', text='Time')
 
         # Configure stretch ratios
         self.rowconfigure(0, weight=1)

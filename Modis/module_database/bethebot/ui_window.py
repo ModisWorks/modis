@@ -1,12 +1,18 @@
-from tools import ui_window
-from share import *
+from ...tools import ui_window
+from ...share import *
 
-pagename = "Be the Bot"
+pagename = "bethebot"
 pad_element = 2
 
 
 class Page(ui_window.Page):
     def __init__(self, parent):
+        """The console tab for bethebot
+
+        Args:
+            parent: tk or ttk element
+        """
+
         super(Page, self).__init__(parent)
 
         chat = Chat(self)
@@ -32,6 +38,12 @@ class Page(ui_window.Page):
 
 class Chat(ui_window.Frame):
     def __init__(self, parent):
+        """Send messages from the bot
+
+        Args:
+            parent:
+        """
+
         super(Chat, self).__init__(parent, "Chat")
 
         self.channel = tk.StringVar()
@@ -103,6 +115,12 @@ class Chat(ui_window.Frame):
 
 class React(ui_window.Frame):
     def __init__(self, parent):
+        """React to messages from the bot
+
+        Args:
+            parent: tk or ttk object
+        """
+
         super(React, self).__init__(parent, "React™")
 
         self.channel = tk.StringVar()

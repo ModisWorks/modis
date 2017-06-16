@@ -1,4 +1,4 @@
-from share import *
+from ...share import *
 
 import googleapiclient.discovery as _googleapi
 

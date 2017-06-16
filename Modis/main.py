@@ -8,19 +8,27 @@ def init():
     """Runs the Modis Discord bot"""
 
     import discord
-    import share
+    from . import share
 
     # Import modules
     share.tkstatus.set("Modis is starting")
     print("Importing modules")
     share.moduletabs.forget(0)
-    import console_elements.loading
-    share.moduletabs.add(console_elements.loading.UI(share.moduletabs), text="Importing modules")
+    try:
+        from .console_elements import loading
+        share.moduletabs.add(loading.UI(share.moduletabs), text="Importing modules")
+    except AttributeError:
+        # No pipe
+        pass
 
-    import module_database
+    from . import module_database
 
     for eh in module_database.event_handlers["ui_window"]:
-        share.moduletabs.add(eh.Page(share.moduletabs), text=eh.pagename)
+        try:
+            share.moduletabs.add(eh.Page(share.moduletabs), text=eh.pagename)
+        except AttributeError:
+            # No pipe
+            pass
     share.moduletabs.forget(0)
 
     # Define event handlers

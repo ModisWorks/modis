@@ -8,6 +8,7 @@ class UI(ttk.Frame):
         Args:
             parent: A tk or ttk object
         """
+
         super(UI, self).__init__(parent)
 
         # Loading label

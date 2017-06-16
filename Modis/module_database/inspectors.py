@@ -5,9 +5,6 @@ def get_event_handlers():
         event_handlers (dict): Contains "all", "on_ready", "on_message", "on_reaction_add", "on_error"
     """
 
-    import os
-    import importlib
-
     # Define dict
     event_handlers = {
         "on_ready": [],
@@ -19,10 +16,14 @@ def get_event_handlers():
 
     # Get list of all modules
     mlist = []
+    import os
     modules_dir = os.path.dirname(os.path.realpath(__file__))
+
+    import importlib
     for m in os.listdir(modules_dir):
         if os.path.isdir("{}\\{}".format(modules_dir, m)) and not m.startswith("_"):
-            mlist.append(importlib.import_module("module_database.{}".format(m)))
+            # TODO Make module imports relative; currently can only run Modis from just outside the package
+            mlist.append(importlib.import_module(".module_database.{}".format(m), "Modis"))
 
     # For each event handler type, sweep through modules and add all defined event handlers
     for m in mlist:

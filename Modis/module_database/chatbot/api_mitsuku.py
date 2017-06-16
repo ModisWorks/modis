@@ -1,8 +1,7 @@
-import requests as _requests
-import lxml.html as _html
-import io as _io
+import requests
+import lxml.html as html
+import io
 
-from share import *
 import datetime
 
 url = 'https://kakko.pandorabots.com/pandora/talk?botid=f6a012073e345a08&amp;skin=chat'
@@ -14,6 +13,9 @@ def get_botcust2():
     Returns:
         botcust2 (str): The botcust2 identifier
     """
+
+    from ._constants import pipe_api_mitsuku
+    tree_item = pipe_api_mitsuku.insert("", "end", text="get_botcust2()", values=(str(datetime.datetime.now()).split('.')[0]))
 
     # Set up http request packages
     params = {
@@ -34,14 +36,15 @@ def get_botcust2():
     }
 
     # Get response from http POST request to url
-    # module_pipes["chatbot"].set("HTTP POST", str(datetime.datetime.now()).split('.')[0])
-    response = _requests.post(
+    pipe_api_mitsuku.insert(tree_item, "end", text="HTTP POST", values=(str(datetime.datetime.now()).split('.')[0]))
+    response = requests.post(
         url,
         params=params,
         headers=headers
     )
 
     # Try to extract Mitsuku response from POST response
+    pipe_api_mitsuku.insert(tree_item, "end", text="Parse", values=(str(datetime.datetime.now()).split('.')[0]))
     try:
         return response.headers['set-cookie'][9:25]
     except IndexError:
@@ -58,6 +61,9 @@ def query(botcust2, message):
     Returns:
         reply (str): The message Mitsuku sent back
     """
+
+    from ._constants import pipe_api_mitsuku
+    tree_item = pipe_api_mitsuku.insert("", "end", text="query()", values=(str(datetime.datetime.now()).split('.')[0]))
 
     # Set up http request packages
     params = {
@@ -87,7 +93,8 @@ def query(botcust2, message):
     }
 
     # Get response from http POST request to url
-    response = _requests.post(
+    pipe_api_mitsuku.insert(tree_item, "end", text="HTTP POST", values=(str(datetime.datetime.now()).split('.')[0]))
+    response = requests.post(
         url,
         params=params,
         headers=headers,
@@ -95,7 +102,8 @@ def query(botcust2, message):
     )
 
     # Parse response
-    parsed = _html.parse(_io.StringIO(response.text)).getroot()
+    pipe_api_mitsuku.insert(tree_item, "end", text="Parse", values=(str(datetime.datetime.now()).split('.')[0]))
+    parsed = html.parse(io.StringIO(response.text)).getroot()
 
     # Try to extract Mitsuku response from POST response
     try:

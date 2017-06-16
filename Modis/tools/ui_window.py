@@ -1,4 +1,4 @@
-from share import *
+from ..share import *
 
 pad_frame = 8
 

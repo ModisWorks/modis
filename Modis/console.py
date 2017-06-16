@@ -2,7 +2,7 @@ def init():
     """Runs the Modis console"""
 
     import tkinter as tk
-    import console_elements.main_window as mwgen
+    from .console_elements import main_window
 
     # Setup the root window
     root = tk.Tk()
@@ -11,8 +11,8 @@ def init():
     root.title("Modis Console")
 
     # Main frame
-    main_window = mwgen.UI(root)
-    main_window.grid()
+    main = main_window.UI(root)
+    main.grid()
 
     # Configure stretch ratios
     root.columnconfigure(0, weight=1)

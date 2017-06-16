@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from tools import ui_window
+from ..tools import ui_window
 
 
 class UI(ttk.Frame):
@@ -59,7 +59,7 @@ class UI(ttk.Frame):
         self.rowconfigure(0, weight=1)
 
         # Register dynamic elements globally
-        import share
+        from .. import share
         share.moduletabs = moduletabs.module_notebook
         share.tkstatus = statusbar.status
 
@@ -75,7 +75,7 @@ class BotControl(ui_window.Frame):
         super(BotControl, self).__init__(parent, "Modis control panel")
 
         # Start button
-        import main
+        from .. import main
         start = ttk.Button(
             self,
             command=lambda: main.thread_init(),

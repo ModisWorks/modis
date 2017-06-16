@@ -1,5 +1,5 @@
-from tools import ui_embed
-from share import *
+from ...tools import ui_embed
+from ...share import *
 from ._constants import *
 
 
