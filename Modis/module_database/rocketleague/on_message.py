@@ -42,8 +42,8 @@ async def on_message(message):
                 success, rldata = api_rocketleague.check_rank(arg)
                 # Create embed UI
                 if success:
-                    embed = ui_embed.success(rldata[0], rldata[1], rldata[2])
+                    embed = ui_embed.success(channel, rldata[0], rldata[1], rldata[2])
                 else:
-                    embed = ui_embed.fail_api()
+                    embed = ui_embed.fail_api(channel)
 
-                await embed.send(channel)
+                await embed.send()

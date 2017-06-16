@@ -2,7 +2,7 @@ from ...tools import ui_embed
 from ._constants import *
 
 
-def success(stats, name, dp):
+def success(channel, stats, name, dp):
     """Creates an embed UI containing the Rocket League stats
 
     Args:
@@ -33,6 +33,7 @@ def success(stats, name, dp):
 
     # Create embed UI object
     gui = ui_embed.UI(
+        channel,
         "Rocket League Stats: {}".format(name),
         "*Stats obtained from [Rocket League Tracker Network](https://rocketleague.tracker.network/)*",
         modulename=modulename,
@@ -45,7 +46,7 @@ def success(stats, name, dp):
     return gui
 
 
-def fail_steamid():
+def fail_steamid(channel):
     """Creates an embed UI for invalid SteamIDs
 
     Returns:
@@ -53,6 +54,7 @@ def fail_steamid():
     """
 
     gui = ui_embed.UI(
+        channel,
         "That SteamID doesn't exist.",
         "You can get your SteamID by going to your profile page and looking at the url, "
         "or you can set a custom ID by going to edit profile on your profile page.",
@@ -64,7 +66,7 @@ def fail_steamid():
     return gui
 
 
-def fail_api():
+def fail_api(channel):
     """Creates an embed UI for when the API call didn't work
 
     Returns:
@@ -72,6 +74,7 @@ def fail_api():
     """
 
     gui = ui_embed.UI(
+        channel,
         "Couldn't get stats off RLTrackerNetwork.",
         "Maybe the API changed, please tell Infraxion.",
         modulename=modulename,
