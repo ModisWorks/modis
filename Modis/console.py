@@ -6,8 +6,8 @@ def init():
 
     # Setup the root window
     root = tk.Tk()
-    root.minsize(width=1280, height=720)
-    root.geometry("1280x720")
+    root.minsize(width=1400, height=600)
+    root.geometry("1400x600")
     root.title("Modis Console")
 
     # Main frame

@@ -1,5 +1,5 @@
 import requests
-import lxml.html as html
+import lxml.html
 import io
 
 import datetime
@@ -15,7 +15,8 @@ def get_botcust2():
     """
 
     from ._constants import pipe_api_mitsuku
-    tree_item = pipe_api_mitsuku.insert("", "end", text="get_botcust2()", values=(str(datetime.datetime.now()).split('.')[0]))
+    time = datetime.datetime.now()
+    tree_item = pipe_api_mitsuku.insert("", 0, text="get_botcust2()", values=(["", "", time]), open=True)
 
     # Set up http request packages
     params = {
@@ -36,21 +37,26 @@ def get_botcust2():
     }
 
     # Get response from http POST request to url
-    pipe_api_mitsuku.insert(tree_item, "end", text="HTTP POST", values=(["", "", str(datetime.datetime.now()).split('.')[0]]))
+    time1 = datetime.datetime.now()
+    tree_item1 = pipe_api_mitsuku.insert(tree_item, 0, text="HTTP POST", values=(["", "", time1]))
     response = requests.post(
         url,
         params=params,
         headers=headers
     )
+    pipe_api_mitsuku.item(tree_item1, 0, values=(["", str(response), time1]))
 
     # Try to extract Mitsuku response from POST response
-    pipe_api_mitsuku.insert(tree_item, "end", text="Parse", values=([response, "", str(datetime.datetime.now()).split('.')[0]]))
+    time2 = datetime.datetime.now()
+    tree_item2 = pipe_api_mitsuku.insert(tree_item, 1, text="Parse", values=([str(response), "", time2]))
     try:
         result = response.headers['set-cookie'][9:25]
     except IndexError:
         result = False
+    pipe_api_mitsuku.item(tree_item2, 1, values=([str(response), str(result), time2]))
 
-    pipe_api_mitsuku.insert(tree_item, "end", text="Finished", values=(["", str(result), str(datetime.datetime.now()).split('.')[0]]))
+    pipe_api_mitsuku.insert(tree_item, 2, text="Done", values=(["", "", datetime.datetime.now()]))
+    pipe_api_mitsuku.item(tree_item, values=(["", str(result), time]), open=False)
     return result
 
 
@@ -66,7 +72,8 @@ def query(botcust2, message):
     """
 
     from ._constants import pipe_api_mitsuku
-    tree_item = pipe_api_mitsuku.insert("", "end", text="query()", values=([message, "", str(datetime.datetime.now()).split('.')[0]]))
+    time = datetime.datetime.now()
+    tree_item = pipe_api_mitsuku.insert("", 0, text="query()", values=([message, "", time]), open=True)
 
     # Set up http request packages
     params = {
@@ -96,24 +103,26 @@ def query(botcust2, message):
     }
 
     # Get response from http POST request to url
-    pipe_api_mitsuku.insert(tree_item, "end", text="HTTP POST", values=([message, "", str(datetime.datetime.now()).split('.')[0]]))
+    time1 = datetime.datetime.now()
+    tree_item1 = pipe_api_mitsuku.insert(tree_item, 0, text="HTTP POST", values=([message, "", time1]))
     response = requests.post(
         url,
         params=params,
         headers=headers,
         data=data
     )
+    pipe_api_mitsuku.item(tree_item1, values=([message, str(response), time1]))
 
     # Parse response
-    pipe_api_mitsuku.insert(tree_item, "end", text="Parse", values=([response, "", str(datetime.datetime.now()).split('.')[0]]))
-    parsed = html.parse(io.StringIO(response.text)).getroot()
-
-    # Try to extract Mitsuku response from POST response
-
+    time2 = datetime.datetime.now()
+    tree_item2 = pipe_api_mitsuku.insert(tree_item, 1, text="Parse", values=([str(response), "", time2]))
+    parsed = lxml.html.parse(io.StringIO(response.text)).getroot()
     try:
         result = parsed[1][2][0][2].tail[1:]
     except IndexError:
         result = False
+    pipe_api_mitsuku.item(tree_item2, values=([str(response), str(result), time2]))
 
-    pipe_api_mitsuku.insert(tree_item, "end", text="Finished", values=([message, str(result), str(datetime.datetime.now()).split('.')[0]]))
+    pipe_api_mitsuku.insert(tree_item, 2, text="Done", values=(["", "", datetime.datetime.now()]))
+    pipe_api_mitsuku.item(tree_item, values=([message, str(result), time]), open=False)
     return result

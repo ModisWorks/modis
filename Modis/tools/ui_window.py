@@ -1,4 +1,5 @@
-from ..share import *
+import tkinter as tk
+from tkinter import ttk
 
 pad_frame = 8
 

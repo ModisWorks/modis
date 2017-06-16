@@ -1,5 +1,5 @@
 from ...tools import ui_window
-from ...share import *
+from tkinter import ttk
 
 pagename = "chatbot"
 pad_element = 2
@@ -52,11 +52,6 @@ class APICalls(ui_window.Frame):
                 "input",
                 "output",
                 "time"
-            ],
-            displaycolumns=[
-                "input",
-                "output",
-                "time"
             ]
         )
         self.display.grid(
@@ -66,12 +61,36 @@ class APICalls(ui_window.Frame):
             pady=pad_element,
             sticky="W E N S"
         )
-        self.display.column("input", width=100, anchor="w")
+        self.display.column("input", width=100, minwidth=100, stretch=True, anchor="w")
         self.display.heading("input", text="Input")
-        self.display.column("output", width=100, anchor="w")
+        self.display.column("output", width=100, minwidth=100, stretch=True, anchor="w")
         self.display.heading("output", text="Output")
-        self.display.column("time", width=120, anchor="center")
+        self.display.column("time", width=160, minwidth=160, stretch=False, anchor="center")
         self.display.heading("time", text="Time")
+
+        # Vertical scrollbar
+        scrollbar = ttk.Scrollbar(
+            self,
+            orient="vertical",
+            command=self.display.yview
+        )
+        scrollbar.grid(
+            column=1,
+            row=0,
+            sticky="N S")
+        self.display['yscrollcommand'] = scrollbar.set
+
+        # Horizontal scrollbar
+        scrollbar = ttk.Scrollbar(
+            self,
+            orient="horizontal",
+            command=self.display.xview
+        )
+        scrollbar.grid(
+            column=0,
+            row=1,
+            sticky="W E")
+        self.display['xscrollcommand'] = scrollbar.set
 
         # Configure stretch ratios
         self.rowconfigure(0, weight=1)

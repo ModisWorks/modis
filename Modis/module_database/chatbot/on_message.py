@@ -39,6 +39,7 @@ async def on_message(message):
             botcust2 = get_serverdata()[server.id][modulename]["channels"][channel.id]
 
             # Remove mention from message content so Mitsuku doesn't see it
+            content = content.replace("<@{}>".format(str(channel.server.me.id)), ' ')
             content = content.replace("<@!{}>".format(str(channel.server.me.id)), ' ')
 
             # Send Mitsuku's reply

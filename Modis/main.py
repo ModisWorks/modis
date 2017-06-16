@@ -1,42 +1,74 @@
-def thread_init():
+discord_thread = None
+
+
+def thread_init(statusbar, moduletabs, botconsole):
+    print("Starting...")
+    statusbar["text"] = "LOADING"
+    statusbar["background"] = "#FFFFBB"
+    botconsole.button_stop.state(['!disabled'])
+    botconsole.button_start.state(['disabled'])
+
     import threading
-    console_thread = threading.Thread(target=init, args=[])
-    console_thread.start()
+    global discord_thread
+    discord_thread = threading.Thread(target=lambda: init(statusbar, moduletabs, botconsole), args=[])
+    discord_thread.start()
 
 
-def init():
+def stop(statusbar, moduletabs, botconsole):
+    print("Stopping...")
+    from . import share
+    share.runcoro(share.client.logout())
+
+    import asyncio
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    share.client = share.discord.Client()
+
+    print("Stopped.")
+    for i in range(len(moduletabs.tabs())):
+        moduletabs.forget(0)
+    import tkinter.ttk as ttk
+    moduletabs.add(ttk.Frame(moduletabs), text="No modules loaded")
+
+    statusbar["text"] = "OFFLINE"
+    statusbar["background"] = "#FFBBBB"
+    botconsole.button_stop.state(['disabled'])
+    botconsole.button_start.state(['!disabled'])
+
+
+def init(statusbar=None, moduletabs=None, botconsole=None):
     """Runs the Modis Discord bot"""
 
     import discord
     from . import share
 
     # Import modules
-    share.tkstatus.set("Modis is starting")
-    print("Importing modules")
-    share.moduletabs.forget(0)
-    try:
+    print("Importing modules...")
+    if moduletabs:
+        moduletabs.forget(0)
         from .console_elements import loading
-        share.moduletabs.add(loading.UI(share.moduletabs), text="Importing modules")
-    except AttributeError:
-        # No pipe
-        pass
+        moduletabs.add(loading.UI(moduletabs), text="Importing modules")
 
     from . import module_database
 
-    for eh in module_database.event_handlers["ui_window"]:
-        try:
-            share.moduletabs.add(eh.Page(share.moduletabs), text=eh.pagename)
-        except AttributeError:
-            # No pipe
-            pass
-    share.moduletabs.forget(0)
+    # Initialise module tabs
+    if moduletabs:
+        for eh in module_database.event_handlers["ui_window"]:
+            try:
+                moduletabs.add(eh.Page(moduletabs), text=eh.pagename)
+            except AttributeError:
+                # No pipe
+                pass
+        moduletabs.forget(0)
 
     # Define event handlers
     @share.client.event
     async def on_ready():
         """Runs some initialisation and runs on_ready() event handlers"""
 
-        share.tkstatus.set("Modis is online")
+        if statusbar:
+            statusbar["text"] = "ONLINE"
+            statusbar["background"] = "#BBFFBB"
         print("Ready.\n"
               + "---\n"
               + "To add this bot to a server, use this link:\n"
@@ -124,6 +156,8 @@ def init():
             await eh.on_error(event_method, *args, **kwargs)
 
     # Start the discord client
-    share.tkstatus.set("Modis is connecting")
+    if statusbar:
+        statusbar["text"] = "CONNECTING"
+        statusbar["background"] = "#BBFFFF"
     print("Connecting to Discord...")
     share.client.run(share.apikeys["discord"])

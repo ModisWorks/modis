@@ -1,5 +1,7 @@
 from ...tools import ui_window
 from ...share import *
+import tkinter as tk
+from tkinter import ttk
 
 pagename = "bethebot"
 pad_element = 2
@@ -57,7 +59,7 @@ class Chat(ui_window.Frame):
             self,
             textvariable=self.channel,
             width=18,
-            font=("Source Code Pro", 9)
+            font=("Courier", 9)
         )
 
         self.message_label = ttk.Label(
@@ -134,7 +136,7 @@ class React(ui_window.Frame):
             self,
             textvariable=self.channel,
             width=18,
-            font=("Source Code Pro", 9)
+            font=("Courier", 9)
         )
 
         self.emoji_label = ttk.Label(

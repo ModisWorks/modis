@@ -3,6 +3,9 @@ import tkinter.ttk as ttk
 
 from ..tools import ui_window
 
+pipe_moduletabs = None
+pipe_statusbar = None
+
 
 class UI(ttk.Frame):
     def __init__(self, parent):
@@ -58,10 +61,11 @@ class UI(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-        # Register dynamic elements globally
-        from .. import share
-        share.moduletabs = moduletabs.module_notebook
-        share.tkstatus = statusbar.status
+        # Export dynamic elements
+        global pipe_statusbar
+        pipe_statusbar = statusbar.statusbar
+        global pipe_moduletabs
+        pipe_moduletabs = moduletabs.module_notebook
 
 
 class BotControl(ui_window.Frame):
@@ -74,16 +78,35 @@ class BotControl(ui_window.Frame):
 
         super(BotControl, self).__init__(parent, "Modis control panel")
 
-        # Start button
         from .. import main
-        start = ttk.Button(
+
+        global pipe_statusbar
+        global pipe_moduletabs
+
+        # stop button
+        self.button_stop = ttk.Button(
             self,
-            command=lambda: main.thread_init(),
-            text="Start Modis"
+            command=lambda: main.stop(pipe_statusbar, pipe_moduletabs, self),
+            text="Stop Modis"
         )
-        start.grid(
+        self.button_stop.grid(
             column=0,
             row=0,
+            padx=4,
+            pady=4,
+            sticky="E S"
+        )
+        self.button_stop.state(["disabled"])
+
+        # Start button
+        self.button_start = ttk.Button(
+            self,
+            command=lambda: main.thread_init(pipe_statusbar, pipe_moduletabs, self),
+            text="Start Modis"
+        )
+        self.button_start.grid(
+            column=0,
+            row=1,
             padx=4,
             pady=4,
             sticky="E S"
@@ -142,7 +165,7 @@ class Log(ui_window.Frame):
         )
         log.insert("end", "Welcome to Modis Beta v2.2\n")
 
-        # Scrollbar
+        # Vertical Scrollbar
         scrollbar = ttk.Scrollbar(
             self,
             orient="vertical",
@@ -153,6 +176,18 @@ class Log(ui_window.Frame):
             row=0,
             sticky="N S")
         log['yscrollcommand'] = scrollbar.set
+
+        # Horizontal Scrollbar
+        scrollbar = ttk.Scrollbar(
+            self,
+            orient="horizontal",
+            command=log.xview
+        )
+        scrollbar.grid(
+            column=0,
+            row=1,
+            sticky="W E")
+        log['xscrollcommand'] = scrollbar.set
 
         # Rediect Python console output to log text box
         import sys
@@ -182,20 +217,18 @@ class StatusBar(ttk.Frame):
 
         super(StatusBar, self).__init__(parent)
 
-        # String variable for status bar to display
-        self.status = tk.StringVar()
-        self.status.set("Modis is offline")
-
         # Status bar
-        statusbar = ttk.Label(
+        self.statusbar = ttk.Label(
             self,
-            textvariable=self.status,
+            # textvariable=self.status,
+            text="OFFLINE",
             padding=2,
-            borderwidth=1,
-            relief="sunken",
-            anchor="w"
+            # borderwidth=1,
+            # relief="sunken",
+            background="#FFBBBB",
+            anchor="center"
         )
-        statusbar.grid(
+        self.statusbar.grid(
             column=0,
             row=0,
             sticky="W E"

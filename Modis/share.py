@@ -1,12 +1,8 @@
 import discord
-import tkinter as tk
-from tkinter import ttk
 
 import json as _json
 import os as _os
 import asyncio as _asyncio
-
-from .tools import pipe_empty as _pipe_empty
 
 apikeys = {}
 client_id = ""
@@ -14,10 +10,6 @@ game = ""
 prefix = ""
 
 client = discord.Client()
-
-tkgui = None
-moduletabs = _pipe_empty.Pipe()
-tkstatus = _pipe_empty.Pipe()
 
 
 def get_serverdata():
