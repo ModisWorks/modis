@@ -49,11 +49,13 @@ class APICalls(ui_window.Frame):
         self.display = ttk.Treeview(
             self,
             columns=[
-                "date",
+                "input",
+                "output",
                 "time"
             ],
             displaycolumns=[
-                "date",
+                "input",
+                "output",
                 "time"
             ]
         )
@@ -64,10 +66,12 @@ class APICalls(ui_window.Frame):
             pady=pad_element,
             sticky="W E N S"
         )
-        self.display.column('date', width=80, anchor='center')
-        self.display.heading('date', text='Date')
-        self.display.column('time', width=60, anchor='center')
-        self.display.heading('time', text='Time')
+        self.display.column("input", width=100, anchor="w")
+        self.display.heading("input", text="Input")
+        self.display.column("output", width=100, anchor="w")
+        self.display.heading("output", text="Output")
+        self.display.column("time", width=120, anchor="center")
+        self.display.heading("time", text="Time")
 
         # Configure stretch ratios
         self.rowconfigure(0, weight=1)

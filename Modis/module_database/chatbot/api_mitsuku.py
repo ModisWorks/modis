@@ -36,7 +36,7 @@ def get_botcust2():
     }
 
     # Get response from http POST request to url
-    pipe_api_mitsuku.insert(tree_item, "end", text="HTTP POST", values=(str(datetime.datetime.now()).split('.')[0]))
+    pipe_api_mitsuku.insert(tree_item, "end", text="HTTP POST", values=(["", "", str(datetime.datetime.now()).split('.')[0]]))
     response = requests.post(
         url,
         params=params,
@@ -44,11 +44,14 @@ def get_botcust2():
     )
 
     # Try to extract Mitsuku response from POST response
-    pipe_api_mitsuku.insert(tree_item, "end", text="Parse", values=(str(datetime.datetime.now()).split('.')[0]))
+    pipe_api_mitsuku.insert(tree_item, "end", text="Parse", values=([response, "", str(datetime.datetime.now()).split('.')[0]]))
     try:
-        return response.headers['set-cookie'][9:25]
+        result = response.headers['set-cookie'][9:25]
     except IndexError:
-        return False
+        result = False
+
+    pipe_api_mitsuku.insert(tree_item, "end", text="Finished", values=(["", str(result), str(datetime.datetime.now()).split('.')[0]]))
+    return result
 
 
 def query(botcust2, message):
@@ -63,7 +66,7 @@ def query(botcust2, message):
     """
 
     from ._constants import pipe_api_mitsuku
-    tree_item = pipe_api_mitsuku.insert("", "end", text="query()", values=(str(datetime.datetime.now()).split('.')[0]))
+    tree_item = pipe_api_mitsuku.insert("", "end", text="query()", values=([message, "", str(datetime.datetime.now()).split('.')[0]]))
 
     # Set up http request packages
     params = {
@@ -93,7 +96,7 @@ def query(botcust2, message):
     }
 
     # Get response from http POST request to url
-    pipe_api_mitsuku.insert(tree_item, "end", text="HTTP POST", values=(str(datetime.datetime.now()).split('.')[0]))
+    pipe_api_mitsuku.insert(tree_item, "end", text="HTTP POST", values=([message, "", str(datetime.datetime.now()).split('.')[0]]))
     response = requests.post(
         url,
         params=params,
@@ -102,11 +105,15 @@ def query(botcust2, message):
     )
 
     # Parse response
-    pipe_api_mitsuku.insert(tree_item, "end", text="Parse", values=(str(datetime.datetime.now()).split('.')[0]))
+    pipe_api_mitsuku.insert(tree_item, "end", text="Parse", values=([response, "", str(datetime.datetime.now()).split('.')[0]]))
     parsed = html.parse(io.StringIO(response.text)).getroot()
 
     # Try to extract Mitsuku response from POST response
+
     try:
-        return parsed[1][2][0][2].tail[1:]
+        result = parsed[1][2][0][2].tail[1:]
     except IndexError:
-        return False
+        result = False
+
+    pipe_api_mitsuku.insert(tree_item, "end", text="Finished", values=([message, str(result), str(datetime.datetime.now()).split('.')[0]]))
+    return result
