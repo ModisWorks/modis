@@ -29,8 +29,8 @@ def get_ytvideos(query, ui_m=None):
 
     # Get video/playlist title
     title = search_result["items"][0]["snippet"]["title"]
-    if ui_m:
-        runcoro(ui_m.temp_update_status("Queueing {}".format(title)))
+    # if ui_m:
+    #     runcoro(ui_m.temp_update_status("Queueing {}".format(title)))
 
     # Queue video if video
     if search_result["items"][0]["id"]["kind"] == "youtube#video":
@@ -63,8 +63,8 @@ def get_ytvideos(query, ui_m=None):
             counter = 2
 
             while "nextPageToken" in playlist:
-                if ui_m:
-                    runcoro(ui_m.temp_update_status("Queueing {} (page {})".format(title, str(counter))))
+                # if ui_m:
+                #     runcoro(ui_m.temp_update_status("Queueing {} (page {})".format(title, str(counter))))
 
                 counter += 1
 

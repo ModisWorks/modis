@@ -50,14 +50,12 @@ class MusicPlayer:
         if not self.ready:
             await self.init(author, text_channel)
 
-        # Play song
-        if self.ready:
-            # Add the query to queue
-            await self.ui_v.enqueue(arg)
+        # Add the query to queue
+        await self.ui_v.enqueue(arg)
 
-            # Start playing if not yet playing
-            if self.ui_v.player is None:
-                await self.ui_v.play()
+        # Start playing if not yet playing
+        if self.ui_v.player is None:
+            await self.ui_v.play()
 
     async def pause(self):
         """The pause command"""
