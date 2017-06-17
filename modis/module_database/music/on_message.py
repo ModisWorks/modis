@@ -1,7 +1,7 @@
 from ...share import *
 from ._constants import *
 
-from . import musicplayer
+from . import _musicplayer
 
 
 async def on_message(message):
@@ -35,7 +35,7 @@ async def on_message(message):
 
             # Lock on to server if not yet locked
             if server.id not in cache:
-                cache[server.id] = musicplayer.MusicPlayer(server.id)
+                cache[server.id] = _musicplayer.MusicPlayer(server.id)
 
             # Remove message
             if command in ['play', 'pause', 'skip', 'shuffle', 'stop', 'volume']:
