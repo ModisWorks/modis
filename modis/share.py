@@ -39,6 +39,7 @@ def runcoro(async_function):
     Args:
         async_function (Coroutine): The asynchronous function to run
     """
+
     future = _asyncio.run_coroutine_threadsafe(async_function, client.loop)
     result = future.result()
     return result
