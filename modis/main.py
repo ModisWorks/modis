@@ -2,7 +2,7 @@ discord_thread = None
 
 
 def thread_init(statusbar, moduletabs, botconsole):
-    print("Loading...")
+    print("Loading Modis ...")
     statusbar["text"] = "LOADING"
     statusbar["background"] = "#FFFFBB"
     botconsole.button_stop.state(['!disabled'])
@@ -19,11 +19,6 @@ def stop(statusbar, moduletabs, botconsole):
     from . import share
     share.runcoro(share.client.logout())
 
-    import asyncio
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    share.client = share.discord.Client()
-
     print("Stopped.")
     for i in range(len(moduletabs.tabs())):
         moduletabs.forget(0)
@@ -39,11 +34,15 @@ def stop(statusbar, moduletabs, botconsole):
 def init(statusbar=None, moduletabs=None, botconsole=None):
     """Runs the Modis Discord bot"""
 
-    import discord
     from . import share
+    import asyncio
+    import discord
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    share.client = discord.Client(loop=loop)
 
     # Import module tabs
-    print("Importing console tabs...")
+    print("    Importing console tabs...")
     if moduletabs:
         moduletabs.forget(0)
         from .console_elements import loading
@@ -60,9 +59,11 @@ def init(statusbar=None, moduletabs=None, botconsole=None):
         moduletabs.forget(0)
 
     # Import event handlers
-    print("Importing event handlers...")
+    print("    Importing event handlers...")
 
     event_handlers = get_event_handlers()
+
+    print("    Loaded.")
 
     # Define event handlers
     @share.client.event
@@ -72,21 +73,6 @@ def init(statusbar=None, moduletabs=None, botconsole=None):
         if statusbar:
             statusbar["text"] = "ONLINE"
             statusbar["background"] = "#BBFFBB"
-        print("Ready.\n"
-              + "---\n"
-              + "To add this bot to a server, use this link:\n"
-              + "{}\n".format(discord.utils.oauth_url(share.client_id))
-              + "---")
-
-        # Set the game Modis is playing
-        if share.game:
-            await share.client.change_presence(
-                game=discord.Game(
-                    name=share.game,
-                    url="https://infraxion.github.io/modis/",
-                    type=0),
-                status=discord.Status.online,
-                afk=False)
 
         for eh in event_handlers["on_ready"]:
             await eh.on_ready()
@@ -98,14 +84,6 @@ def init(statusbar=None, moduletabs=None, botconsole=None):
         Args:
             message (discord.Message): The message received by the bot
         """
-
-        # Add the server to serverdata if it doesn't yet exist
-        _sd = share.get_serverdata()
-        if message.server.id not in _sd:
-            _sd[message.server.id] = {
-                "prefix": share.prefix
-            }
-            share.write_serverdata(_sd)
 
         # Run the on_message() event handler for all modules that have it
         for eh in event_handlers["on_message"]:
@@ -120,21 +98,9 @@ def init(statusbar=None, moduletabs=None, botconsole=None):
             user (discord.User): The user that sent the reaction
         """
 
-        # Add the server to serverdata if it doesn't yet exist
-        _sd = share.get_serverdata()
-        if reaction.message.server.id not in _sd:
-            _sd[reaction.message.server.id] = {
-                "prefix": share.prefix
-            }
-            share.write_serverdata(_sd)
-
         # Run the on_reaction_add() event handler for all modules that have it
         for eh in event_handlers["on_reaction_add"]:
             await eh.on_reaction_add(reaction, user)
-
-    import datetime
-    import sys
-    import traceback
 
     @share.client.event
     async def on_error(event_method, *args, **kwargs):
@@ -145,14 +111,6 @@ def init(statusbar=None, moduletabs=None, botconsole=None):
             *args:
             **kwargs:
         """
-
-        # Print error prettily
-        print("\n"
-              + "################################\n"
-              + "ERROR\n"
-              + str(datetime.datetime.now()).split('.')[0] + "\n"
-              + ''.join(traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2]))
-              + "################################\n\n")
 
         # Run the on_error() event handler for all modules that have it
         for eh in event_handlers["on_error"]:
@@ -192,7 +150,7 @@ def get_event_handlers():
 
         # Iterate through files in module
         if os.path.isdir(module_dir) and not module_name.startswith("_"):
-            print("    Importing {} event handler...".format(module_name))
+            print("        Importing {} event handler...".format(module_name))
 
             # Add all defined event handlers in module files
             module_event_handlers = os.listdir(module_dir)
@@ -209,7 +167,7 @@ def get_event_handlers():
             if "on_error.py" in module_event_handlers:
                 event_handlers["on_error"].append(importlib.import_module(".module_database.{}.on_error".format(module_name), "modis"))
 
-            print("        Import successfull.".format(module_name))
+            print("            Import successfull.".format(module_name))
 
     return event_handlers
 
@@ -234,7 +192,7 @@ def get_console_tabs():
 
         # Iterate through files in module
         if os.path.isdir(module_dir) and not module_name.startswith("_"):
-            print("    Importing {} console tab".format(module_name))
+            print("        Importing {} console tab...".format(module_name))
 
             # Add all defined event handlers in module files
             module_event_handlers = os.listdir(module_dir)
@@ -242,7 +200,7 @@ def get_console_tabs():
             if "ui_window.py" in module_event_handlers:
                 console_tabs.append(importlib.import_module(".module_database.{}.ui_window".format(module_name), "modis"))
 
-            print("        Import successfull.".format(module_name))
+            print("            Import successfull.".format(module_name))
 
     return console_tabs
 
