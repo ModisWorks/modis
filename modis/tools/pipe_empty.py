@@ -10,19 +10,14 @@ class Pipe:
     def insert(self, *args, **kwargs):
         """For ttk.Treeview"""
 
-        return self.void
+    def item(self, *args, **kwargs):
+        """For ttk.Treeview"""
 
     def set(self, *args, **kwargs):
         """For ttk.Label"""
 
-        return self.void
-
     def add(self, *args, **kwargs):
         """For ttk.Notebook"""
 
-        return self.void
-
     def forget(self, *args, **kwargs):
         """For ttk.Norebook"""
-
-        return self.void

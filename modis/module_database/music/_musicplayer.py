@@ -105,6 +105,9 @@ class MusicPlayer:
             except TypeError:
                 if self.ui_m:
                     await self.ui_m.temp_update_status("Skip argument must be a number")
+            except ValueError:
+                if self.ui_m:
+                    await self.ui_m.temp_update_status("Skip argument must be a number")
             else:
                 await self.ui_v.skip(arg)
 

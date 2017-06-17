@@ -9,7 +9,7 @@ client_id = ""
 game = ""
 prefix = ""
 
-client = None
+client = discord.Client()
 
 
 def get_serverdata():
