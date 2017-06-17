@@ -28,18 +28,18 @@ def stop(statusbar, moduletabs, botconsole):
     statusbar["text"] = "OFFLINE"
     statusbar["background"] = "#FFBBBB"
     botconsole.button_stop.state(['disabled'])
-    botconsole.button_start.state(['!disabled'])
+    botconsole.button_start.state(['disabled'])
 
 
 def init(statusbar=None, moduletabs=None, botconsole=None):
     """Runs the Modis Discord bot"""
 
     from . import share
-    import asyncio
-    import discord
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    share.client = discord.Client(loop=loop)
+    # import asyncio
+    # import discord
+    # loop = asyncio.new_event_loop()
+    # asyncio.set_event_loop(loop)
+    # share.client = discord.Client(loop=loop)
 
     # Import module tabs
     print("    Importing console tabs...")
