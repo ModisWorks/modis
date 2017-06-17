@@ -9,7 +9,7 @@ client_id = ""
 game = ""
 prefix = ""
 
-client = discord.Client()
+client = None
 
 
 def get_serverdata():
@@ -18,6 +18,7 @@ def get_serverdata():
     Returns:
         serverdata (dict): Parsed serverdata.json file
     """
+
     with open(_os.path.dirname(_os.path.realpath(__file__)) + "\\" + "serverdata.json", 'r') as file:
         return _json.load(file)
 
