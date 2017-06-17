@@ -35,7 +35,7 @@ class MusicPlayer:
         await self.ui_v.create()
 
         # Mark serverlock ready if both voice and embed UIs are ready
-        self.ready = all((self.ui_m.ready, self.ui_v.ready))
+        return all((self.ui_m.ready, self.ui_v.ready))
 
     async def play(self, author, text_channel, arg):
         """The play command
@@ -48,14 +48,15 @@ class MusicPlayer:
 
         # Create UIs
         if not self.ready:
-            await self.init(author, text_channel)
+            self.ready = await self.init(author, text_channel)
 
-        # Add the query to queue
-        await self.ui_v.enqueue(arg)
+        if self.ready:
+            # Add the query to queue
+            await self.ui_v.enqueue(arg)
 
-        # Start playing if not yet playing
-        if self.ui_v.player is None:
-            await self.ui_v.play()
+            # Start playing if not yet playing
+            if self.ui_v.player is None:
+                await self.ui_v.play()
 
     async def pause(self):
         """The pause command"""

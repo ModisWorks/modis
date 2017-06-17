@@ -192,7 +192,7 @@ class Log(ui_window.Frame):
         # Rediect Python console output to log text box
         import sys
 
-        class StdoutRedirector(object):
+        class StdoutRedirector:
             def __init__(self, text_widget):
                 self.text_widget = text_widget
 
@@ -200,7 +200,14 @@ class Log(ui_window.Frame):
                 self.text_widget.insert("end", string)
                 self.text_widget.see("end")
 
+            def flush(self):
+                pass
+
+            def isatty(self):
+                return True
+
         sys.stdout = StdoutRedirector(log)
+        sys.stderr = StdoutRedirector(log)
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
