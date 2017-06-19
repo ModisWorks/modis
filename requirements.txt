@@ -1,4 +1,16 @@
-All Modis external packages:
+# Discord.py:
+    discord.py
+    aiohttp
+    websockets
+    multidict
+    async-timeout
+
+    youtube-dl
+
+    #  ffmpeg
+
+
+# All Modis external packages:
     discord.py
     youtube_dl
     pynacl
