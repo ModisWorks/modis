@@ -35,5 +35,39 @@
         "318790962858164224": "da02a27d4e701277"
       }
     }
+  },
+  "155580021715632128": {
+    "prefix": "!",
+    "music": {
+      "activated": true
+    },
+    "replies": {
+      "activated": true,
+      "normal": {},
+      "tts": {}
+    },
+    "rocketleague": {
+      "activated": true
+    },
+    "tableflip": {
+      "activated": true
+    }
+  },
+  "258179137879932929": {
+    "prefix": "!",
+    "music": {
+      "activated": true
+    },
+    "replies": {
+      "activated": true,
+      "normal": {},
+      "tts": {}
+    },
+    "rocketleague": {
+      "activated": true
+    },
+    "tableflip": {
+      "activated": true
+    }
   }
 }
