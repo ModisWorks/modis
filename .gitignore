@@ -1,6 +1,7 @@
 ######## MODIS ########
 *.log
 TestModis.py
+OfficialModis.py
 
 ######## PYCHARM ########
 .idea
