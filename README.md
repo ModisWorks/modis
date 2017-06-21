@@ -21,7 +21,8 @@ A music player with an interactive GUI using reactions as buttons.
 - `!shuffle`: Shuffles the songs in the queue.
 - `!stop`: Stops the player and clears the queue.
 - `!volume [n]`: Sets the volume to `n`%. `n` can be any integer from 0 to 200.
-- `!destroy`: Removes the GUI and resets everything. Handy if something is messed up, or if you want to move the GUI to a different channel.
+- `!destroy`: Removes the GUI and resets everything. Handy if something is messed up.
+- `!front` or `!movehere`: Moves the GUI to the channel you're currently in. If it's already in your channel it gets moved to the bottom where you can see it.
 
 ### replies
 Replies uses a json file to make it easy for users to make the bot say things in reply to specific messages.
