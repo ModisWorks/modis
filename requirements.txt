@@ -2,6 +2,7 @@
     discord.py
     aiohttp
     websockets
+	chardet
     multidict
     async-timeout
 

@@ -9,9 +9,9 @@ def console(token_discord):
 
     # Create threads
     loop = asyncio.get_event_loop()
-    discord_thread = threading.Thread(target=lambda: discord_main.start(token_discord, loop), args=[])
-    reddit_thread = threading.Thread(target=lambda: reddit_main.start(), args=[])
-    facebook_thread = threading.Thread(target=lambda: facebook_main.start(), args=[])
+    discord_thread = threading.Thread(target=discord_main.start, args=[token_discord, loop])
+    reddit_thread = threading.Thread(target=reddit_main.start, args=[])
+    facebook_thread = threading.Thread(target=facebook_main.start, args=[])
 
     # Run threads
     discord_thread.start()
@@ -49,58 +49,9 @@ def gui():
     root.rowconfigure(0, weight=1)
 
     # Add tabs
-    main.add(discord_gui.Frame())
-    main.add(reddit_gui.Frame())
-    main.add(facebook_gui.Frame())
+    main.add(discord_gui.Frame(main))
+    main.add(reddit_gui.Frame(main))
+    main.add(facebook_gui.Frame(main))
 
     # Run the window UI
     root.mainloop()
-
-
-# DEPRECATED
-def run(apikeys, client_id="", game="", prefix="!"):
-    """Runs Modis
-
-    Args:
-        apikeys (dict): The API keys required to run Modis and its modules
-        client_id (str): The client id of the bot Modis will run on; used to make the invite link
-        game (str): The game Modis will be playing; defaults to ""
-        prefix (str): The prefix to use for Modis commands; defaults to '!'
-    """
-
-    # Import global variable bank
-    from . import share
-
-    # Register variables globally
-    share.apikeys = apikeys
-    share.client_id = client_id
-    share.game = game
-    share.prefix = prefix
-
-    # Start console
-    from . import main
-    main.init()
-
-
-def run_with_console(apikeys, client_id="", game="", prefix="!"):
-    """Runs Modis with console ui
-
-    Args:
-        apikeys (dict): The API keys required to run Modis and its modules
-        client_id (str): The client id of the bot Modis will run on; used to make the invite link
-        game (str): The game Modis will be playing; defaults to ""
-        prefix (str): The prefix to use for Modis commands; defaults to '!'
-    """
-
-    # Import global variable bank
-    from . import share
-
-    # Register variables globally
-    share.apikeys = apikeys
-    share.client_id = client_id
-    share.game = game
-    share.prefix = prefix
-
-    # Start console
-    from . import console
-    console.init()

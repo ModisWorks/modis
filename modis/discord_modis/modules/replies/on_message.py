@@ -1,6 +1,5 @@
 from ..._client import client
-from ..._datatools import get_serverdata
-from ..._datatools import write_serverdata
+from ... import datatools
 
 from . import _data
 
@@ -19,16 +18,16 @@ async def on_message(message):
     content = message.content
 
     # Make sure this module is in serverdata for this server
-    _sd = get_serverdata()
-    if _data.modulename not in _sd[server.id]:
-        _sd[server.id][_data.modulename] = _data.sd_structure
-        write_serverdata(_sd)
+    data = datatools.get_data()
+    if _data.modulename not in data["servers"][server.id]:
+        data["servers"][server.id][_data.modulename] = _data.sd_structure
+        datatools.write_data(data)
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Retrieve replies from serverdata
-        normal_replies = get_serverdata()[server.id][_data.modulename]["normal"]
-        tts_replies = get_serverdata()[server.id][_data.modulename]["tts"]
+        normal_replies = datatools.get_data()[server.id][_data.modulename]["normal"]
+        tts_replies = datatools.get_data()[server.id][_data.modulename]["tts"]
 
         # Check normal replies
         for r in normal_replies.keys():
