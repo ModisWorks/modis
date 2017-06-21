@@ -3,8 +3,10 @@ sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get dist-upgrade
 sudo apt-get clean
-sudo raspi -config (for localisation)
+suto apt-get autoclean
+sudo raspi -config (for localisation and enable ssh)
 use sudo bash (file) to run .sh scripts
+use sudo nano (file) to edit text
 
 # Install UI (optional)
 sudo apt-get install --no-install-recommends xserver-xorg
@@ -19,7 +21,8 @@ sudo chown pi: /var/www/html
 # Install Python
 python 3.6:
 sudo apt-get install build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev
-wget https://www.python.org/ftp/python/3.6.1/Python-3.6.0.tar.xz
+# ZLIB1G-DEV ALREADY INSTALLED SET TO MANUAL, MAYBE YOU SHOULDN'T REMOVE IT AT THE END
+wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
 tar xf Python-3.6.1.tar.xz
 cd Python-3.6.1
 sudo ./configure
@@ -36,7 +39,6 @@ sudo apt-get autoremove
 sudo apt-get clean
 
 # Install Modis requirements
-sudo apt-get install pip3
 sudo python3.6 -m pip install discord.py
 sudo python3.6 -m pip install youtube-dl
 sudo python3.6 -m pip install requests

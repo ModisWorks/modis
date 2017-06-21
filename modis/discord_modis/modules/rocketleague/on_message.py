@@ -4,10 +4,7 @@ from .... import datatools
 from . import _data
 
 from . import api_rocketleaguestats
-from . import api_rocketleagueheatmap
 from . import ui_embed
-
-import requests
 
 
 async def on_message(message):
@@ -52,30 +49,3 @@ async def on_message(message):
                     embed = ui_embed.fail_api(channel)
 
                 await embed.send()
-
-            if command == 'rlheatmap':
-                if message.attachments:
-                    await client.send_typing(channel)
-
-                    print(message.attachments[0])
-                    replay_url = message.attachments[0]["url"]
-                    replay_filename = message.attachments[0]["filename"]
-
-                    # Download replay
-                    with open(replay_filename, "wb") as replaycache:
-                        r = requests.get(replay_url, stream=True)
-                        for chunk in r.iter_content(chunk_size=1024):
-                            if chunk:
-                                replaycache.write(chunk)
-
-                    await client.send_message(channel, "Replay received. Please wait while we generate a heatmap.")
-
-                    # Generate heatmap
-                    heatmap = api_rocketleagueheatmap.get_heatmap(replay_filename)
-
-                    # Send heatmap
-                    # await client.send_file(channel, heatmap, filename="replay", content="Here's your heatmap c:")
-
-                else:
-                    await client.send_typing(channel)
-                    await client.send_message(channel, "Please attatch a replay file.")
