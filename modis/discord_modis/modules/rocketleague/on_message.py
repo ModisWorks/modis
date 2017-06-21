@@ -6,8 +6,6 @@ from . import _data
 from . import api_rocketleaguestats
 from . import ui_embed
 
-import requests
-
 
 async def on_message(message):
     """The on_message event handler for this module
