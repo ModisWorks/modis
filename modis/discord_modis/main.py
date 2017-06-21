@@ -82,9 +82,9 @@ def _get_event_handlers():
     }
 
     # Iterate through module folders
-    database_dir = "{}\\modules".format(os.path.dirname(os.path.realpath(__file__)))
+    database_dir = "{}/modules".format(os.path.dirname(os.path.realpath(__file__)))
     for module_name in os.listdir(database_dir):
-        module_dir = "{}\\{}".format(database_dir, module_name)
+        module_dir = "{}/{}".format(database_dir, module_name)
 
         # Iterate through files in module
         if os.path.isdir(module_dir) and not module_name.startswith("_"):

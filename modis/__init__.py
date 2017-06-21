@@ -36,7 +36,7 @@ def console(discord_token, discord_client_id, google_api_key):
     facebook_thread.start()
 
 
-def gui():
+def gui(discord_token, discord_client_id, google_api_key):
     import tkinter as tk
     import tkinter.ttk as ttk
 
@@ -64,11 +64,22 @@ def gui():
     # Configure stretch ratios
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
+    main.columnconfigure(0, weight=1)
+    main.rowconfigure(0, weight=1)
 
     # Add tabs
-    main.add(discord_gui.Frame(main))
-    main.add(reddit_gui.Frame(main))
-    main.add(facebook_gui.Frame(main))
+    main.add(discord_gui.Frame(
+        main,
+        discord_token,
+        discord_client_id,
+        google_api_key
+    ), text="Discord")
+    main.add(reddit_gui.Frame(
+        main
+    ), text="Reddit")
+    main.add(facebook_gui.Frame(
+        main
+    ), text="Facebook")
 
     # Run the window UI
     root.mainloop()

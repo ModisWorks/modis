@@ -74,10 +74,13 @@ class MusicPlayer:
             song = self.queue[0][0]
             songname = self.queue[0][1]
 
-            self.player = await self.speaker.create_ytdl_player(song, after=lambda: runcoro(self.after()))
+            try:
+                self.player = await self.speaker.create_ytdl_player(song, after=lambda: runcoro(self.after()))
 
-            self.player.volume = self.volume / 100
-            self.player.start()
+                self.player.volume = self.volume / 100
+                self.player.start()
+            except:
+                pass
 
             self.queue.pop(0)
 
