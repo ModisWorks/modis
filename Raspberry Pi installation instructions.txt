@@ -43,6 +43,7 @@ sudo python3.6 -m pip install discord.py
 sudo python3.6 -m pip install youtube-dl
 sudo python3.6 -m pip install requests
 sudo python3.6 -m pip install google-api-python-client
+sudo python3.6 -m pip install pynacl
 sudo apt-get install libxml2-dev libxslt-dev
 sudo python3.6 -m pip install lxml
 
