@@ -95,7 +95,7 @@ def _get_event_handlers():
             for event_handler in event_handlers.keys():
                 if "{}.py".format(event_handler) in module_event_handlers:
                     import_name = ".discord_modis.modules.{}.{}".format(module_name, event_handler)
-                    print(import_name)
+                    print("Importing {}".format(import_name))
                     event_handlers[event_handler].append(importlib.import_module(import_name, "modis"))
 
     return event_handlers

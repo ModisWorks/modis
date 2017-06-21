@@ -4,6 +4,9 @@ from . import _data
 
 from .._tools import ui_embed
 
+import threading
+import asyncio
+
 
 class MusicPlayer:
     def __init__(self, channel, queue_length=9):
@@ -20,6 +23,9 @@ class MusicPlayer:
         self.ui_m = None
 
         self.new_embed_ui()
+
+        self.status = ""
+        self.statustimer = None
 
         self.ready = False
 
@@ -157,6 +163,8 @@ class MusicPlayer:
             message (str): The new status
         """
 
+        self.status = message
+
         if len(message) > 43:
             message = "{}...".format(message[:40])
 
@@ -175,3 +183,19 @@ class MusicPlayer:
 
         self.ui_m.update_data(4, "```{}```".format(message))
         await self.ui_m.usend()
+
+        if self.statustimer:
+            self.statustimer.cancel()
+        self.statustimer = threading.Timer(3, lambda: runcoro(self.update_status(self.status))).start()
+
+
+def runcoro(async_function):
+    """Runs an asynchronous function without needing to use await - useful for lambda
+
+    Args:
+        async_function (Coroutine): The asynchronous function to run
+    """
+
+    future = asyncio.run_coroutine_threadsafe(async_function, client.loop)
+    result = future.result()
+    return result
