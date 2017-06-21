@@ -1,2 +1,2 @@
 async def on_ready():
-    print("ready")
+    print("Modis for Discord is ready")

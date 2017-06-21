@@ -1,9 +1,8 @@
-modulename = "replies"
+modulename = "chatbot"
 
 creator = "infraxion"
 
 sd_structure = {
     "activated": True,
-    "normal": {},
-    "tts": {}
+    "channels": {}
 }

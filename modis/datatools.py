@@ -13,7 +13,7 @@ def get_data():
     """
 
     with open(_datafile, 'r') as file:
-        return _json.load(file)["discord"]
+        return _json.load(file)
 
 
 def write_data(data):
@@ -23,10 +23,5 @@ def write_data(data):
         data (dict): The updated data dict of Discord
     """
 
-    print("written data")
-
-    temp = get_data()
-    temp["discord"] = data
-
     with open(_datafile, 'w') as file:
-        _json.dump(temp, file, indent=2)
+        _json.dump(data, file, indent=2)

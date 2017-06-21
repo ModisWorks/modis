@@ -1,10 +1,34 @@
 {
-  "servers": {},
   "discord": {
     "servers": {
       "317748520452882443": {
-        "prefix": "!"
+        "prefix": "!",
+        "replies": {
+          "activated": true,
+          "normal": {},
+          "tts": {}
+        },
+        "chatbot": {
+          "activated": true,
+          "channels": {
+            "324144924666888192": "902623d39e703fb8",
+            "324597472162873346": "cca7fbcade703fbd",
+            "318790962858164224": "f712822cbe703fbc"
+          }
+        },
+        "tableflip": {
+          "activated": true
+        },
+        "rocketleague": {
+          "activated": true
+        },
+        "music": {
+          "activated": true
+        }
       }
-    }
+    },
+    "token": "MzI1MjQ0ODM4MDYyNzE4OTc2.DCVfiQ.XsRuL3NQAzSjcmkLvq32-4COkWw",
+    "client_id": "325244838062718976",
+    "google_api_key": "AIzaSyBfaZ01_1_WiGtYkwK7hM3-15Mi_JRUOPA"
   }
 }

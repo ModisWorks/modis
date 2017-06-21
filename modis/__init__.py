@@ -1,4 +1,12 @@
-def console(token_discord):
+def console(discord_token, discord_client_id, google_api_key):
+    """Starts Modis in console format
+
+    Args:
+        discord_token (str): The bot token for your Discord application
+        discord_client_id: The bot's client ID
+        google_api_key: A Google API key with YouTube API enabled
+    """
+
     import threading
     import asyncio
 
@@ -9,9 +17,18 @@ def console(token_discord):
 
     # Create threads
     loop = asyncio.get_event_loop()
-    discord_thread = threading.Thread(target=discord_main.start, args=[token_discord, loop])
-    reddit_thread = threading.Thread(target=reddit_main.start, args=[])
-    facebook_thread = threading.Thread(target=facebook_main.start, args=[])
+    discord_thread = threading.Thread(target=discord_main.start,  args=[
+            discord_token,
+            discord_client_id,
+            google_api_key,
+            loop
+    ])
+    reddit_thread = threading.Thread(target=reddit_main.start, args=[
+
+    ])
+    facebook_thread = threading.Thread(target=facebook_main.start, args=[
+
+    ])
 
     # Run threads
     discord_thread.start()

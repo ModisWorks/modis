@@ -1,0 +1,7 @@
+modulename = "rocketleague"
+
+creator = "infraxion"
+
+sd_structure = {
+    "activated": True
+}

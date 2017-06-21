@@ -1,5 +1,5 @@
 from ..._client import client
-from ... import datatools
+from .... import datatools
 
 from . import _data
 
@@ -19,15 +19,15 @@ async def on_message(message):
 
     # Make sure this module is in serverdata for this server
     data = datatools.get_data()
-    if _data.modulename not in data["servers"][server.id]:
-        data["servers"][server.id][_data.modulename] = _data.sd_structure
+    if _data.modulename not in data["discord"]["servers"][server.id]:
+        data["discord"]["servers"][server.id][_data.modulename] = _data.sd_structure
         datatools.write_data(data)
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Retrieve replies from serverdata
-        normal_replies = datatools.get_data()[server.id][_data.modulename]["normal"]
-        tts_replies = datatools.get_data()[server.id][_data.modulename]["tts"]
+        normal_replies = datatools.get_data()["discord"]["servers"][server.id][_data.modulename]["normal"]
+        tts_replies = datatools.get_data()["discord"]["servers"][server.id][_data.modulename]["tts"]
 
         # Check normal replies
         for r in normal_replies.keys():

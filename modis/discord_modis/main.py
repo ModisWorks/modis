@@ -1,31 +1,36 @@
-def start(token, loop):
+def start(token, client_id, google_api_key, loop):
     import discord
     import asyncio
 
+    # Create client
     asyncio.set_event_loop(loop)
     client = discord.Client()
+    from . import _client
+    _client.client = client
+
+    # Save key info to data
+    from .. import datatools
+    data = datatools.get_data()
+    data["discord"]["token"] = token
+    data["discord"]["client_id"] = client_id
+    data["discord"]["google_api_key"] = google_api_key
+    datatools.write_data(data)
 
     # Import event handlers
     event_handlers = _get_event_handlers()
 
     # Create event handler combiner
     def create_event_handler(event_handler_type):
-
         async def func(*args, **kwargs):
-            for eh in event_handlers[event_handler_type]:
-                meh = getattr(eh, event_handler_type)
-                await meh(*args, **kwargs)
-
+            for module_event_handler in event_handlers[event_handler_type]:
+                module_event_handler_func = getattr(module_event_handler, event_handler_type)
+                await module_event_handler_func(*args, **kwargs)
         func.__name__ = event_handler_type
         return func
 
     # Register event handlers
     for event_handler in event_handlers.keys():
         client.event(create_event_handler(event_handler))
-
-    # Register the client in cache
-    from . import _client
-    _client.client = client
 
     # Start the discord client
     client.run(token)

@@ -1,5 +1,7 @@
-from ...share import *
-from ._constants import *
+from ..._client import client
+from .... import datatools
+
+from . import _data
 
 from . import api_flipcheck
 
@@ -18,10 +20,10 @@ async def on_message(message):
     content = message.content
 
     # Make sure this module is in serverdata for this server
-    _sd = get_serverdata()
-    if modulename not in _sd[server.id]:
-        _sd[server.id][modulename] = sd_structure
-        write_serverdata(_sd)
+    data = datatools.get_data()
+    if _data.modulename not in data["discord"]["servers"][server.id]:
+        data["discord"]["servers"][server.id][_data.modulename] = _data.sd_structure
+        datatools.write_data(data)
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
