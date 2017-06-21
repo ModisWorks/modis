@@ -188,6 +188,17 @@ class MusicPlayer:
             self.statustimer.cancel()
         self.statustimer = threading.Timer(3, lambda: runcoro(self.update_status(self.status))).start()
 
+    async def move(self, channel):
+        """Moves the embed message to a new channel; can also be used to move the musicplayer to the front
+
+        Args:
+            channel (discord.Channel): The channel to move to
+        """
+
+        await self.ui_m.delete()
+        self.ui_m.channel = channel
+        await self.ui_m.usend()
+
 
 def runcoro(async_function):
     """Runs an asynchronous function without needing to use await - useful for lambda

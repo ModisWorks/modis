@@ -139,3 +139,13 @@ class MusicPlayer:
                         await self.ui_m.temp_update_status("Volume argument must be +, -, or a %")
                 else:
                     await self.ui_v.set_vol(value)
+
+    async def movehere(self, channel):
+        """Moves the embed message to a new channel; can also be used to move the musicplayer to the front
+
+        Args:
+            channel (discord.Channel): The channel to move to
+        """
+
+        if self.ui_m:
+            await self.ui_m.move(channel)
