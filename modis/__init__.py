@@ -1,46 +1,74 @@
-def run(apikeys, client_id="", game="", prefix="!"):
-    """Runs Modis
+def console(discord_token, discord_client_id, google_api_key):
+    """Starts Modis in console format
 
     Args:
-        apikeys (dict): The API keys required to run Modis and its modules
-        client_id (str): The client id of the bot Modis will run on; used to make the invite link
-        game (str): The game Modis will be playing; defaults to ""
-        prefix (str): The prefix to use for Modis commands; defaults to '!'
+        discord_token (str): The bot token for your Discord application
+        discord_client_id: The bot's client ID
+        google_api_key: A Google API key with YouTube API enabled
     """
 
-    # Import global variable bank
-    from . import share
+    import threading
+    import asyncio
 
-    # Register variables globally
-    share.apikeys = apikeys
-    share.client_id = client_id
-    share.game = game
-    share.prefix = prefix
+    # Import bots
+    from modis.discord_modis import main as discord_main
+    from modis.reddit_modis import main as reddit_main
+    from modis.facebook_modis import main as facebook_main
 
-    # Start console
-    from . import main
-    main.init()
+    # Create threads
+    loop = asyncio.get_event_loop()
+    discord_thread = threading.Thread(target=discord_main.start,  args=[
+            discord_token,
+            discord_client_id,
+            google_api_key,
+            loop
+    ])
+    reddit_thread = threading.Thread(target=reddit_main.start, args=[
+
+    ])
+    facebook_thread = threading.Thread(target=facebook_main.start, args=[
+
+    ])
+
+    # Run threads
+    discord_thread.start()
+    reddit_thread.start()
+    facebook_thread.start()
 
 
-def run_with_console(apikeys, client_id="", game="", prefix="!"):
-    """Runs Modis with console ui
+def gui():
+    import tkinter as tk
+    import tkinter.ttk as ttk
 
-    Args:
-        apikeys (dict): The API keys required to run Modis and its modules
-        client_id (str): The client id of the bot Modis will run on; used to make the invite link
-        game (str): The game Modis will be playing; defaults to ""
-        prefix (str): The prefix to use for Modis commands; defaults to '!'
-    """
+    # Import bots
+    from modis.discord_modis import gui as discord_gui
+    from modis.reddit_modis import gui as reddit_gui
+    from modis.facebook_modis import gui as facebook_gui
 
-    # Import global variable bank
-    from . import share
+    # Setup the root window
+    root = tk.Tk()
+    root.minsize(width=1400, height=600)
+    root.geometry("1400x600")
+    root.title("Modis Control Panel")
 
-    # Register variables globally
-    share.apikeys = apikeys
-    share.client_id = client_id
-    share.game = game
-    share.prefix = prefix
+    # Setup the notebook
+    main = ttk.Notebook(root)
+    main.grid(
+        column=0,
+        row=0,
+        padx=4,
+        pady=4,
+        sticky="W E N S"
+    )
 
-    # Start console
-    from . import console
-    console.init()
+    # Configure stretch ratios
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
+
+    # Add tabs
+    main.add(discord_gui.Frame(main))
+    main.add(reddit_gui.Frame(main))
+    main.add(facebook_gui.Frame(main))
+
+    # Run the window UI
+    root.mainloop()

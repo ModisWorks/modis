@@ -2,6 +2,7 @@
 *.log
 TestModis.py
 OfficialModis.py
+data.json
 
 ######## PYCHARM ########
 .idea
@@ -130,3 +131,4 @@ ENV/
 
 # mypy
 .mypy_cache/
+data.json
