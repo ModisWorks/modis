@@ -1,0 +1,60 @@
+# Basics
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+sudo apt-get clean
+sudo raspi -config (for localisation)
+use sudo bash (file) to run .sh scripts
+
+# Install UI (optional)
+sudo apt-get install --no-install-recommends xserver-xorg
+sudo apt-get install --no-install-recommends xinit
+sudo apt-get install raspberrypi-ui-mods
+startx
+
+# Install Apache
+sudo apt-get install apache2 -y
+sudo chown pi: /var/www/html
+
+# Install Python
+python 3.6:
+sudo apt-get install build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev
+wget https://www.python.org/ftp/python/3.6.1/Python-3.6.0.tar.xz
+tar xf Python-3.6.1.tar.xz
+cd Python-3.6.1
+sudo ./configure
+sudo make -j4
+sudo make altinstall
+# Remove build tools
+sudo rm -r Python-3.6.1
+rm Python-3.6.1.tgz
+sudo apt-get --purge remove build-essential tk-dev
+sudo apt-get --purge remove libncurses5-dev libncursesw5-dev libreadline6-dev
+sudo apt-get --purge remove libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev
+sudo apt-get --purge remove libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev
+sudo apt-get autoremove
+sudo apt-get clean
+
+# Install Modis requirements
+sudo apt-get install pip3
+sudo python3.6 -m pip install discord.py
+sudo python3.6 -m pip install youtube-dl
+sudo python3.6 -m pip install requests
+sudo python3.6 -m pip install google-api-python-client
+sudo apt-get install libxml2-dev libxslt-dev
+sudo python3.6 -m pip install lxml
+
+# Install ffmpeg
+cd /usr/src
+sudo git clone git://git.videolan.org/x264
+cd x264
+sudo ./configure --host=arm-unknown-linux-gnueabi --enable-static --disable-opencl
+sudo make -j4
+sudo make install
+
+cd /usr/src
+sudo git clone https://github.com/FFmpeg/FFmpeg.git
+cd FFmpeg
+sudo ./configure --arch=armel --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree
+sudo make -j4
+sudo make install
