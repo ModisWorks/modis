@@ -22,6 +22,7 @@ sudo chown pi: /var/www/html
 python 3.6:
 sudo apt-get install build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev
 # ZLIB1G-DEV ALREADY INSTALLED SET TO MANUAL, MAYBE YOU SHOULDN'T REMOVE IT AT THE END
+cd /usr/src
 wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
 tar xf Python-3.6.1.tar.xz
 cd Python-3.6.1
@@ -43,6 +44,7 @@ sudo python3.6 -m pip install discord.py
 sudo python3.6 -m pip install youtube-dl
 sudo python3.6 -m pip install requests
 sudo python3.6 -m pip install google-api-python-client
+sudo apt-get install libsodium-dev libffi-dev
 sudo python3.6 -m pip install pynacl
 sudo apt-get install libxml2-dev libxslt-dev
 sudo python3.6 -m pip install lxml
@@ -58,6 +60,7 @@ sudo make install
 cd /usr/src
 sudo git clone https://github.com/FFmpeg/FFmpeg.git
 cd FFmpeg
-sudo ./configure --arch=armel --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree
+sudo apt-get install libgnutls28-dev
+sudo ./configure --arch=armel --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree ***--enable-gnutls***
 sudo make -j4
 sudo make install

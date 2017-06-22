@@ -1,5 +1,5 @@
-import requests as _requests
-import json as _json
+import requests
+import json
 
 
 def check_rank(player):
@@ -14,7 +14,7 @@ def check_rank(player):
     """
 
     # Get player ID and name Rocket League Tracker Network
-    webpage = _requests.get(
+    webpage = requests.get(
         "https://rocketleague.tracker.network/profile/steam/{}".format(player)
     ).text
 
@@ -37,8 +37,8 @@ def check_rank(player):
         return False, ()
 
     # Get player stats from Rocket League Tracker Network
-    livedata = _json.loads(
-        _requests.post(
+    livedata = json.loads(
+        requests.post(
             "https://rocketleague.tracker.network/live/data",
             json={"playerIds": [playerid]}
         ).text
