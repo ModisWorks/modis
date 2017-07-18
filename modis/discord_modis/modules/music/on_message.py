@@ -1,3 +1,5 @@
+import logging
+
 from ..._client import client
 from .... import datatools
 
@@ -6,6 +8,8 @@ from . import _data
 from . import _musicplayer
 
 import discord
+
+logger = logging.getLogger(__name__)
 
 
 async def on_message(message):
@@ -46,9 +50,9 @@ async def on_message(message):
                 try:
                     await client.delete_message(message)
                 except discord.errors.NotFound:
-                    pass
+                    logger.warning("Could not delete music player command message - NotFound")
                 except discord.errors.Forbidden:
-                    pass
+                    logger.warning("Could not delete music player command message - Forbidden")
 
             # Commands
             if command == 'init':

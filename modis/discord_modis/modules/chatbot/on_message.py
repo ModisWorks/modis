@@ -1,9 +1,13 @@
+import logging
+
 from ..._client import client
 from .... import datatools
 
 from . import _data
 
 from . import api_mitsuku
+
+logger = logging.getLogger(__name__)
 
 
 async def on_message(message):
@@ -29,6 +33,7 @@ async def on_message(message):
     if server is not None and author != channel.server.me:
         # Only reply to mentions
         if channel.server.me in message.mentions:
+            logger.info("Bot was mentioned, summoning Mitsuku")
             await client.send_typing(channel)
 
             # Get new botcust2 from Mitsuku if does not exist for channel in serverdata

@@ -1,8 +1,14 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 def start(token, client_id, google_api_key, loop):
     import discord
     import asyncio
 
     # Create client
+    logger.debug("Creating Discord client")
     asyncio.set_event_loop(loop)
     client = discord.Client()
     from . import _client
@@ -17,9 +23,12 @@ def start(token, client_id, google_api_key, loop):
     datatools.write_data(data)
 
     # Import event handlers
+    logger.info("Importing event handlers")
     event_handlers = _get_event_handlers()
 
     # Create event handler combiner
+    logger.debug("Compiling event handlers")
+
     def create_event_handler(event_handler_type):
         async def func(*args, **kwargs):
             for module_event_handler in event_handlers[event_handler_type]:
@@ -29,10 +38,12 @@ def start(token, client_id, google_api_key, loop):
         return func
 
     # Register event handlers
+    logger.debug("Registering event handlers into client")
     for event_handler in event_handlers.keys():
         client.event(create_event_handler(event_handler))
 
-    # Start the discord client
+    # Run the client loop
+    logger.debug("Logging in to Discord")
     client.run(token)
 
 
@@ -95,7 +106,8 @@ def _get_event_handlers():
             for event_handler in event_handlers.keys():
                 if "{}.py".format(event_handler) in module_event_handlers:
                     import_name = ".discord_modis.modules.{}.{}".format(module_name, event_handler)
-                    print("Importing {}".format(import_name))
+                    logger.info("Found event handler {}".format(import_name))
+
                     event_handlers[event_handler].append(importlib.import_module(import_name, "modis"))
 
     return event_handlers

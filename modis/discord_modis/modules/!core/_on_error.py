@@ -1,6 +1,10 @@
+import logging
+
 import datetime
 import sys
 import traceback
+
+logger = logging.getLogger(__name__)
 
 
 async def on_error(event_method, *args, **kwargs):

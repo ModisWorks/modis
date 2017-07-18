@@ -1,6 +1,10 @@
+import logging
+
 import requests
 import lxml.html
 import io
+
+logger = logging.getLogger(__name__)
 
 url = 'https://kakko.pandorabots.com/pandora/talk?botid=f6a012073e345a08&amp;skin=chat'
 
@@ -11,6 +15,7 @@ def get_botcust2():
     Returns:
         botcust2 (str): The botcust2 identifier
     """
+    logger.debug("Getting new botcust2")
 
     # Set up http request packages
     params = {
@@ -31,17 +36,21 @@ def get_botcust2():
     }
 
     # Get response from http POST request to url
+    logger.debug("Sending POST request")
     response = requests.post(
         url,
         params=params,
         headers=headers
     )
+    logger.debug("POST response {}".format(response))
 
     # Try to extract Mitsuku response from POST response
     try:
         result = response.headers['set-cookie'][9:25]
+        logger.debug("Getting botcust2 successful")
     except IndexError:
         result = False
+        logger.critical("Getting botcust2 from html failed")
 
     return result
 
@@ -56,6 +65,7 @@ def query(botcust2, message):
     Returns:
         reply (str): The message Mitsuku sent back
     """
+    logger.debug("Getting Mitsuku reply")
 
     # Set up http request packages
     params = {
@@ -85,18 +95,22 @@ def query(botcust2, message):
     }
 
     # Get response from http POST request to url
+    logger.debug("Sending POST request")
     response = requests.post(
         url,
         params=params,
         headers=headers,
         data=data
     )
+    logger.debug("POST response {}".format(response))
 
     # Parse response
     parsed = lxml.html.parse(io.StringIO(response.text)).getroot()
     try:
         result = parsed[1][2][0][2].tail[1:]
+        logger.debug("Getting botcust2 successful")
     except IndexError:
         result = False
+        logger.critical("Getting botcust2 from html failed")
 
     return result

@@ -1,9 +1,18 @@
+import logging
+
 from .... import datatools
 
 import googleapiclient.discovery
 
+logger = logging.getLogger(__name__)
+
+logger.debug("Building YouTube discovery API")
 ytdevkey = datatools.get_data()["discord"]["google_api_key"]
-youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=ytdevkey)
+try:
+    youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=ytdevkey)
+    logger.debug("Build successfull")
+except:
+    logger.critical("HTTP error connecting to YouTube API, build failed")
 
 
 def get_ytvideos(query):

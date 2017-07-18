@@ -1,2 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 async def on_ready():
-    print("Modis for Discord is ready")
+    logger.info("Modis for Discord is ready")

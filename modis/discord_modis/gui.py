@@ -1,8 +1,12 @@
+import logging
+
 import tkinter as tk
 import tkinter.ttk as ttk
 
 import threading
 import asyncio
+
+logger = logging.getLogger(__name__)
 
 
 class Frame(ttk.Frame):
@@ -14,6 +18,8 @@ class Frame(ttk.Frame):
         """
 
         super(Frame, self).__init__(parent)
+
+        logger.debug("Initialising frame")
 
         # Bot control panel
         botcontrol = BotControl(self, discord_token, discord_client_id, google_api_key)
@@ -68,6 +74,8 @@ class BotControl(ttk.Labelframe):
             parent: A tk or ttk object
         """
 
+        logger.debug("Initialising main control panel")
+
         super(BotControl, self).__init__(
             parent,
             padding=8,
@@ -108,27 +116,33 @@ class BotControl(ttk.Labelframe):
         self.columnconfigure(0, weight=1)
 
     def start(self, discord_token, discord_client_id, google_api_key):
-        from modis.discord_modis import main as discord_main
+        self.button_stop.state(['!disabled'])
+        self.button_start.state(['disabled'])
 
+        logger.info("Starting Discord Modis")
+
+        from modis.discord_modis import main
+
+        logger.debug("Creating event loop")
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        self.discord_thread = threading.Thread(target=discord_main.start, args=[
+        self.discord_thread = threading.Thread(target=main.start, args=[
             discord_token,
             discord_client_id,
             google_api_key,
             loop
         ])
+        logger.debug("Starting event loop")
         self.discord_thread.start()
 
-        self.button_stop.state(['!disabled'])
-        self.button_start.state(['disabled'])
-
     def stop(self):
-        from ._client import client
-        asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
-
         self.button_stop.state(['disabled'])
         self.button_start.state(['!disabled'])
+
+        logger.info("Stopping Discord Modis")
+
+        from ._client import client
+        asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
 
 
 class ModuleTabs(ttk.Labelframe):
@@ -138,6 +152,8 @@ class ModuleTabs(ttk.Labelframe):
         Args:
             parent: A tk or ttk object
         """
+
+        logger.debug("Initialising module tabs")
 
         super(ModuleTabs, self).__init__(
             parent,
@@ -170,6 +186,8 @@ class Log(ttk.Labelframe):
         Args:
             parent: A tk or ttk object
         """
+
+        logger.debug("Initialising log panel")
 
         super(Log, self).__init__(
             parent,
@@ -211,25 +229,25 @@ class Log(ttk.Labelframe):
             sticky="W E")
         log['xscrollcommand'] = scrollbar.set
 
-        # Rediect Python console output to log text box
-        import sys
-
-        class StdoutRedirector:
-            def __init__(self, text_widget):
-                self.text_widget = text_widget
-
-            def write(self, string):
-                self.text_widget.insert("end", string)
-                self.text_widget.see("end")
-
-            def flush(self):
-                pass
-
-            def isatty(self):
-                return True
-
-        sys.stdout = StdoutRedirector(log)
-        sys.stderr = StdoutRedirector(log)
+        # # Rediect Python console output to log text box
+        # import sys
+        #
+        # class StdoutRedirector:
+        #     def __init__(self, text_widget):
+        #         self.text_widget = text_widget
+        #
+        #     def write(self, string):
+        #         self.text_widget.insert("end", string)
+        #         self.text_widget.see("end")
+        #
+        #     def flush(self):
+        #         pass
+        #
+        #     def isatty(self):
+        #         return True
+        #
+        # sys.stdout = StdoutRedirector(log)
+        # sys.stderr = StdoutRedirector(log)
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
@@ -243,6 +261,8 @@ class StatusBar(ttk.Frame):
         Args:
             parent: A tk or ttk object
         """
+
+        logger.debug("Initialising status bar")
 
         super(StatusBar, self).__init__(parent)
 
