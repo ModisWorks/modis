@@ -21,6 +21,16 @@ class Frame(ttk.Frame):
 
         logger.debug("Initialising frame")
 
+        # Log
+        log = Log(self)
+        log.grid(
+            column=1,
+            row=0,
+            padx=8,
+            pady=8,
+            sticky="W E N S"
+        )
+
         # Bot control panel
         botcontrol = BotControl(self, discord_token, discord_client_id, google_api_key)
         botcontrol.grid(
@@ -36,16 +46,6 @@ class Frame(ttk.Frame):
         moduletabs = ModuleTabs(self)
         moduletabs.grid(
             column=0,
-            row=0,
-            padx=8,
-            pady=8,
-            sticky="W E N S"
-        )
-
-        # Log
-        log = Log(self)
-        log.grid(
-            column=1,
             row=0,
             padx=8,
             pady=8,
@@ -229,25 +229,27 @@ class Log(ttk.Labelframe):
             sticky="W E")
         log['xscrollcommand'] = scrollbar.set
 
-        # # Rediect Python console output to log text box
-        # import sys
-        #
-        # class StdoutRedirector:
-        #     def __init__(self, text_widget):
-        #         self.text_widget = text_widget
-        #
-        #     def write(self, string):
-        #         self.text_widget.insert("end", string)
-        #         self.text_widget.see("end")
-        #
-        #     def flush(self):
-        #         pass
-        #
-        #     def isatty(self):
-        #         return True
-        #
-        # sys.stdout = StdoutRedirector(log)
-        # sys.stderr = StdoutRedirector(log)
+        # Rediect Python console output to log text box
+
+        class LogHandler(logging.Handler):
+            def __init__(self, text_widget):
+                logging.Handler.__init__(self)
+
+                self.text_widget = text_widget
+
+            def flush(self):
+                self.text_widget.see("end")
+
+            def emit(self, record):
+                msg = self.format(record)
+                self.text_widget.insert("end", msg + "\n")
+                self.flush()
+
+        discord_logger = logging.getLogger("modis.discord_modis")
+        formatter = logging.Formatter('%(asctime)s %(levelname)s: %(name)s - %(message)s')
+        discord_handler = LogHandler(log)
+        discord_handler.setFormatter(formatter)
+        discord_logger.addHandler(discord_handler)
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)

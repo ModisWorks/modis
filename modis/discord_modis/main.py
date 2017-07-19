@@ -44,7 +44,25 @@ def start(token, client_id, google_api_key, loop):
 
     # Run the client loop
     logger.debug("Logging in to Discord")
-    client.run(token)
+    asyncio.run_coroutine_threadsafe(client.login(token), client.loop)
+    try:
+        logger.debug("Connecting to Discord")
+        asyncio.run_coroutine_threadsafe(client.connect(), client.loop)
+    except KeyboardInterrupt:
+        client.loop.run_until_complete(client.logout())
+        pending = asyncio.Task.all_tasks(loop=client.loop)
+        gathered = asyncio.gather(*pending, loop=client.loop)
+        try:
+            gathered.cancel()
+            client.loop.run_until_complete(gathered)
+
+            # we want to retrieve any exceptions to make sure that
+            # they don't nag us about it being un-retrieved.
+            gathered.exception()
+        except:
+            pass
+    finally:
+        client.loop.close()
 
 
 def _get_event_handlers():

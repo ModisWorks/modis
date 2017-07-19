@@ -3,7 +3,7 @@ from ...share import *
 import googleapiclient.discovery as _googleapi
 
 ytdevkey = apikeys["ytdevkey"]
-youtube = _googleapi.build("youtube", "v3", developerKey=ytdevkey)
+ytdiscoveryapi = _googleapi.build("youtube", "v3", developerKey=ytdevkey)
 
 
 def get_ytvideos(query, ui_m=None):
@@ -20,7 +20,7 @@ def get_ytvideos(query, ui_m=None):
     queue = []
 
     # Search YouTube
-    search_result = youtube.search().list(
+    search_result = ytdiscoveryapi.search().list(
         q=query,
         part="id,snippet",
         maxResults=1,
@@ -46,7 +46,7 @@ def get_ytvideos(query, ui_m=None):
         playlistid = search_result["items"][0]["id"]["playlistId"]
 
         # Get items in playlist
-        playlist = youtube.playlistItems().list(
+        playlist = ytdiscoveryapi.playlistItems().list(
             playlistId=playlistid,
             part="snippet",
             maxResults=50
@@ -69,7 +69,7 @@ def get_ytvideos(query, ui_m=None):
                 counter += 1
 
                 # Get items in next page of playlist
-                playlist = youtube.playlistItems().list(
+                playlist = ytdiscoveryapi.playlistItems().list(
                     playlistId=playlistid,
                     part="snippet",
                     maxResults=50,

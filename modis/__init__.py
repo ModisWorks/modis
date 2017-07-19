@@ -13,7 +13,7 @@ filehandler.setFormatter(formatter)
 logger.addHandler(printhandler)
 logger.addHandler(filehandler)
 
-logger.critical("----------------NEW INSTANCE----------------")
+logger.info("----------------NEW INSTANCE----------------")
 logger.info("Loading Modis")
 
 

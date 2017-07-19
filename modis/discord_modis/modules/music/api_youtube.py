@@ -6,13 +6,20 @@ import googleapiclient.discovery
 
 logger = logging.getLogger(__name__)
 
-logger.debug("Building YouTube discovery API")
-ytdevkey = datatools.get_data()["discord"]["google_api_key"]
-try:
-    youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=ytdevkey)
-    logger.debug("Build successfull")
-except:
-    logger.critical("HTTP error connecting to YouTube API, build failed")
+ytdiscoveryapi = None
+
+
+def build_api():
+    logger.debug("Building YouTube discovery API")
+    ytdevkey = datatools.get_data()["discord"]["google_api_key"]
+    try:
+        global ytdiscoveryapi
+        ytdiscoveryapi = googleapiclient.discovery.build("youtube", "v3", developerKey=ytdevkey)
+        logger.debug("Build successfull")
+        return True
+    except:
+        logger.critical("HTTP error connecting to YouTube API, build failed")
+        return False
 
 
 def get_ytvideos(query):
@@ -28,7 +35,7 @@ def get_ytvideos(query):
     queue = []
 
     # Search YouTube
-    search_result = youtube.search().list(
+    search_result = ytdiscoveryapi.search().list(
         q=query,
         part="id,snippet",
         maxResults=1,
@@ -54,7 +61,7 @@ def get_ytvideos(query):
         playlistid = search_result["items"][0]["id"]["playlistId"]
 
         # Get items in playlist
-        playlist = youtube.playlistItems().list(
+        playlist = ytdiscoveryapi.playlistItems().list(
             playlistId=playlistid,
             part="snippet",
             maxResults=50
@@ -77,7 +84,7 @@ def get_ytvideos(query):
                 counter += 1
 
                 # Get items in next page of playlist
-                playlist = youtube.playlistItems().list(
+                playlist = ytdiscoveryapi.playlistItems().list(
                     playlistId=playlistid,
                     part="snippet",
                     maxResults=50,
