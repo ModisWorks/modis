@@ -98,3 +98,5 @@ def get_ytvideos(query):
                     queue.append(["https://www.youtube.com/watch?v={}".format(videoid), songname])
 
     return queue
+
+build_api()

@@ -44,10 +44,10 @@ def start(token, client_id, google_api_key, loop):
 
     # Run the client loop
     logger.debug("Logging in to Discord")
-    asyncio.run_coroutine_threadsafe(client.login(token), client.loop)
+    client.loop.run_until_complete(client.login(token))
     try:
         logger.debug("Connecting to Discord")
-        asyncio.run_coroutine_threadsafe(client.connect(), client.loop)
+        client.loop.run_until_complete(client.connect())
     except KeyboardInterrupt:
         client.loop.run_until_complete(client.logout())
         pending = asyncio.Task.all_tasks(loop=client.loop)
@@ -124,7 +124,7 @@ def _get_event_handlers():
             for event_handler in event_handlers.keys():
                 if "{}.py".format(event_handler) in module_event_handlers:
                     import_name = ".discord_modis.modules.{}.{}".format(module_name, event_handler)
-                    logger.info("Found event handler {}".format(import_name))
+                    logger.info("Found event handler {}".format(import_name[23:]))
 
                     event_handlers[event_handler].append(importlib.import_module(import_name, "modis"))
 

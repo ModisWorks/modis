@@ -1,3 +1,5 @@
+import logging
+
 from ..._client import client
 
 from . import _data
@@ -6,6 +8,8 @@ from .._tools import ui_embed
 
 import threading
 import asyncio
+
+logger = logging.getLogger(__name__)
 
 
 class MusicPlayer:
@@ -16,6 +20,8 @@ class MusicPlayer:
             channel (discord.Channel): The text channel to run the embed UI on
             queue_length (int): The amount of songs to display in the queue, defaults to 9
         """
+
+        logger.debug("Creating new gui")
 
         self.channel = channel
         self.queue_length = queue_length
@@ -31,6 +37,8 @@ class MusicPlayer:
 
     def new_embed_ui(self):
         """Create the embed UI object and save it to self"""
+
+        logger.debug("Initiating new gui")
 
         # Initial queue display
         queue_display = []
@@ -57,8 +65,31 @@ class MusicPlayer:
             datapacks=datapacks
         )
 
+        # Add handler to show logs in status bar of player
+        class LogHandler(logging.Handler):
+            def __init__(self, embed):
+                logging.Handler.__init__(self)
+
+                self.embed = embed
+
+            def flush(self):
+                runcoro(self.ui_m.usend())
+
+            def emit(self, record):
+                msg = self.format(record)
+                self.ui_m.update_data(4, "```{}```".format(msg))
+                self.flush()
+
+        music_logger = logging.getLogger("modis.discord_modis.modules.music")
+        formatter = logging.Formatter("{message}", style="{")
+        handler = LogHandler(self.ui_m)
+        handler.setFormatter(formatter)
+        music_logger.addHandler(handler)
+
     def reset_embed_ui(self):
         """Resets the current embed UI object"""
+
+        logger.debug("Resetting gui data")
 
         # Initial queue display
         queue_display = []
@@ -79,6 +110,9 @@ class MusicPlayer:
 
     async def create(self):
         """Sends the embed ui created by get_embed_ui to the channel specified in self"""
+
+        logger.debug("Sending embed gui")
+
         await self.ui_m.usend()
 
         await self.update_status("Loading buttons")
@@ -93,6 +127,8 @@ class MusicPlayer:
         Args:
             reason (str): The message to send after deleting the embed message
         """
+
+        logger.debug("Destroying gui")
 
         await self.ui_m.delete()
 
@@ -111,6 +147,8 @@ class MusicPlayer:
             reason (str): The reason for the player reset
         """
 
+        logger.debug("Resetting gui")
+
         self.reset_embed_ui()
         await self.update_status(reason)
 
@@ -121,6 +159,8 @@ class MusicPlayer:
             songname (str): The currently playing song
         """
 
+        logger.debug("Updating nowplaying")
+
         self.ui_m.update_data(0, songname)
         await self.ui_m.usend()
 
@@ -130,6 +170,8 @@ class MusicPlayer:
         Args:
             queue (list): The current queue
         """
+
+        logger.debug("Updating queue")
 
         queue_display = []
         for i in range(self.queue_length):
@@ -152,6 +194,8 @@ class MusicPlayer:
         Args:
             volume (int): The current volume percentage
         """
+
+        logger.debug("Updating volume")
 
         self.ui_m.update_data(3, "{}%".format(str(volume)))
         await self.ui_m.usend()
@@ -194,6 +238,8 @@ class MusicPlayer:
         Args:
             channel (discord.Channel): The channel to move to
         """
+
+        logger.debug("Moving gui")
 
         await self.ui_m.delete()
         self.ui_m.channel = channel

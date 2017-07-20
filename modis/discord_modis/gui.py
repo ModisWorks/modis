@@ -119,7 +119,7 @@ class BotControl(ttk.Labelframe):
         self.button_stop.state(['!disabled'])
         self.button_start.state(['disabled'])
 
-        logger.info("Starting Discord Modis")
+        logger.info("----------------STARTING DISCORD MODIS----------------")
 
         from modis.discord_modis import main
 
@@ -230,7 +230,6 @@ class Log(ttk.Labelframe):
         log['xscrollcommand'] = scrollbar.set
 
         # Rediect Python console output to log text box
-
         class LogHandler(logging.Handler):
             def __init__(self, text_widget):
                 logging.Handler.__init__(self)
@@ -242,11 +241,12 @@ class Log(ttk.Labelframe):
 
             def emit(self, record):
                 msg = self.format(record)
+                msg = msg[:9] + msg[29:]
                 self.text_widget.insert("end", msg + "\n")
                 self.flush()
 
         discord_logger = logging.getLogger("modis.discord_modis")
-        formatter = logging.Formatter('%(asctime)s %(levelname)s: %(name)s - %(message)s')
+        formatter = logging.Formatter("{levelname:8} {name} - {message}", style="{")
         discord_handler = LogHandler(log)
         discord_handler.setFormatter(formatter)
         discord_logger.addHandler(discord_handler)

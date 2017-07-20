@@ -4,7 +4,8 @@ import sys
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(name)s - %(message)s')
+# formatter = logging.Formatter('%(asctime)s %(levelname)s: %(name)s - %(message)s')
+formatter = logging.Formatter("{asctime} {levelname:8} {name} - {message}", style="{")
 printhandler = logging.StreamHandler(sys.stdout)
 printhandler.setFormatter(formatter)
 filehandler = logging.FileHandler("modis.log")
@@ -93,8 +94,8 @@ def gui(discord_token, discord_client_id, google_api_key):
     notebook.grid(
         column=0,
         row=0,
-        padx=4,
-        pady=4,
+        padx=0,
+        pady=0,
         sticky="W E N S"
     )
 

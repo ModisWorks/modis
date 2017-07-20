@@ -1,5 +1,9 @@
+import logging
+
 from . import ui_embed
 from . import ui_voice
+
+logger = logging.getLogger(__name__)
 
 
 class MusicPlayer:
@@ -9,6 +13,8 @@ class MusicPlayer:
         Args:
             server_id (str): The Discord ID of the server to lock on to
         """
+
+        logger.debug("Creating new music player")
 
         self.ui_m = None
         self.ui_v = None
@@ -24,6 +30,8 @@ class MusicPlayer:
             author (discord.Member): The user that the voice ui will seek
             text_channel (discord.Channel): The channel for the embed ui to run in
         """
+
+        logger.debug("Initiating music player")
 
         # Create embed UI
         if self.ui_m is None:
@@ -46,6 +54,8 @@ class MusicPlayer:
             arg (str): The argument that was passed with the command
         """
 
+        logger.debug("Play command received")
+
         # Create UIs
         if not self.ready:
             self.ready = await self.init(author, text_channel)
@@ -61,11 +71,15 @@ class MusicPlayer:
     async def pause(self):
         """The pause command"""
 
+        logger.debug("Pause command received")
+
         if self.ready:
             await self.ui_v.pause()
 
     async def stop(self):
         """The stop command"""
+
+        logger.debug("Stop command received")
 
         if self.ready:
             await self.ui_v.destroy()
@@ -81,6 +95,8 @@ class MusicPlayer:
         Args:
             reason (str): The reason for destroying the player; will be sent as a separate message after destruction
         """
+
+        logger.debug("Destroy command received")
 
         if self.ready:
             await self.ui_v.destroy()
@@ -99,6 +115,8 @@ class MusicPlayer:
             num (int): The number of items to skip
         """
 
+        logger.debug("Skip command received")
+
         if self.ui_v and self.ready:
             try:
                 arg = int(num)
@@ -114,6 +132,8 @@ class MusicPlayer:
     async def shuffle(self):
         """The shuffle command"""
 
+        logger.debug("Shuffle command received")
+
         if self.ui_v and self.ready:
             await self.ui_v.shuffle()
 
@@ -123,6 +143,8 @@ class MusicPlayer:
         Args:
             value (str): The value to set the volume to
         """
+
+        logger.debug("Volume command received")
 
         if self.ui_v and self.ready:
             if value == '+':
@@ -146,6 +168,8 @@ class MusicPlayer:
         Args:
             channel (discord.Channel): The channel to move to
         """
+
+        logger.debug("Movehere command received")
 
         if self.ui_m:
             await self.ui_m.move(channel)
