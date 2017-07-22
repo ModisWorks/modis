@@ -3,6 +3,7 @@ import logging
 from .... import datatools
 
 import googleapiclient.discovery
+# import pafy
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +55,7 @@ def get_ytvideos(query):
 
         # Append video to queue
         queue.append(["https://www.youtube.com/watch?v={}".format(videoid), title])
+        # queue.append([pafy.new(videoid).getbestaudio().url, title])
 
     # Queue playlist if playlist
     elif search_result["items"][0]["id"]["kind"] == "youtube#playlist":
@@ -72,6 +74,7 @@ def get_ytvideos(query):
             videoid = entry["snippet"]["resourceId"]["videoId"]
             songname = entry["snippet"]["title"]
             queue.append(["https://www.youtube.com/watch?v={}".format(videoid), songname])
+            # queue.append([pafy.new(videoid).getbestaudio().url, title])
 
         # For playlists with more than 50 entries
         if "nextPageToken" in playlist:
