@@ -44,45 +44,11 @@ class MusicPlayer:
         self.queuelenlog = logging.getLogger("{}.{}.queuelen".format(__name__, self.server_id))
         self.volumelog = logging.getLogger("{}.{}.volume".format(__name__, self.server_id))
         self.statuslog = logging.getLogger("{}.{}.status".format(__name__, self.server_id))
+        self.statuslog.setLevel("DEBUG")
         self.statustimer = None
         self.mready = False
 
     # Commands
-    async def setup(self, author, text_channel):
-        """Creates the UIs
-
-        Args:
-            author (discord.Member): The user that the voice ui will seek
-            text_channel (discord.Channel): The channel for the embed ui to run in
-        """
-
-        # Create gui
-        self.mchannel = text_channel
-        self.new_embed_ui()
-        self.embed.usend()
-        self.statuslog.info("Loading buttons")
-        for e in ("⏯", "⏹", "⏩", "🔀", "🔉", "🔊"):
-            try:
-                await client.add_reaction(self.embed.sent_embed, e)
-            except discord.DiscordException:
-                self.statuslog.error("I couldn't add the buttons. Check my permissions.")
-
-        # Create voice client
-        self.vchannel = author.voice.voice_channel
-        if self.vchannel:
-            self.statuslog.info("Connecting to voice")
-            try:
-                self.vclient = await client.join_voice_channel(self.vchannel)
-            except discord.DiscordException:
-                self.statuslog.error("I couldn't connect to the voice channel. Check my permissions.")
-                return
-            self.vready = True
-        else:
-            self.statuslog.error("You're not connected to a voice channel.")
-            return
-
-        # Mark ready
-        self.ready = True
 
     async def play(self, author, text_channel, query):
         """The play command
@@ -93,9 +59,16 @@ class MusicPlayer:
             query (str): The argument that was passed with the command
         """
 
+        self.logger.debug("play command")
+
         # Init music player if not done
-        if not self.ready:
-            await self.setup(author, text_channel)
+        if not self.mready:
+            await self.msetup(text_channel)
+
+        if not self.vready:
+            await self.vsetup(author)
+
+        self.ready = self.mready and self.vready
 
         if self.ready:
             # Add the query to queue
@@ -103,10 +76,12 @@ class MusicPlayer:
 
             # Start playing if not yet playing
             if self.streamer is None:
-                self.vplay()
+                await self.vplay()
 
     async def pause(self):
         """The pause command"""
+
+        self.logger.debug("pause command")
 
         if not self.ready:
             return
@@ -124,10 +99,12 @@ class MusicPlayer:
     async def stop(self):
         """The stop command"""
 
-        try:
-            self.streamer.stop()
-        except AttributeError:
-            pass
+        self.logger.debug("stop command")
+
+        # try:
+        #     self.streamer.stop()
+        # except AttributeError:
+        #     pass
         try:
             await self.vclient.disconnect()
         except discord.DiscordException:
@@ -138,6 +115,7 @@ class MusicPlayer:
 
         self.vready = False
 
+        self.nowplayinglog.info("---")
         self.statuslog.info("Stopped")
 
     async def destroy(self, reason=None):
@@ -147,25 +125,24 @@ class MusicPlayer:
             reason (str): The reason for destroying the player; will be sent as a separate message after destruction
         """
 
-        logger.debug("Destroy command received")
+        self.logger.debug("destroy command")
 
         # Voice destroy
-        self.queue = []
-        self.stop()
+        await self.stop()
         self.vready = False
 
         # Gui destroy
         await self.embed.delete()
+        self.embed = None
         if reason:
             await client.send_typing(self.mchannel)
             await client.send_message(self.mchannel, reason)
-        self.new_embed_ui()
         self.mready = False
 
         # Ready reset
         self.ready = False
 
-    async def skip(self, query=1):
+    async def skip(self, query):
         """The skip command
 
         Args:
@@ -174,6 +151,9 @@ class MusicPlayer:
 
         if not self.ready:
             return
+
+        if query == "":
+            query = "1"
 
         try:
             num = int(query)
@@ -198,6 +178,8 @@ class MusicPlayer:
     async def shuffle(self):
         """The shuffle command"""
 
+        self.logger.debug("shuffle command")
+
         if not self.ready:
             return
 
@@ -214,6 +196,8 @@ class MusicPlayer:
         Args:
             value (str): The value to set the volume to
         """
+
+        self.logger.debug("volume command")
 
         if not self.ready:
             return
@@ -268,6 +252,8 @@ class MusicPlayer:
             channel (discord.Channel): The channel to move to
         """
 
+        self.logger.debug("movehere command")
+
         if not self.ready:
             return
 
@@ -276,8 +262,59 @@ class MusicPlayer:
         await self.embed.usend()
 
     # Methods
+    async def vsetup(self, author):
+        """Creates the voice client
+
+        Args:
+            author (discord.Member): The user that the voice ui will seek
+        """
+
+        self.logger.debug("Setting up voice")
+
+        # Create voice client
+        self.vchannel = author.voice.voice_channel
+        if self.vchannel:
+            self.statuslog.info("Connecting to voice")
+            try:
+                self.vclient = await client.join_voice_channel(self.vchannel)
+            except discord.DiscordException:
+                self.statuslog.error("I couldn't connect to the voice channel. Check my permissions.")
+                return
+            self.vready = True
+        else:
+            self.statuslog.error("You're not connected to a voice channel.")
+            return
+
+        # Mark ready
+        self.vready = True
+
+    async def msetup(self, text_channel):
+        """Creates the gui
+
+        Args:
+            text_channel (discord.Channel): The channel for the embed ui to run in
+        """
+
+        self.logger.debug("Setting up gui")
+
+        # Create gui
+        self.mchannel = text_channel
+        self.new_embed_ui()
+        await self.embed.usend()
+        self.statuslog.info("Loading buttons")
+        for e in ("⏯", "⏹", "⏩", "🔀", "🔉", "🔊"):
+            try:
+                await client.add_reaction(self.embed.sent_embed, e)
+            except discord.DiscordException:
+                self.statuslog.error("I couldn't add the buttons. Check my permissions.")
+
+        # Mark ready
+        self.mready = True
+
     def new_embed_ui(self):
         """Create the embed UI object and save it to self"""
+
+        self.logger.debug("Creating new embed ui object")
 
         # Initial queue display
         queue_display = []
@@ -294,7 +331,7 @@ class MusicPlayer:
         ]
 
         # Create embed UI object
-        embed = ui_embed.UI(
+        self.embed = ui_embed.UI(
             self.mchannel,
             "Music Player",
             "Press the buttons!",
@@ -307,18 +344,17 @@ class MusicPlayer:
         # Add handlers to update gui
         noformatter = logging.Formatter("{message}", style="{")
         codeformatter = logging.Formatter("```{message}```", style="{")
-        nowplayingformatter = logging.Formatter("Now playing {message}", style="{")
         volumeformatter = logging.Formatter("{message}%", style="{")
 
-        nowplayinghandler = EmbedLogHandler(embed, 0)
-        nowplayinghandler.setFormatter(nowplayingformatter)
-        queuehandler = EmbedLogHandler(embed, 1)
+        nowplayinghandler = EmbedLogHandler(self.embed, 0)
+        nowplayinghandler.setFormatter(noformatter)
+        queuehandler = EmbedLogHandler(self.embed, 1)
         queuehandler.setFormatter(codeformatter)
-        queuelenhandler = EmbedLogHandler(embed, 2)
+        queuelenhandler = EmbedLogHandler(self.embed, 2)
         queuelenhandler.setFormatter(noformatter)
-        volumehandler = EmbedLogHandler(embed, 3)
+        volumehandler = EmbedLogHandler(self.embed, 3)
         volumehandler.setFormatter(volumeformatter)
-        statushandler = EmbedLogHandler(embed, 4)
+        statushandler = EmbedLogHandler(self.embed, 4)
         statushandler.setFormatter(codeformatter)
 
         self.nowplayinglog.addHandler(nowplayinghandler)
@@ -327,14 +363,14 @@ class MusicPlayer:
         self.volumelog.addHandler(volumehandler)
         self.statuslog.addHandler(statushandler)
 
-        return embed
-
     def enqueue(self, query):
         """Queues songs based on either a YouTube search or a link
 
         Args:
             query (str): Either a search term or a link
         """
+
+        self.logger.debug("Enqueueing from query")
 
         self.statuslog.info("Queueing {}".format(query))
 
@@ -346,6 +382,9 @@ class MusicPlayer:
         self.update_queue()
 
     def update_queue(self):
+
+        self.logger.debug("Updating queue display")
+
         queue_display = []
         for i in range(self.queue_display):
             try:
@@ -361,6 +400,9 @@ class MusicPlayer:
         self.queuelenlog.info(str(len(self.queue)))
 
     async def vplay(self):
+
+        self.logger.debug("Playing next in queue")
+
         # Queue has items
         if self.queue:
             self.statuslog.info("Loading next song")
@@ -390,6 +432,8 @@ class MusicPlayer:
     async def vafter(self):
         """Function that is called after a song finishes playing"""
 
+        self.logger.debug("Finished playing a song")
+
         if self.streamer.error is None:
             await self.vplay()
         else:
@@ -399,6 +443,12 @@ class MusicPlayer:
 
 class EmbedLogHandler(logging.Handler):
     def __init__(self, embed, line):
+        """
+
+        Args:
+            embed (ui_embed.UI):
+            line (int):
+        """
         logging.Handler.__init__(self)
 
         self.embed = embed
@@ -406,7 +456,7 @@ class EmbedLogHandler(logging.Handler):
 
     def flush(self):
         try:
-            runcoro(self.embed.usend())
+            asyncio.run_coroutine_threadsafe(self.embed.usend(), client.loop)
         except discord.DiscordException:
             return
 
@@ -425,6 +475,8 @@ def runcoro(async_function):
     Args:
         async_function (Coroutine): The asynchronous function to run
     """
+
+    print(async_function)
 
     future = asyncio.run_coroutine_threadsafe(async_function, client.loop)
     result = future.result()
