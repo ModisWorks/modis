@@ -36,6 +36,10 @@ chatbot module:
     requests
     lxml
 
+gamedeals module:
+    discord.py
+    praw
+
 rocketleague module:
     discord.py
     requests

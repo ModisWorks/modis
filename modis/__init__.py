@@ -33,23 +33,23 @@ def console(discord_token, discord_client_id, google_api_key):
     import asyncio
 
     logger.debug("Loading packages")
-    from modis import discord_modis
-    from modis import reddit_modis
-    from modis import facebook_modis
+    from modis.discord_modis import main as discord_modis_console
+    from modis.reddit_modis import main as reddit_modis_console
+    from modis.facebook_modis import main as facebook_modis_console
 
     # Create threads
     logger.debug("Initiating threads")
     loop = asyncio.get_event_loop()
-    discord_thread = threading.Thread(target=discord_modis.main.start, args=[
+    discord_thread = threading.Thread(target=discord_modis_console.start, args=[
         discord_token,
         discord_client_id,
         google_api_key,
         loop
     ])
-    reddit_thread = threading.Thread(target=reddit_modis.main.start, args=[
+    reddit_thread = threading.Thread(target=reddit_modis_console.start, args=[
 
     ])
-    facebook_thread = threading.Thread(target=facebook_modis.main.start, args=[
+    facebook_thread = threading.Thread(target=facebook_modis_console.start, args=[
 
     ])
 

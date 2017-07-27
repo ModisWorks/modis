@@ -66,6 +66,7 @@ def start(token, client_id, google_api_key, loop):
             except:
                 pass
         finally:
+            logger.critical("Bot stopped")
             client.loop.close()
 
 

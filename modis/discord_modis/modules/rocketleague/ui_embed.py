@@ -7,7 +7,7 @@ def success(channel, stats, name, dp):
 
     Args:
         channel (discord.Channel): The Discord channel to bind the embed to
-        stats (list): Tuples of (field, value, percentile)
+        stats (tuple): Tuples of (field, value, percentile)
         name (str): The name of the player
         dp (str): URL to the player's dp
 
