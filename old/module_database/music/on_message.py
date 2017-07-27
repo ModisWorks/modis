@@ -48,7 +48,7 @@ async def on_message(message):
 
             # Commands
             if command == 'init':
-                await cache[server.id].init(author, channel)
+                await cache[server.id].setup(author, channel)
 
             if command == 'play':
                 await cache[server.id].play(author, channel, arg)
@@ -57,7 +57,7 @@ async def on_message(message):
                 await cache[server.id].pause()
 
             elif command == 'skip':
-                await cache[server.id].skip(num=arg)
+                await cache[server.id].skip(query=arg)
 
             elif command == 'shuffle':
                 await cache[server.id].shuffle()

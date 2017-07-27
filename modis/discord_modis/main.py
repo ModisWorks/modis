@@ -43,26 +43,30 @@ def start(token, client_id, google_api_key, loop):
         client.event(create_event_handler(event_handler))
 
     # Run the client loop
-    logger.debug("Logging in to Discord")
-    client.loop.run_until_complete(client.login(token))
+    logger.debug("Connecting to Discord")
     try:
-        logger.debug("Connecting to Discord")
-        client.loop.run_until_complete(client.connect())
-    except KeyboardInterrupt:
-        client.loop.run_until_complete(client.logout())
-        pending = asyncio.Task.all_tasks(loop=client.loop)
-        gathered = asyncio.gather(*pending, loop=client.loop)
+        client.loop.run_until_complete(client.login(token))
+    except:
+        logger.critical("Could not connect to Discord")
+    else:
+        logger.debug("Running the bot")
         try:
-            gathered.cancel()
-            client.loop.run_until_complete(gathered)
+            client.loop.run_until_complete(client.connect())
+        except KeyboardInterrupt:
+            client.loop.run_until_complete(client.logout())
+            pending = asyncio.Task.all_tasks(loop=client.loop)
+            gathered = asyncio.gather(*pending, loop=client.loop)
+            try:
+                gathered.cancel()
+                client.loop.run_until_complete(gathered)
 
-            # we want to retrieve any exceptions to make sure that
-            # they don't nag us about it being un-retrieved.
-            gathered.exception()
-        except:
-            pass
-    finally:
-        client.loop.close()
+                # we want to retrieve any exceptions to make sure that
+                # they don't nag us about it being un-retrieved.
+                gathered.exception()
+            except:
+                pass
+        finally:
+            client.loop.close()
 
 
 def _get_event_handlers():

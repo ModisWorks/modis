@@ -3,7 +3,6 @@ import logging
 from .... import datatools
 
 import googleapiclient.discovery
-# import pafy
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +22,12 @@ def build_api():
         return False
 
 
-def get_ytvideos(query):
+def get_ytvideos(query, ilogger):
     """Gets either a list of videos from a playlist or a single video, from the first result of a YouTube search
 
     Args:
         query (str): The YouTube search query
+        ilogger (logging.logger): The logger to log API calls to
 
     Returns:
         queue (list): The items obtained from the YouTube search
@@ -45,8 +45,7 @@ def get_ytvideos(query):
 
     # Get video/playlist title
     title = search_result["items"][0]["snippet"]["title"]
-    # if ui_m:
-    #     runcoro(ui_m.temp_update_status("Queueing {}".format(title)))
+    ilogger.debug("Queueing {}".format(title))
 
     # Queue video if video
     if search_result["items"][0]["id"]["kind"] == "youtube#video":
@@ -55,7 +54,6 @@ def get_ytvideos(query):
 
         # Append video to queue
         queue.append(["https://www.youtube.com/watch?v={}".format(videoid), title])
-        # queue.append([pafy.new(videoid).getbestaudio().url, title])
 
     # Queue playlist if playlist
     elif search_result["items"][0]["id"]["kind"] == "youtube#playlist":
@@ -74,15 +72,13 @@ def get_ytvideos(query):
             videoid = entry["snippet"]["resourceId"]["videoId"]
             songname = entry["snippet"]["title"]
             queue.append(["https://www.youtube.com/watch?v={}".format(videoid), songname])
-            # queue.append([pafy.new(videoid).getbestaudio().url, title])
 
         # For playlists with more than 50 entries
         if "nextPageToken" in playlist:
             counter = 2
 
             while "nextPageToken" in playlist:
-                # if ui_m:
-                #     runcoro(ui_m.temp_update_status("Queueing {} (page {})".format(title, str(counter))))
+                ilogger.debug("Queueing {} (page {})".format(title, str(counter)))
 
                 counter += 1
 
