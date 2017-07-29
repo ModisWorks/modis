@@ -23,8 +23,8 @@ def success(channel, post):
         post[1],
         modulename=modulename,
         creator=creator,
-        colour=0xFF4444,
-        thumbnail=post[3],
+        colour=0xFF8800,
+        thumbnail=post[1],
         datapacks=datapacks
     )
 
@@ -47,7 +47,7 @@ def no_results(channel):
         ":c",
         modulename=modulename,
         creator=creator,
-        colour=0xFF4444
+        colour=0xFF8800
     )
 
     return gui
