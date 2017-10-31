@@ -22,6 +22,7 @@ def start(token, client_id, google_api_key, loop):
     else:
         # Create a blank data file
         data = {"discord": {}}
+        data["discord"]["servers"] = {}
 
     data["discord"]["token"] = token
     data["discord"]["client_id"] = client_id
