@@ -113,6 +113,8 @@ class MusicPlayer:
         self.vclient = None
         self.streamer = None
 
+        self.ready = False
+        self.mready = False
         self.vready = False
 
         self.nowplayinglog.info("---")
@@ -381,6 +383,8 @@ class MusicPlayer:
 
         self.update_queue()
 
+        self.statuslog.info("Queued {}".format(query))
+
     def update_queue(self):
 
         self.logger.debug("Updating queue display")
@@ -410,19 +414,23 @@ class MusicPlayer:
             song = self.queue[0][0]
             songname = self.queue[0][1]
 
+            self.queue.pop(0)
+
             try:
-                self.streamer = await self.vclient.create_ytdl_player(song, after=lambda: runcoro(self.vafter()))
+                result = await self.vclient.create_ytdl_player(song, after=lambda: runcoro(self.vafter()))
+                self.streamer = result
 
                 self.streamer.volume = self.volume / 100
                 self.streamer.start()
-            except:
-                self.statuslog.error("Had a problem playing {}".format(songname))
 
-            self.queue.pop(0)
+                self.statuslog.info("Playing")
+                self.nowplayinglog.info(songname)
+            except:
+                self.nowplayinglog.info("Error playing {}".format(songname))
+                self.statuslog.error("Had a problem playing {}".format(songname))
+                await self.vplay()
 
             self.update_queue()
-            self.statuslog.info("Playing")
-            self.nowplayinglog.info(songname)
 
         # Queue exhausted
         else:

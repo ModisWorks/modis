@@ -8,7 +8,7 @@
 
     youtube-dl
 
-    #  ffmpeg
+    # Needs ffmpeg in path
 
 
 # All Modis external packages:
