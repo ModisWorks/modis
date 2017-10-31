@@ -1,3 +1,5 @@
+"""Base GUI for Modis."""
+
 import logging
 
 import tkinter as tk
@@ -10,56 +12,37 @@ logger = logging.getLogger(__name__)
 
 
 class Frame(ttk.Frame):
-    def __init__(self, parent, discord_token, discord_client_id, google_api_key):
-        """The main window frame for Modis
+    """The main window frame for Modis."""
+
+    def __init__(self, parent, discord_token, discord_client_id,
+                 google_api_key):
+        """
+        Create a new main window frame.
 
         Args:
             parent: A tk or ttk object
         """
-
         super(Frame, self).__init__(parent)
 
         logger.debug("Initialising frame")
 
         # Log
         log = Log(self)
-        log.grid(
-            column=1,
-            row=0,
-            padx=8,
-            pady=8,
-            sticky="W E N S"
-        )
+        log.grid(column=1, row=0, padx=8, pady=8, sticky="W E N S")
 
         # Bot control panel
-        botcontrol = BotControl(self, discord_token, discord_client_id, google_api_key)
+        botcontrol = BotControl(self, discord_token, discord_client_id,
+                                google_api_key)
         botcontrol.grid(
-            column=0,
-            row=1,
-            columnspan=2,
-            padx=8,
-            pady=8,
-            sticky="W E N"
-        )
+            column=0, row=1, columnspan=2, padx=8, pady=8, sticky="W E N")
 
         # Module tabs
         moduletabs = ModuleTabs(self)
-        moduletabs.grid(
-            column=0,
-            row=0,
-            padx=8,
-            pady=8,
-            sticky="W E N S"
-        )
+        moduletabs.grid(column=0, row=0, padx=8, pady=8, sticky="W E N S")
 
         # Status bar
         statusbar = StatusBar(self)
-        statusbar.grid(
-            column=0,
-            row=2,
-            columnspan=2,
-            sticky="W E S"
-        )
+        statusbar.grid(column=0, row=2, columnspan=2, sticky="W E S")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
@@ -67,55 +50,39 @@ class Frame(ttk.Frame):
 
 
 class BotControl(ttk.Labelframe):
-    def __init__(self, parent, discord_token, discord_client_id, google_api_key):
-        """Modis control panel
+    """The control panel for the Modis bot."""
+
+    def __init__(self, parent, discord_token, discord_client_id,
+                 google_api_key):
+        """
+        Create a new control panel and add it to the parent.
 
         Args:
             parent: A tk or ttk object
         """
-
         logger.debug("Initialising main control panel")
 
         super(BotControl, self).__init__(
-            parent,
-            padding=8,
-            text="Modis control panel")
+            parent, padding=8, text="Modis control panel")
 
         self.discord_thread = None
 
         # Stop button
         self.button_stop = ttk.Button(
-            self,
-            command=lambda: self.stop(),
-            text="Stop Modis"
-        )
-        self.button_stop.grid(
-            column=0,
-            row=0,
-            padx=4,
-            pady=4,
-            sticky="E S"
-        )
+            self, command=lambda: self.stop(), text="Stop Modis")
+        self.button_stop.grid(column=0, row=0, padx=4, pady=4, sticky="E S")
         self.button_stop.state(["disabled"])
 
         # Start button
         self.button_start = ttk.Button(
-            self,
-            command=lambda: self.start(discord_token, discord_client_id, google_api_key),
-            text="Start Modis"
-        )
-        self.button_start.grid(
-            column=0,
-            row=1,
-            padx=4,
-            pady=4,
-            sticky="E S"
-        )
+            self, command=lambda: self.start(discord_token, discord_client_id, google_api_key), text="Start Modis")
+        self.button_start.grid(column=0, row=1, padx=4, pady=4, sticky="E S")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
 
     def start(self, discord_token, discord_client_id, google_api_key):
+        """Start Modis and log it into Discord."""
         self.button_stop.state(['!disabled'])
         self.button_start.state(['disabled'])
 
@@ -126,16 +93,14 @@ class BotControl(ttk.Labelframe):
         logger.debug("Creating event loop")
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        self.discord_thread = threading.Thread(target=main.start, args=[
-            discord_token,
-            discord_client_id,
-            google_api_key,
-            loop
-        ])
+        self.discord_thread = threading.Thread(
+            target=main.start,
+            args=[discord_token, discord_client_id, google_api_key, loop])
         logger.debug("Starting event loop")
         self.discord_thread.start()
 
     def stop(self):
+        """Stop Modis and log it out of Discord."""
         self.button_stop.state(['disabled'])
         self.button_start.state(['!disabled'])
 
@@ -146,30 +111,23 @@ class BotControl(ttk.Labelframe):
 
 
 class ModuleTabs(ttk.Labelframe):
+    """The notebook showing the tabs for all the modules."""
+
     def __init__(self, parent):
-        """The notebook showing the tabs for all the modules
+        """
+        Create a new notebook and add it to the given parent.
 
         Args:
             parent: A tk or ttk object
         """
-
         logger.debug("Initialising module tabs")
 
-        super(ModuleTabs, self).__init__(
-            parent,
-            padding=8,
-            text="Module tabs"
-        )
+        super(ModuleTabs, self).__init__(parent, padding=8, text="Module tabs")
 
         # Module tabs notebook
         self.module_notebook = ttk.Notebook(self)
         self.module_notebook.grid(
-            column=0,
-            row=0,
-            padx=4,
-            pady=4,
-            sticky="W E N S"
-        )
+            column=0, row=0, padx=4, pady=4, sticky="W E N S")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
@@ -180,53 +138,32 @@ class ModuleTabs(ttk.Labelframe):
 
 
 class Log(ttk.Labelframe):
+    """The text box showing the Python console log."""
+
     def __init__(self, parent):
-        """The text box showing Python console log
+        """
+        Create a new text box for the console log.
 
         Args:
             parent: A tk or ttk object
         """
-
         logger.debug("Initialising log panel")
 
-        super(Log, self).__init__(
-            parent,
-            padding=8,
-            text="Python console log")
+        super(Log, self).__init__(parent, padding=8, text="Python console log")
 
         # Log text box
         log = tk.Text(self)
-        log.grid(
-            column=0,
-            row=0,
-            padx=4,
-            pady=4,
-            sticky="W E N S"
-        )
+        log.grid(column=0, row=0, padx=4, pady=4, sticky="W E N S")
         log.insert("end", "Welcome to Modis for Discord Beta v0.2.3\n")
 
         # Vertical Scrollbar
-        scrollbar = ttk.Scrollbar(
-            self,
-            orient="vertical",
-            command=log.yview
-        )
-        scrollbar.grid(
-            column=1,
-            row=0,
-            sticky="N S")
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=log.yview)
+        scrollbar.grid(column=1, row=0, sticky="N S")
         log['yscrollcommand'] = scrollbar.set
 
         # Horizontal Scrollbar
-        scrollbar = ttk.Scrollbar(
-            self,
-            orient="horizontal",
-            command=log.xview
-        )
-        scrollbar.grid(
-            column=0,
-            row=1,
-            sticky="W E")
+        scrollbar = ttk.Scrollbar(self, orient="horizontal", command=log.xview)
+        scrollbar.grid(column=0, row=1, sticky="W E")
         log['xscrollcommand'] = scrollbar.set
 
         # Rediect Python console output to log text box
@@ -246,7 +183,8 @@ class Log(ttk.Labelframe):
                 self.flush()
 
         discord_logger = logging.getLogger("modis.discord_modis")
-        formatter = logging.Formatter("{levelname:8} {name} - {message}", style="{")
+        formatter = logging.Formatter(
+            "{levelname:8} {name} - {message}", style="{")
         discord_handler = LogHandler(log)
         discord_handler.setFormatter(formatter)
         discord_logger.addHandler(discord_handler)
@@ -257,13 +195,15 @@ class Log(ttk.Labelframe):
 
 
 class StatusBar(ttk.Frame):
+    """The status bar at the bottom of the UI."""
+
     def __init__(self, parent):
-        """The statusbar at the bottom
+        """
+        Create a new status bar.
 
         Args:
             parent: A tk or ttk object
         """
-
         logger.debug("Initialising status bar")
 
         super(StatusBar, self).__init__(parent)
@@ -277,13 +217,8 @@ class StatusBar(ttk.Frame):
             # borderwidth=1,
             # relief="sunken",
             background="#FFBBBB",
-            anchor="center"
-        )
-        self.statusbar.grid(
-            column=0,
-            row=0,
-            sticky="W E"
-        )
+            anchor="center")
+        self.statusbar.grid(column=0, row=0, sticky="W E")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)

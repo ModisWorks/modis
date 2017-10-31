@@ -1,11 +1,13 @@
+"""Initialises Modis."""
+
 import logging
 import sys
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
-# formatter = logging.Formatter('%(asctime)s %(levelname)s: %(name)s - %(message)s')
-formatter = logging.Formatter("{asctime} {levelname:8} {name} - {message}", style="{")
+formatter = logging.Formatter(
+    "{asctime} {levelname:8} {name} - {message}", style="{")
 printhandler = logging.StreamHandler(sys.stdout)
 printhandler.setFormatter(formatter)
 filehandler = logging.FileHandler("modis.log")
@@ -19,14 +21,14 @@ logger.info("Loading Modis")
 
 
 def console(discord_token, discord_client_id, google_api_key):
-    """Starts Modis in console format
+    """
+    Start Modis in console format.
 
     Args:
         discord_token (str): The bot token for your Discord application
         discord_client_id: The bot's client ID
         google_api_key: A Google API key with YouTube API enabled
     """
-
     logger.info("Starting Modis in console")
 
     import threading
@@ -40,18 +42,13 @@ def console(discord_token, discord_client_id, google_api_key):
     # Create threads
     logger.debug("Initiating threads")
     loop = asyncio.get_event_loop()
-    discord_thread = threading.Thread(target=discord_modis_console.start, args=[
-        discord_token,
-        discord_client_id,
-        google_api_key,
-        loop
-    ])
-    reddit_thread = threading.Thread(target=reddit_modis_console.start, args=[
-
-    ])
-    facebook_thread = threading.Thread(target=facebook_modis_console.start, args=[
-
-    ])
+    discord_thread = threading.Thread(
+        target=discord_modis_console.start,
+        args=[discord_token, discord_client_id, google_api_key, loop])
+    reddit_thread = threading.Thread(
+        target=reddit_modis_console.start, args=[])
+    facebook_thread = threading.Thread(
+        target=facebook_modis_console.start, args=[])
 
     # Run threads
     logger.debug("Starting threads")
@@ -63,14 +60,14 @@ def console(discord_token, discord_client_id, google_api_key):
 
 
 def gui(discord_token, discord_client_id, google_api_key):
-    """Starts Modis in gui format
+    """
+    Start Modis in gui format.
 
-        Args:
-            discord_token (str): The bot token for your Discord application
-            discord_client_id: The bot's client ID
-            google_api_key: A Google API key with YouTube API enabled
-        """
-
+    Args:
+        discord_token (str): The bot token for your Discord application
+        discord_client_id: The bot's client ID
+        google_api_key: A Google API key with YouTube API enabled
+    """
     logger.info("Starting Modis in GUI")
 
     import tkinter as tk
@@ -91,13 +88,7 @@ def gui(discord_token, discord_client_id, google_api_key):
 
     # Setup the notebook
     notebook = ttk.Notebook(root)
-    notebook.grid(
-        column=0,
-        row=0,
-        padx=0,
-        pady=0,
-        sticky="W E N S"
-    )
+    notebook.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
 
     # Configure stretch ratios
     root.columnconfigure(0, weight=1)
@@ -107,18 +98,12 @@ def gui(discord_token, discord_client_id, google_api_key):
 
     # Add tabs
     logger.debug("Adding packages to window")
-    notebook.add(discord_modis_gui.Frame(
-        notebook,
-        discord_token,
-        discord_client_id,
-        google_api_key
-    ), text="Discord")
-    notebook.add(reddit_modis_gui.Frame(
-        notebook
-    ), text="Reddit")
-    notebook.add(facebook_modis_gui.Frame(
-        notebook
-    ), text="Facebook")
+    notebook.add(
+        discord_modis_gui.Frame(notebook, discord_token, discord_client_id,
+                                google_api_key),
+        text="Discord")
+    notebook.add(reddit_modis_gui.Frame(notebook), text="Reddit")
+    notebook.add(facebook_modis_gui.Frame(notebook), text="Facebook")
 
     logger.debug("GUI initialised")
 
