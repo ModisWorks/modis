@@ -4,6 +4,7 @@ logger = logging.getLogger(__name__)
 
 
 def start(token, client_id, google_api_key, loop):
+    """Start the Discord client and log Modis into Discord."""
     import discord
     import asyncio
 
@@ -16,7 +17,12 @@ def start(token, client_id, google_api_key, loop):
 
     # Save key info to data
     from .. import datatools
-    data = datatools.get_data()
+    if datatools.has_data():
+        data = datatools.get_data()
+    else:
+        # Create a blank data file
+        data = {"discord": {}}
+
     data["discord"]["token"] = token
     data["discord"]["client_id"] = client_id
     data["discord"]["google_api_key"] = google_api_key
@@ -32,8 +38,10 @@ def start(token, client_id, google_api_key, loop):
     def create_event_handler(event_handler_type):
         async def func(*args, **kwargs):
             for module_event_handler in event_handlers[event_handler_type]:
-                module_event_handler_func = getattr(module_event_handler, event_handler_type)
+                module_event_handler_func = getattr(module_event_handler,
+                                                    event_handler_type)
                 await module_event_handler_func(*args, **kwargs)
+
         func.__name__ = event_handler_type
         return func
 
@@ -71,7 +79,8 @@ def start(token, client_id, google_api_key, loop):
 
 
 def _get_event_handlers():
-    """Gets dictionary of event handlers and the modules that define them
+    """
+    Gets dictionary of event handlers and the modules that define them
 
     Returns:
         event_handlers (dict): Contains "all", "on_ready", "on_message", "on_reaction_add", "on_error"
@@ -116,7 +125,8 @@ def _get_event_handlers():
     }
 
     # Iterate through module folders
-    database_dir = "{}/modules".format(os.path.dirname(os.path.realpath(__file__)))
+    database_dir = "{}/modules".format(
+        os.path.dirname(os.path.realpath(__file__)))
     for module_name in os.listdir(database_dir):
         module_dir = "{}/{}".format(database_dir, module_name)
 
@@ -128,9 +138,12 @@ def _get_event_handlers():
 
             for event_handler in event_handlers.keys():
                 if "{}.py".format(event_handler) in module_event_handlers:
-                    import_name = ".discord_modis.modules.{}.{}".format(module_name, event_handler)
-                    logger.info("Found event handler {}".format(import_name[23:]))
+                    import_name = ".discord_modis.modules.{}.{}".format(
+                        module_name, event_handler)
+                    logger.info(
+                        "Found event handler {}".format(import_name[23:]))
 
-                    event_handlers[event_handler].append(importlib.import_module(import_name, "modis"))
+                    event_handlers[event_handler].append(
+                        importlib.import_module(import_name, "modis"))
 
     return event_handlers

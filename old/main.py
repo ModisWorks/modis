@@ -156,18 +156,22 @@ def get_event_handlers():
             module_event_handlers = os.listdir(module_dir)
 
             if "on_ready.py" in module_event_handlers:
-                event_handlers["on_ready"].append(importlib.import_module(".module_database.{}.on_ready".format(module_name), "modis"))
+                event_handlers["on_ready"].append(
+                    importlib.import_module(".module_database.{}.on_ready".format(module_name), "modis"))
 
             if "on_message.py" in module_event_handlers:
-                event_handlers["on_message"].append(importlib.import_module(".module_database.{}.on_message".format(module_name), "modis"))
+                event_handlers["on_message"].append(
+                    importlib.import_module(".module_database.{}.on_message".format(module_name), "modis"))
 
             if "on_reaction_add.py" in module_event_handlers:
-                event_handlers["on_reaction_add"].append(importlib.import_module(".module_database.{}.on_reaction_add".format(module_name), "modis"))
+                event_handlers["on_reaction_add"].append(
+                    importlib.import_module(".module_database.{}.on_reaction_add".format(module_name), "modis"))
 
             if "on_error.py" in module_event_handlers:
-                event_handlers["on_error"].append(importlib.import_module(".module_database.{}.on_error".format(module_name), "modis"))
+                event_handlers["on_error"].append(
+                    importlib.import_module(".module_database.{}.on_error".format(module_name), "modis"))
 
-            print("            Import successfull.".format(module_name))
+            print("            Import successful.".format(module_name))
 
     return event_handlers
 
@@ -198,7 +202,9 @@ def get_console_tabs():
             module_event_handlers = os.listdir(module_dir)
 
             if "ui_window.py" in module_event_handlers:
-                console_tabs.append(importlib.import_module(".module_database.{}.ui_window".format(module_name), "modis"))
+                console_tabs.append(importlib.import_module(
+                    ".module_database.{}.ui_window".format(module_name),
+                    "modis"))
 
             print("            Import successfull.".format(module_name))
 

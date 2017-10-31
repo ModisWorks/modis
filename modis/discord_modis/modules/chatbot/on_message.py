@@ -39,7 +39,8 @@ async def on_message(message):
             # Get new botcust2 from Mitsuku if does not exist for channel in serverdata
             if channel.id not in datatools.get_data()["discord"]["servers"][server.id][_data.modulename]["channels"]:
                 new_serverdata = datatools.get_data()
-                new_serverdata["discord"]["servers"][server.id][_data.modulename]["channels"][channel.id] = api_mitsuku.get_botcust2()
+                new_serverdata["discord"]["servers"][server.id][_data.modulename]["channels"][channel.id] =\
+                    api_mitsuku.get_botcust2()
                 datatools.write_data(new_serverdata)
 
             # Get botcust2 from serverdata
