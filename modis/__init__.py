@@ -82,8 +82,8 @@ def gui(discord_token, discord_client_id, google_api_key):
 
     # Setup the root window
     root = tk.Tk()
-    root.minsize(width=1400, height=600)
-    root.geometry("1400x600")
+    root.minsize(width=800, height=600)
+    root.geometry("800x600")
     root.title("Modis Control Panel")
 
     # Setup the notebook
