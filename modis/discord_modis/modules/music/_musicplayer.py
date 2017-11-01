@@ -590,7 +590,7 @@ class EmbedLogHandler(logging.Handler):
             return
 
     async def usend_when_ready(self):
-        if not self.music_player.state != 'destroying' and self.embed is not None:
+        if self.music_player.state != 'destroying' and self.embed is not None:
             await self.embed.usend()
 
     def emit(self, record):
