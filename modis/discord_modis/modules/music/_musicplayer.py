@@ -9,7 +9,6 @@ from . import _data
 import discord
 import asyncio
 import random
-import threading
 
 logger = logging.getLogger(__name__)
 

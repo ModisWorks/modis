@@ -153,7 +153,7 @@ class Log(ttk.Labelframe):
         super(Log, self).__init__(parent, padding=8, text="Python console log")
 
         # Log text box
-        log = tk.Text(self)
+        log = tk.Text(self, wrap="none")
         log.grid(column=0, row=0, padx=4, pady=4, sticky="W E N S")
         log.insert("end", "Welcome to Modis for Discord Beta v0.2.3\n")
 
