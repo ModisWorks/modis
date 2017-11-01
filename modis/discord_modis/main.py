@@ -45,7 +45,7 @@ def start(token, client_id, google_api_key, loop):
                                                         event_handler_type)
                     await module_event_handler_func(*args, **kwargs)
                 except Exception as e:
-                    logger.error("An error occured in processing '{}'".format(module_event_handler))
+                    logger.error("An error occured in '{}'".format(module_event_handler))
                     logger.exception(e)
 
         func.__name__ = event_handler_type

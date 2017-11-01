@@ -43,6 +43,9 @@ def get_ytvideos(query, ilogger):
         type="video,playlist"
     ).execute()
 
+    if not search_result["items"]:
+        return []
+
     # Get video/playlist title
     title = search_result["items"][0]["snippet"]["title"]
     ilogger.debug("Queueing {}".format(title))
