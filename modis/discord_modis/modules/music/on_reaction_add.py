@@ -36,14 +36,14 @@ async def on_reaction_add(reaction, user):
 
                 # Commands
                 if emoji == "⏯":
-                    await _data.cache[server.id].pause()
+                    await _data.cache[server.id].toggle()
                 if emoji == "⏹":
                     await _data.cache[server.id].stop()
-                if emoji == "⏩":
-                    await _data.cache[server.id].skip()
+                if emoji == "⏭":
+                    await _data.cache[server.id].skip("1")
                 if emoji == "🔀":
                     await _data.cache[server.id].shuffle()
                 if emoji == "🔉":
-                    await _data.cache[server.id].volume('-')
+                    await _data.cache[server.id].setvolume('-')
                 if emoji == "🔊":
-                    await _data.cache[server.id].volume('+')
+                    await _data.cache[server.id].setvolume('+')

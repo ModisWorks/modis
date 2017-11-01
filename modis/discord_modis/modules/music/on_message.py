@@ -25,7 +25,7 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    # Make sure this module is in serverdata for this server
+    # Make sure this module is in stored data for this server
     data = datatools.get_data()
     if _data.modulename not in data["discord"]["servers"][server.id]:
         data["discord"]["servers"][server.id][_data.modulename] = _data.sd_structure
@@ -42,11 +42,12 @@ async def on_message(message):
             arg = ' '.join(args)
 
             # Lock on to server if not yet locked
-            if server.id not in _data.cache:
+            if server.id not in _data.cache or _data.cache[server.id].state == 'destroyed':
                 _data.cache[server.id] = _musicplayer.MusicPlayer(server.id)
 
             # Remove message
-            if command in ['play', 'pause', 'skip', 'shuffle', 'stop', 'volume', 'front', 'movehere']:
+            if command in ['play', 'pause', 'resume', 'skip', 'shuffle', 'stop', 'destroy', 'volume', 'front',
+                           'movehere']:
                 try:
                     await client.delete_message(message)
                 except discord.errors.NotFound:
@@ -64,20 +65,23 @@ async def on_message(message):
             elif command == 'pause':
                 await _data.cache[server.id].pause()
 
+            elif command == 'resume':
+                await _data.cache[server.id].resume()
+
             elif command == 'skip':
                 await _data.cache[server.id].skip(query=arg)
 
             elif command == 'shuffle':
                 await _data.cache[server.id].shuffle()
 
-            elif command == 'destroy':
-                await _data.cache[server.id].destroy(reason="Music Player was destroyed")
-
             elif command == 'stop':
                 await _data.cache[server.id].stop()
 
+            elif command == 'destroy':
+                await _data.cache[server.id].destroy()
+
             elif command == 'volume':
-                await _data.cache[server.id].volume(arg)
+                await _data.cache[server.id].setvolume(arg)
 
             elif command == 'front' or command == 'movehere':
                 await _data.cache[server.id].movehere(channel)

@@ -39,9 +39,14 @@ def start(token, client_id, google_api_key, loop):
     def create_event_handler(event_handler_type):
         async def func(*args, **kwargs):
             for module_event_handler in event_handlers[event_handler_type]:
-                module_event_handler_func = getattr(module_event_handler,
-                                                    event_handler_type)
-                await module_event_handler_func(*args, **kwargs)
+                # Check for errors in the module event
+                try:
+                    module_event_handler_func = getattr(module_event_handler,
+                                                        event_handler_type)
+                    await module_event_handler_func(*args, **kwargs)
+                except Exception as e:
+                    logger.error("An error occured in '{}'".format(module_event_handler))
+                    logger.exception(e)
 
         func.__name__ = event_handler_type
         return func
