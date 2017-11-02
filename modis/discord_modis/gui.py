@@ -14,8 +14,7 @@ logger = logging.getLogger(__name__)
 class Frame(ttk.Frame):
     """The main window frame for Modis."""
 
-    def __init__(self, parent, discord_token, discord_client_id,
-                 google_api_key):
+    def __init__(self, parent, discord_token, discord_client_id):
         """
         Create a new main window frame.
 
@@ -31,8 +30,7 @@ class Frame(ttk.Frame):
         log.grid(column=1, row=0, padx=8, pady=8, sticky="W E N S")
 
         # Bot control panel
-        botcontrol = BotControl(self, discord_token, discord_client_id,
-                                google_api_key)
+        botcontrol = BotControl(self, discord_token, discord_client_id)
         botcontrol.grid(
             column=0, row=1, columnspan=2, padx=8, pady=8, sticky="W E N")
 
@@ -53,8 +51,7 @@ class Frame(ttk.Frame):
 class BotControl(ttk.Labelframe):
     """The control panel for the Modis bot."""
 
-    def __init__(self, parent, discord_token, discord_client_id,
-                 google_api_key):
+    def __init__(self, parent, discord_token, discord_client_id):
         """
         Create a new control panel and add it to the parent.
 
@@ -68,21 +65,41 @@ class BotControl(ttk.Labelframe):
 
         self.discord_thread = None
 
+        # Key name
+        self.key_name = tk.StringVar()
+        ttk.Label(self, text="API Key Name:").grid(column=0, row=0, padx=4, pady=4, sticky="W E S")
+        self.text_key_name = ttk.Entry(self, textvariable=self.key_name)
+        self.text_key_name.grid(column=0, row=1, padx=4, pady=4, sticky="W E N S")
+        # Key value
+        self.key_val = tk.StringVar()
+        ttk.Label(self, text="API Key Value:").grid(column=1, row=0, padx=4, pady=4, sticky="W E S")
+        self.text_key_value = ttk.Entry(self, textvariable=self.key_val)
+        self.text_key_value.grid(column=1, row=1, padx=4, pady=4, sticky="W E N S")
+        # Callbacks for text edit
+        self.key_name.trace("w", lambda name, index, mode, sv=self.key_name: self.key_changed())
+        self.key_val.trace("w", lambda name, index, mode, sv=self.key_val: self.key_changed())
+        # Add key button
+        self.button_key_add = ttk.Button(
+            self, command=lambda: self.key_add(), text="Add API Key")
+        self.button_key_add.grid(column=2, row=1, padx=4, pady=4, sticky="W E N S")
+        self.button_key_add.state(["disabled"])
+
         # Stop button
         self.button_stop = ttk.Button(
             self, command=lambda: self.stop(), text="Stop Modis")
-        self.button_stop.grid(column=0, row=0, padx=4, pady=4, sticky="E S")
+        self.button_stop.grid(column=3, row=0, padx=4, pady=4, sticky="W E N S")
         self.button_stop.state(["disabled"])
 
         # Start button
         self.button_start = ttk.Button(
-            self, command=lambda: self.start(discord_token, discord_client_id, google_api_key), text="Start Modis")
-        self.button_start.grid(column=0, row=1, padx=4, pady=4, sticky="E S")
+            self, command=lambda: self.start(discord_token, discord_client_id), text="Start Modis")
+        self.button_start.grid(column=3, row=1, padx=4, pady=4, sticky="W E N S")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=2)
 
-    def start(self, discord_token, discord_client_id, google_api_key):
+    def start(self, discord_token, discord_client_id):
         """Start Modis and log it into Discord."""
         self.button_stop.state(['!disabled'])
         self.button_start.state(['disabled'])
@@ -96,7 +113,7 @@ class BotControl(ttk.Labelframe):
         asyncio.set_event_loop(loop)
         self.discord_thread = threading.Thread(
             target=main.start,
-            args=[discord_token, discord_client_id, google_api_key, loop])
+            args=[discord_token, discord_client_id, loop])
         logger.debug("Starting event loop")
         self.discord_thread.start()
 
@@ -109,6 +126,36 @@ class BotControl(ttk.Labelframe):
 
         from ._client import client
         asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
+
+
+    def key_changed(self):
+        """Checks if the key name and value fields have been set, and updates the add key button"""
+        if self.key_name.get() and self.key_val.get():
+            self.button_key_add.state(["!disabled"])
+        else:
+            self.button_key_add.state(["disabled"])
+
+
+    def key_add(self):
+        """Adds the current API key to the bot's data"""
+        from .. import datatools
+        data = datatools.get_data()
+
+        if "keys" not in data["discord"]:
+            data["discord"]["keys"] = {}
+
+        is_key_new = False
+        if not self.key_name.get() in data["discord"]["keys"]:
+            is_key_new = True
+        elif data["discord"]["keys"][self.key_name.get()] == self.key_val.get():
+            logger.info("API key '{}' already has value '{}'".format(self.key_name.get(), self.key_val.get()))
+            return
+
+        data["discord"]["keys"][self.key_name.get()] = self.key_val.get()
+        datatools.write_data(data)
+
+        key_text = "added" if is_key_new else "updated"
+        logger.info("API key '{}' {} with value '{}'".format(self.key_name.get(), key_text, self.key_val.get()))
 
 
 class ModuleTabs(ttk.Labelframe):

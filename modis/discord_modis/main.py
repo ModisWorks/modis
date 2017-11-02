@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def start(token, client_id, google_api_key, loop):
+def start(token, client_id, loop):
     """Start the Discord client and log Modis into Discord."""
     import discord
     import asyncio
@@ -23,10 +23,10 @@ def start(token, client_id, google_api_key, loop):
         # Create a blank data file
         data = {"discord": {}}
         data["discord"]["servers"] = {}
+        data["discord"]["keys"] = {}
 
     data["discord"]["token"] = token
     data["discord"]["client_id"] = client_id
-    data["discord"]["google_api_key"] = google_api_key
     datatools.write_data(data)
 
     # Import event handlers
