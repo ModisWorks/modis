@@ -2,11 +2,12 @@ import requests
 import json
 
 
-def check_rank(player):
-    """Gets the Rocket League stats and name and dp of a SteamID
+def check_rank(player, platform="steam"):
+    """Gets the Rocket League stats and name and dp of a UserID
 
     Args:
-        player (str): The SteamID of the player we want to rank check
+        player (str): The UserID of the player we want to rank check
+        platform (str): The platform to check for, can be 'steam', 'ps', or 'xbox'
 
     Returns:
         success (bool): Whether the rank check was successful
@@ -15,14 +16,15 @@ def check_rank(player):
 
     # Get player ID and name Rocket League Tracker Network
     webpage = requests.get(
-        "https://rocketleague.tracker.network/profile/steam/{}".format(player)
+        "https://rocketleague.tracker.network/profile/{}/{}".format(platform, player)
     ).text
 
     try:
-        # Get player SteamID
-        steamid_index = webpage.index("/profile/mmr/steam/") + len("/profile/mmr/steam/")
-        steamid_end_index = webpage.index("""">""", steamid_index)
-        steamid = webpage[steamid_index:steamid_end_index]
+        # Get player's UserID
+        profile_mmr_page = "/profile/mmr/{}/".format(platform)
+        userid_index = webpage.index(profile_mmr_page) + len(profile_mmr_page)
+        userid_end_index = webpage.index("""">""", userid_index)
+        userid = webpage[userid_index:userid_end_index]
 
         # Get player ID
         playerid_index = webpage.index("/live?ids=") + len("/live?ids=")
@@ -73,4 +75,12 @@ def check_rank(player):
     dp = 'https://rocketleague.media.zestyio.com/' \
          'rocket-league-logos-vr-white.f1cb27a519bdb5b6ed34049a5b86e317.png'
 
-    return True, (stats, name, dp)
+    platform_display = platform
+    if platform == "steam":
+        platform_display = "Steam"
+    elif platform == "ps":
+        platform_display = "PlayStation"
+    elif platform == "xbox":
+        platform_display = "Xbox"
+
+    return True, (stats, name, platform_display, dp)

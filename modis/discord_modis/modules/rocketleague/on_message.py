@@ -20,6 +20,10 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
+    alias_steam = ["steam", "pc"]
+    alias_ps = ["ps", "psn", "playstation", "ps4", "playstation 4"]
+    alias_xbox = ["xbox", "xb", "xb1", "xbone", "xbox one", "xbox one"]
+
     # Make sure this module is in serverdata for this server
     data = datatools.get_data()
     if _data.modulename not in data["discord"]["servers"][server.id]:
@@ -34,17 +38,29 @@ async def on_message(message):
             package = content.split(" ")
             command = package[0][1:]
             args = package[1:]
-            arg = ' '.join(args)
+
+            platform = "steam"
+            if len(args) > 0:
+                player_name = args[0]
+            if len(args) > 1:
+                platform = ' '.join(args[1:]).lower()
+
+            if platform in alias_steam:
+                platform = "steam"
+            elif platform in alias_ps:
+                platform = "ps"
+            elif platform in alias_xbox:
+                platform = "xbox"
 
             # Commands
             if command == 'rlstats':
                 await client.send_typing(channel)
 
                 # Get Rocket League stats from stats API
-                success, rldata = api_rocketleaguestats.check_rank(arg)
+                success, rldata = api_rocketleaguestats.check_rank(player_name, platform)
                 # Create embed UI
                 if success:
-                    embed = ui_embed.success(channel, rldata[0], rldata[1], rldata[2])
+                    embed = ui_embed.success(channel, rldata[0], rldata[1], rldata[2], rldata[3])
                 else:
                     embed = ui_embed.fail_api(channel)
 
