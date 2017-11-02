@@ -20,14 +20,13 @@ logger.info("----------------NEW INSTANCE----------------")
 logger.info("Loading Modis")
 
 
-def console(discord_token, discord_client_id, google_api_key):
+def console(discord_token, discord_client_id):
     """
     Start Modis in console format.
 
     Args:
         discord_token (str): The bot token for your Discord application
         discord_client_id: The bot's client ID
-        google_api_key: A Google API key with YouTube API enabled
     """
     logger.info("Starting Modis in console")
 
@@ -44,7 +43,7 @@ def console(discord_token, discord_client_id, google_api_key):
     loop = asyncio.get_event_loop()
     discord_thread = threading.Thread(
         target=discord_modis_console.start,
-        args=[discord_token, discord_client_id, google_api_key, loop])
+        args=[discord_token, discord_client_id, loop])
     reddit_thread = threading.Thread(
         target=reddit_modis_console.start, args=[])
     facebook_thread = threading.Thread(
@@ -59,14 +58,13 @@ def console(discord_token, discord_client_id, google_api_key):
     logger.debug("Root startup completed")
 
 
-def gui(discord_token, discord_client_id, google_api_key):
+def gui(discord_token, discord_client_id):
     """
     Start Modis in gui format.
 
     Args:
         discord_token (str): The bot token for your Discord application
         discord_client_id: The bot's client ID
-        google_api_key: A Google API key with YouTube API enabled
     """
     logger.info("Starting Modis in GUI")
 
@@ -99,8 +97,7 @@ def gui(discord_token, discord_client_id, google_api_key):
     # Add tabs
     logger.debug("Adding packages to window")
     notebook.add(
-        discord_modis_gui.Frame(notebook, discord_token, discord_client_id,
-                                google_api_key),
+        discord_modis_gui.Frame(notebook, discord_token, discord_client_id),
         text="Discord")
     notebook.add(reddit_modis_gui.Frame(notebook), text="Reddit")
     notebook.add(facebook_modis_gui.Frame(notebook), text="Facebook")
