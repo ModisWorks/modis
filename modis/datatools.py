@@ -38,4 +38,4 @@ def write_data(data: dict):
         data (dict): The updated data dictionary for Modis
     """
     with open(_datafile, 'w') as file:
-        _json.dump(data, file, indent=2)
+        _json.dump(data, file, sort_keys=True, indent=2)

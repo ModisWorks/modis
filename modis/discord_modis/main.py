@@ -23,6 +23,8 @@ def start(token, client_id, loop):
         # Create a blank data file
         data = {"discord": {}}
         data["discord"]["servers"] = {}
+
+    if "keys" not in data["discord"]:
         data["discord"]["keys"] = {}
 
     data["discord"]["token"] = token
