@@ -34,17 +34,23 @@ async def on_message(message):
             package = content.split(" ")
             command = package[0][1:]
             args = package[1:]
-            arg = ' '.join(args)
+
+            print(' '.join(args))
+            platform = "steam"
+            if len(args) > 0:
+                player_name = args[0]
+            if len(args) > 1:
+                platform = args[1]
 
             # Commands
             if command == 'rlstats':
                 await client.send_typing(channel)
 
                 # Get Rocket League stats from stats API
-                success, rldata = api_rocketleaguestats.check_rank(arg)
+                success, rldata = api_rocketleaguestats.check_rank(player_name, platform)
                 # Create embed UI
                 if success:
-                    embed = ui_embed.success(channel, rldata[0], rldata[1], rldata[2])
+                    embed = ui_embed.success(channel, rldata[0], rldata[1], rldata[2], rldata[3])
                 else:
                     embed = ui_embed.fail_api(channel)
 
