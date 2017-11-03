@@ -15,7 +15,6 @@ def start(token, client_id, loop):
     from . import _client
     _client.client = client
 
-    # Save key info to data
     from .. import datatools
     if datatools.has_data():
         data = datatools.get_data()
@@ -24,6 +23,7 @@ def start(token, client_id, loop):
         data = {"discord": {}}
         data["discord"]["servers"] = {}
 
+    # Save default key info to data
     if "keys" not in data["discord"]:
         data["discord"]["keys"] = {}
 
