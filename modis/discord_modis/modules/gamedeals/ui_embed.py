@@ -14,12 +14,12 @@ def success(channel, post):
     """
 
     # Create datapacks
-    datapacks = [("Upvotes", post[2], True)]
+    datapacks = [("Game", post[0], True), ("Upvotes", post[2], True)]
 
     # Create embed UI object
     gui = ui_embed.UI(
         channel,
-        post[0],
+        "Link",
         post[1],
         modulename=modulename,
         creator=creator,

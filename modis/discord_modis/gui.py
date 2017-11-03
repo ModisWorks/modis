@@ -127,7 +127,6 @@ class BotControl(ttk.Labelframe):
         from ._client import client
         asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
 
-
     def key_changed(self):
         """Checks if the key name and value fields have been set, and updates the add key button"""
         if self.key_name.get() and self.key_val.get():
@@ -135,27 +134,14 @@ class BotControl(ttk.Labelframe):
         else:
             self.button_key_add.state(["disabled"])
 
-
     def key_add(self):
         """Adds the current API key to the bot's data"""
-        from .. import datatools
-        data = datatools.get_data()
+        from .main import add_api_key
+        add_api_key(self.key_name.get(), self.key_val.get())
 
-        if "keys" not in data["discord"]:
-            data["discord"]["keys"] = {}
-
-        is_key_new = False
-        if not self.key_name.get() in data["discord"]["keys"]:
-            is_key_new = True
-        elif data["discord"]["keys"][self.key_name.get()] == self.key_val.get():
-            logger.info("API key '{}' already has value '{}'".format(self.key_name.get(), self.key_val.get()))
-            return
-
-        data["discord"]["keys"][self.key_name.get()] = self.key_val.get()
-        datatools.write_data(data)
-
-        key_text = "added" if is_key_new else "updated"
-        logger.info("API key '{}' {} with value '{}'".format(self.key_name.get(), key_text, self.key_val.get()))
+        # Clear the text fields
+        self.key_name.set("")
+        self.key_val.set("")
 
 
 class ModuleTabs(ttk.Labelframe):
