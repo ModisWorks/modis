@@ -5,7 +5,7 @@ import discord
 
 class UI:
     def __init__(self, channel, title, description,
-                 modulename="Modis", creator="anonymous", colour=0xAAFF00, thumbnail=None, datapacks=()):
+                 modulename="Modis", creator="anonymous", colour=0xAAFF00, thumbnail=None, image=None, datapacks=()):
         """Initialises variables and builds GUI
 
         Args:
@@ -26,6 +26,7 @@ class UI:
         self.creator = creator
         self.colour = colour
         self.thumbnail = thumbnail
+        self.image = image
         self.datapacks = datapacks
 
         self.built_embed = self.build()
@@ -46,6 +47,9 @@ class UI:
 
         if self.thumbnail:
             embed.set_thumbnail(url=self.thumbnail)
+
+        if self.image:
+            embed.set_image(url=self.image)
 
         embed.set_author(
             name="Modis",

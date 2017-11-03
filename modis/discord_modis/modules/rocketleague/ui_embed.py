@@ -2,7 +2,7 @@ from .._tools import ui_embed
 from ._data import *
 
 
-def success(channel, stats, name, dp):
+def success(channel, stats, name, platform, dp):
     """Creates an embed UI containing the Rocket League stats
 
     Args:
@@ -17,6 +17,7 @@ def success(channel, stats, name, dp):
 
     # Create datapacks
     datapacks = []
+    datapacks.append(("Platform", platform, False))
     for stat in stats:
         # Add stats
         if stat[0] in ("Duel 1v1", "Doubles 2v2", "Solo Standard 3v3", "Standard 3v3"):

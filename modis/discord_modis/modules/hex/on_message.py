@@ -3,7 +3,7 @@ from .... import datatools
 
 from . import _data
 
-from . import api_rocketleaguestats
+from . import api_hexconvert
 from . import ui_embed
 
 
@@ -20,10 +20,6 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    alias_steam = ["steam", "pc"]
-    alias_ps = ["ps", "psn", "playstation", "ps4", "playstation 4"]
-    alias_xbox = ["xbox", "xb", "xb1", "xbone", "xbox one", "xbox one"]
-
     # Make sure this module is in serverdata for this server
     data = datatools.get_data()
     if _data.modulename not in data["discord"]["servers"][server.id]:
@@ -38,30 +34,38 @@ async def on_message(message):
             package = content.split(" ")
             command = package[0][1:]
             args = package[1:]
-
-            platform = "steam"
-            if len(args) > 0:
-                player_name = args[0]
-            if len(args) > 1:
-                platform = ' '.join(args[1:]).lower()
-
-            if platform in alias_steam:
-                platform = "steam"
-            elif platform in alias_ps:
-                platform = "ps"
-            elif platform in alias_xbox:
-                platform = "xbox"
+            arg = ' '.join(args)
 
             # Commands
-            if command == 'rlstats':
+            if command == 'hex':
                 await client.send_typing(channel)
 
-                # Get Rocket League stats from stats API
-                success, rldata = api_rocketleaguestats.check_rank(player_name, platform)
+                # Parse message
+                success, hex_str = api_hexconvert.convert_hex_value(arg)
                 # Create embed UI
                 if success:
-                    embed = ui_embed.success(channel, rldata[0], rldata[1], rldata[2], rldata[3])
+                    image_url = convert_hex_to_url(hex_str)
+                    embed = ui_embed.success(channel, image_url, hex_str)
                 else:
                     embed = ui_embed.fail_api(channel)
 
                 await embed.send()
+        else:
+            # Parse message
+            success, hex_str = api_hexconvert.convert_hex_value(content)
+            # Create embed UI
+            if success:
+                await client.send_typing(channel)
+                image_url = convert_hex_to_url(hex_str)
+                embed = ui_embed.success(channel, image_url, hex_str)
+                await embed.send()
+
+
+def convert_hex_to_url(hex_value):
+    """
+    Converts a hex value to a url for an image of that value
+
+    Returns:
+        url (str): A url referencing an image of the given hex value
+    """
+    return "https://dummyimage.com/250.png/{0}/{0}".format(hex_value)
