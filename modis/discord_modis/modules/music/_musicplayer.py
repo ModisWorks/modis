@@ -41,6 +41,7 @@ class MusicPlayer:
         self.mchannel = None
         self.embed = None
         self.queue_display = 9
+        self.nowplaying = "---"
         self.nowplayinglog = logging.getLogger("{}.{}.nowplaying".format(__name__, self.server_id))
         self.queuelog = logging.getLogger("{}.{}.queue".format(__name__, self.server_id))
         self.queuelenlog = logging.getLogger("{}.{}.queuelen".format(__name__, self.server_id))
@@ -73,7 +74,7 @@ class MusicPlayer:
                 except:
                     pass
 
-    async def play(self, author, text_channel, query):
+    async def play(self, author, text_channel, query, now=False, stop_current=False):
         """
         The play command
 
@@ -81,12 +82,17 @@ class MusicPlayer:
             author (discord.Member): The member that called the command
             text_channel (discord.Channel): The channel where the command was called
             query (str): The argument that was passed with the command
+            now (bool): Whether to play now or at the end of the queue
         """
         await self.setup(author, text_channel)
 
         if self.state == 'ready':
             # Queue the song
-            self.enqueue(query)
+            self.enqueue(query, now)
+
+            if stop_current:
+                if self.streamer:
+                    self.streamer.stop()
 
             # Start playing if not yet playing
             if self.streamer is None:
@@ -101,10 +107,6 @@ class MusicPlayer:
         self.nowplayinglog.info("---")
         self.statuslog.info("Stopping")
 
-        if self.embed:
-            await self.embed.usend()
-
-        self.mready = False
         self.vready = False
 
         try:
@@ -119,11 +121,17 @@ class MusicPlayer:
             pass
 
         self.vclient = None
+        self.queue = []
         self.streamer = None
+
+        self.update_queue()
 
         self.nowplayinglog.info("---")
         self.statuslog.info("Stopped")
         self.state = 'off'
+
+        if self.embed:
+            await self.embed.usend()
 
     async def destroy(self):
         """Destroy the whole gui and music player"""
@@ -148,10 +156,10 @@ class MusicPlayer:
         self.streamer = None
 
         if self.embed:
-            await self.embed.destroy()
+            await self.embed.delete()
             self.embed = None
 
-        self.state = 'destroyed'
+        self.state = 'off'
 
     async def toggle(self):
         """Toggles between paused and not paused command"""
@@ -216,6 +224,8 @@ class MusicPlayer:
 
         if query == "":
             query = "1"
+        elif query == "all":
+            query = str(len(self.queue) + 1)
 
         try:
             num = int(query)
@@ -316,13 +326,16 @@ class MusicPlayer:
 
         self.logger.debug("movehere command")
 
-        if self.state != 'ready':
-            return
-
+        # Delete the old message
         await self.embed.delete()
+        # Set the channel to this channel
         self.embed.channel = channel
-        await self.embed.usend()
+        # Send a new embed to the channel
+        await self.embed.send()
+        # Re-add the reactions
         await self.add_reactions()
+
+        self.statuslog.info("Moved to front")
 
     # Methods
     async def vsetup(self, author):
@@ -384,6 +397,7 @@ class MusicPlayer:
         # Create gui
         self.mchannel = text_channel
         self.new_embed_ui()
+        await self.embed.send()
         await self.embed.usend()
         await self.add_reactions()
 
@@ -391,10 +405,6 @@ class MusicPlayer:
 
     def new_embed_ui(self):
         """Create the embed UI object and save it to self"""
-
-        if self.state != 'starting':
-            logger.error("Attempt to create UI from wrong state ('{}'), must be 'starting'.".format(self.state))
-            return
 
         self.logger.debug("Creating new embed ui object")
 
@@ -405,7 +415,7 @@ class MusicPlayer:
 
         # Initial datapacks
         datapacks = [
-            ("Now playing", "---", False),
+            ("Now playing", self.nowplaying, False),
             ("Queue", "```{}```".format(''.join(queue_display)), False),
             ("Songs left in queue", "---", True),
             ("Volume", "{}%".format(self.volume), True),
@@ -413,16 +423,15 @@ class MusicPlayer:
         ]
 
         # Create embed UI object
-        if not self.embed:
-            self.embed = ui_embed.UI(
-                self.mchannel,
-                "Music Player",
-                "Press the buttons!",
-                modulename=_data.modulename,
-                creator=_data.creator,
-                colour=0x88FF00,
-                datapacks=datapacks
-            )
+        self.embed = ui_embed.UI(
+            self.mchannel,
+            "Music Player",
+            "Press the buttons!",
+            modulename=_data.modulename,
+            creator=_data.creator,
+            colour=0x88FF00,
+            datapacks=datapacks
+        )
 
         # Add handlers to update gui
         noformatter = logging.Formatter("{message}", style="{")
@@ -451,17 +460,19 @@ class MusicPlayer:
         self.statuslog.info("Loading buttons")
         for e in ("⏯", "⏹", "⏭", "🔀", "🔉", "🔊"):
             try:
-                await client.add_reaction(self.embed.sent_embed, e)
+                if self.embed is not None:
+                    await client.add_reaction(self.embed.sent_embed, e)
             except discord.DiscordException:
                 self.statuslog.error("I couldn't add the buttons. Check my permissions.")
             except Exception as e:
                 logger.exception(e)
 
-    def enqueue(self, query):
+    def enqueue(self, query, front=False):
         """Queues songs based on either a YouTube search or a link
 
         Args:
             query (str): Either a search term or a link
+            front (bool): Whether to enqueue at the front or the end
         """
 
         if self.state != 'ready':
@@ -473,9 +484,15 @@ class MusicPlayer:
         self.statuslog.info("Queueing {}".format(query))
 
         if "/" in query and "youtube" not in query:
-            self.queue.append([query, query])
+            if front:
+                self.queue.push([query, query])
+            else:
+                self.queue.append([query, query])
         else:
-            self.queue = self.queue + api_youtube.get_ytvideos(query, self.statuslog)
+            if front:
+                self.queue = api_youtube.get_ytvideos(query, self.statuslog) + self.queue
+            else:
+                self.queue = self.queue + api_youtube.get_ytvideos(query, self.statuslog)
 
         self.update_queue()
 
@@ -485,6 +502,8 @@ class MusicPlayer:
         """ Updates the queue in the music player """
 
         self.logger.debug("Updating queue display")
+
+        self.nowplayinglog.info(self.nowplaying)
 
         queue_display = []
         for i in range(self.queue_display):
@@ -530,8 +549,10 @@ class MusicPlayer:
                 self.streamer.start()
 
                 self.statuslog.info("Playing")
+                self.nowplaying = songname
                 self.nowplayinglog.info(songname)
             except Exception as e:
+                self.nowplaying = "Error"
                 self.nowplayinglog.info("Error playing {}".format(songname))
                 self.statuslog.error("Had a problem playing {}".format(songname))
                 logger.exception(e)
@@ -551,22 +572,33 @@ class MusicPlayer:
         else:
             self.statuslog.info("Finished queue")
             self.state = "ready"
+
+            self.update_queue()
+
             await self.stop()
 
     async def vafter(self):
         """Function that is called after a song finishes playing"""
 
+        self.logger.debug("Finished playing a song")
         if self.state != 'ready':
+            self.logger.debug("Returning because player is in state {}".format(self.state))
             return
 
-        self.logger.debug("Finished playing a song")
+        try:
+            if self.streamer.error is None:
+                self.streamer = None
+                await self.vplay()
+            else:
+                await self.destroy()
+                self.statuslog.critical("Encountered an error while playing :/")
+        except Exception as e:
+            try:
+                await self.destroy()
+            except:
+                pass
 
-        if self.streamer.error is None:
-            self.streamer = None
-            await self.vplay()
-        else:
-            await self.destroy()
-            self.statuslog.critical("Encountered an error while playing :/")
+            logger.exception(e)
 
 
 class EmbedLogHandler(logging.Handler):
@@ -590,7 +622,7 @@ class EmbedLogHandler(logging.Handler):
             return
 
     async def usend_when_ready(self):
-        if self.music_player.state != 'destroying' and self.embed is not None:
+        if self.embed is not None:
             await self.embed.usend()
 
     def emit(self, record):

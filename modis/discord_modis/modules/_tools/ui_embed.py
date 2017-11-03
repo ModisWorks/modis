@@ -28,8 +28,6 @@ class UI:
         self.thumbnail = thumbnail
         self.datapacks = datapacks
 
-        self.destroyed = False
-
         self.built_embed = self.build()
         self.sent_embed = None
 
@@ -40,75 +38,56 @@ class UI:
             discord.Embed: Built GUI
         """
 
-        if not self.destroyed:
-            embed = discord.Embed(
-                title=self.title,
-                type='rich',
-                description=self.description,
-                colour=self.colour)
+        embed = discord.Embed(
+            title=self.title,
+            type='rich',
+            description=self.description,
+            colour=self.colour)
 
-            if self.thumbnail:
-                embed.set_thumbnail(url=self.thumbnail)
+        if self.thumbnail:
+            embed.set_thumbnail(url=self.thumbnail)
 
-            embed.set_author(
-                name="Modis",
-                url="https://infraxion.github.io/modis/",
-                icon_url="http://infraxion.ddns.net/modis/dp/modis64t.png")
+        embed.set_author(
+            name="Modis",
+            url="https://infraxion.github.io/modis/",
+            icon_url="http://infraxion.ddns.net/modis/dp/modis64t.png")
 
-            for pack in self.datapacks:
-                embed.add_field(
-                    name=pack[0],
-                    value=pack[1],
-                    inline=pack[2]
-                )
-
-            embed.set_footer(
-                text="{} module by {}".format(self.modulename, self.creator),
-                icon_url="http://infraxion.ddns.net/modis/dp/{}64.jpg".format(self.creator)
+        for pack in self.datapacks:
+            embed.add_field(
+                name=pack[0],
+                value=pack[1],
+                inline=pack[2]
             )
 
-            return embed
+        embed.set_footer(
+            text="{} module by {}".format(self.modulename, self.creator),
+            icon_url="http://infraxion.ddns.net/modis/dp/{}64.jpg".format(self.creator)
+        )
+
+        return embed
 
     async def send(self):
         """Send new GUI"""
 
-        if not self.destroyed:
-            await client.send_typing(self.channel)
-            self.sent_embed = await client.send_message(self.channel, embed=self.built_embed)
+        await client.send_typing(self.channel)
+        self.sent_embed = await client.send_message(self.channel, embed=self.built_embed)
 
     async def usend(self):
         """Edit existing GUI if available, else send new GUI"""
 
-        if not self.destroyed:
-            if self.sent_embed:
-                try:
-                    await client.edit_message(self.sent_embed, embed=self.built_embed)
-                except discord.NotFound:
-                    self.sent_embed = await client.send_message(self.channel, embed=self.built_embed)
-            else:
-                await client.send_typing(self.channel)
-                self.sent_embed = await client.send_message(self.channel, embed=self.built_embed)
+        try:
+            await client.edit_message(self.sent_embed, embed=self.built_embed)
+        except:
+            pass
 
     async def delete(self):
         """Deletes the existing GUI if available"""
-
-        if not self.destroyed:
-            try:
-                await client.delete_message(self.sent_embed)
-            except:
-                pass
-
-    async def destroy(self):
-        """Destroys the existing GUI if available"""
-
-        self.destroyed = True
 
         try:
             await client.delete_message(self.sent_embed)
         except:
             pass
 
-        self.built_embed = None
         self.sent_embed = None
 
     def update_data(self, index, data):
@@ -119,6 +98,5 @@ class UI:
             data (str): The new value to set for this datapack
         """
 
-        if not self.destroyed:
-            datapack = self.built_embed.to_dict()["fields"][index]
-            self.built_embed.set_field_at(index, name=datapack["name"], value=data, inline=datapack["inline"])
+        datapack = self.built_embed.to_dict()["fields"][index]
+        self.built_embed.set_field_at(index, name=datapack["name"], value=data, inline=datapack["inline"])
