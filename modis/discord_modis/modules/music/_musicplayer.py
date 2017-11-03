@@ -65,13 +65,7 @@ class MusicPlayer:
             await self.vsetup(author)
 
             # Mark as 'ready' if everything is ok
-            self.state = 'ready' if self.mready and self.vready else 'error'
-
-            if self.state != 'ready':
-                try:
-                    await self.stop()
-                except:
-                    pass
+            self.state = 'ready' if self.mready and self.vready else 'off'
 
     async def play(self, author, text_channel, query, now=False, stop_current=False):
         """
@@ -121,8 +115,9 @@ class MusicPlayer:
             pass
 
         self.vclient = None
-        self.queue = []
+        self.vchannel = None
         self.streamer = None
+        self.queue = []
 
         self.update_queue()
 
@@ -146,6 +141,11 @@ class MusicPlayer:
         self.vready = False
 
         try:
+            self.streamer.stop()
+        except:
+            pass
+
+        try:
             await self.vclient.disconnect()
         except Exception as e:
             logger.error(e)
@@ -154,6 +154,7 @@ class MusicPlayer:
         self.vclient = None
         self.vchannel = None
         self.streamer = None
+        self.queue = []
 
         if self.embed:
             await self.embed.delete()

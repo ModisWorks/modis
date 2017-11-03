@@ -33,8 +33,9 @@ async def on_message(message):
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
+        logger.info("New message received in {}".format(server.id))
         # Commands section
-        if content.startswith(datatools.get_data()["discord"]["servers"][server.id]["prefix"]):
+        if content.startswith(data["discord"]["servers"][server.id]["prefix"]):
             # Parse message
             package = content.split(" ")
             command = package[0][1:]
@@ -42,7 +43,7 @@ async def on_message(message):
             arg = ' '.join(args)
 
             # Lock on to server if not yet locked
-            if server.id not in _data.cache or _data.cache[server.id].state == 'destroyed':
+            if server.id not in _data.cache:
                 _data.cache[server.id] = _musicplayer.MusicPlayer(server.id)
 
             # Remove message
