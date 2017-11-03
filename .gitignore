@@ -131,4 +131,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Local data
 data.json
+
+# Atom build
+.atom-build.*
