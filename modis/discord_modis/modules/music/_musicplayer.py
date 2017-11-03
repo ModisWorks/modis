@@ -41,7 +41,6 @@ class MusicPlayer:
         self.mchannel = None
         self.embed = None
         self.queue_display = 9
-        self.nowplaying = "---"
         self.nowplayinglog = logging.getLogger("{}.{}.nowplaying".format(__name__, self.server_id))
         self.queuelog = logging.getLogger("{}.{}.queue".format(__name__, self.server_id))
         self.queuelenlog = logging.getLogger("{}.{}.queuelen".format(__name__, self.server_id))
@@ -82,7 +81,8 @@ class MusicPlayer:
             author (discord.Member): The member that called the command
             text_channel (discord.Channel): The channel where the command was called
             query (str): The argument that was passed with the command
-            now (bool): Whether to play now or at the end of the queue
+            now (bool): Whether to play next or at the end of the queue
+            stop_current (bool): Whether to stop the currently playing song
         """
         await self.setup(author, text_channel)
 
@@ -415,7 +415,7 @@ class MusicPlayer:
 
         # Initial datapacks
         datapacks = [
-            ("Now playing", self.nowplaying, False),
+            ("Now playing", "---", False),
             ("Queue", "```{}```".format(''.join(queue_display)), False),
             ("Songs left in queue", "---", True),
             ("Volume", "{}%".format(self.volume), True),
@@ -503,8 +503,6 @@ class MusicPlayer:
 
         self.logger.debug("Updating queue display")
 
-        self.nowplayinglog.info(self.nowplaying)
-
         queue_display = []
         for i in range(self.queue_display):
             try:
@@ -549,10 +547,8 @@ class MusicPlayer:
                 self.streamer.start()
 
                 self.statuslog.info("Playing")
-                self.nowplaying = songname
                 self.nowplayinglog.info(songname)
             except Exception as e:
-                self.nowplaying = "Error"
                 self.nowplayinglog.info("Error playing {}".format(songname))
                 self.statuslog.error("Had a problem playing {}".format(songname))
                 logger.exception(e)
