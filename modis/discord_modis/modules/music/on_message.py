@@ -57,9 +57,6 @@ async def on_message(message):
                     logger.warning("Could not delete music player command message - Forbidden")
 
             # Commands
-            if command == 'init':
-                await _data.cache[server.id].setup(author, channel)
-
             if command == 'play':
                 await _data.cache[server.id].play(author, channel, arg)
 
