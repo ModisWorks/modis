@@ -155,3 +155,38 @@ def _get_event_handlers():
                         importlib.import_module(import_name, "modis"))
 
     return event_handlers
+
+
+def add_api_key(key, value):
+    """
+    Adds a key to the bot's data
+
+    Args:
+        key: The name of the key to add
+        value: The value for the key
+    """
+
+    if key is None or key == "":
+        logger.error("Key cannot be empty")
+
+    if value is None or value == "":
+        logger.error("Value cannot be empty")
+
+    from .. import datatools
+    data = datatools.get_data()
+
+    if "keys" not in data["discord"]:
+        data["discord"]["keys"] = {}
+
+    is_key_new = False
+    if key not in data["discord"]["keys"]:
+        is_key_new = True
+    elif data["discord"]["keys"][key] == value:
+        logger.info("API key '{}' already has value '{}'".format(key, value))
+        return
+
+    data["discord"]["keys"][key] = value
+    datatools.write_data(data)
+
+    key_text = "added" if is_key_new else "updated"
+    logger.info("API key '{}' {} with value '{}'".format(key, key_text, value))
