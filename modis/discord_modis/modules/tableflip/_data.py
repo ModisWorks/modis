@@ -1,6 +1,6 @@
-modulename = "tableflip"
+modulename = "Tableflip"
 
-creator = "infraxion"
+creator = "Infraxion"
 
 sd_structure = {
     "activated": True

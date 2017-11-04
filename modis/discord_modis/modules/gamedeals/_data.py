@@ -1,6 +1,6 @@
-modulename = "gamedeals"
+modulename = "Gamedeals"
 
-creator = "infraxion"
+creator = "Infraxion"
 
 sd_structure = {
     "activated": True

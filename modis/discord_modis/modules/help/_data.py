@@ -1,6 +1,6 @@
-modulename = "help"
+modulename = "Help"
 
-creator = "ytnomsnrub"
+creator = "YtnomSnrub"
 
 sd_structure = {
     "activated": True

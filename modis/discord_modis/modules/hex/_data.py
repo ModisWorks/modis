@@ -1,6 +1,6 @@
-modulename = "hex"
+modulename = "Hex"
 
-creator = "ytnomsnrub"
+creator = "YtnomSnrub"
 
 sd_structure = {
     "activated": True

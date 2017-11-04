@@ -1,6 +1,6 @@
-modulename = "replies"
+modulename = "Replies"
 
-creator = "infraxion"
+creator = "Infraxion"
 
 sd_structure = {
     "activated": True,

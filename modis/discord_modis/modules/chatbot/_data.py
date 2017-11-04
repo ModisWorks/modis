@@ -1,6 +1,6 @@
-modulename = "chatbot"
+modulename = "ChatBot"
 
-creator = "infraxion"
+creator = "Infraxion"
 
 sd_structure = {
     "activated": True,

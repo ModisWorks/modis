@@ -1,4 +1,4 @@
-modulename = "bethebot"
+modulename = "BeTheBot"
 
 creator = "Infraxion"
 
