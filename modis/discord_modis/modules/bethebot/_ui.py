@@ -22,12 +22,12 @@ class ModuleUIFrame(ttk.Frame):
             parent: tk or ttk element
         """
 
-        super(ModuleUIFrame, self).__init__(parent)
+        super(ModuleUIFrame, self).__init__(parent, padding=8)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
 
         chat = ChatFrame(self)
-        chat.grid(column=0, row=0, padx=8, pady=8, sticky="W E")
-
-        self.columnconfigure(0, weight=1)
+        chat.grid(column=0, row=0, sticky="W E N S")
 
         # Help frame
         help_frame = ttk.LabelFrame(self, padding=8, text="Help")
