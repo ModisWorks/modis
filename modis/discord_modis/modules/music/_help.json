@@ -39,5 +39,5 @@
       "description": "Moves the music player to the front of the channel the command was sent from"
     }
   },
-  "About": "Music plays videos and playlists from YouTube, and music files stored on the internet."
+  "About": "music plays videos and playlists from YouTube, and music files stored on the internet."
 }
