@@ -1,5 +1,3 @@
-
-
 def convert_hex_value(message, needs_prefix=True):
     prefixes = ["0x", "#"]
     hex_chars = "0123456789ABCDEF"

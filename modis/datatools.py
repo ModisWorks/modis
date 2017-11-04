@@ -4,7 +4,7 @@ import json as _json
 import os as _os
 
 _dir = _os.path.dirname(_os.path.realpath(__file__))
-_datafile = "data.json".format(_dir)
+_datafile = "{}/../data.json".format(_dir)
 
 
 def has_data() -> bool:

@@ -1,0 +1,8 @@
+{
+  "Commands": {
+    "gamedeals": {
+      "description": "Gets the top game deals from Reddit"
+    }
+  },
+  "About": "Gamedeals uses Reddit to find the best game deals."
+}
