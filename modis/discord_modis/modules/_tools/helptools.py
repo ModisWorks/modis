@@ -31,7 +31,7 @@ def get_help_data(filepath):
 
 def get_help_datapacks(filepath, prefix="!"):
     """
-    Load help text from a file and give is as datapacks
+    Load help text from a file and give it as datapacks
 
     Args:
         filepath (str): The file to load help text from
@@ -84,7 +84,7 @@ def add_help_text(parent, filepath, prefix="!"):
 
     text = tk.Text(parent, wrap='word', font=("Helvetica", 10))
     text.grid(row=0, column=0, sticky="W E N S")
-    text.tag_config("heading", font=("Helvetica", 12))
+    text.tag_config("heading", font=("Helvetica", 14))
     text.tag_config("command", font=("Courier", 10))
     text.tag_config("param", font=("Courier", 10))
     text.tag_config("description")
