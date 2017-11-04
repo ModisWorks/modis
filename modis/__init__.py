@@ -80,12 +80,12 @@ def gui(discord_token, discord_client_id):
 
     # Setup the root window
     root = tk.Tk()
-    root.minsize(width=800, height=600)
+    root.minsize(width=800, height=400)
     root.geometry("800x600")
     root.title("Modis Control Panel")
 
     # Setup the notebook
-    notebook = ttk.Notebook(root)
+    """notebook = ttk.Notebook(root)
     notebook.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
 
     # Configure stretch ratios
@@ -100,7 +100,14 @@ def gui(discord_token, discord_client_id):
         discord_modis_gui.Frame(notebook, discord_token, discord_client_id),
         text="Discord")
     notebook.add(reddit_modis_gui.Frame(notebook), text="Reddit")
-    notebook.add(facebook_modis_gui.Frame(notebook), text="Facebook")
+    notebook.add(facebook_modis_gui.Frame(notebook), text="Facebook")"""
+    discord = discord_modis_gui.Frame(root, discord_token, discord_client_id)
+    discord.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
+    # Configure stretch ratios
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
+    discord.columnconfigure(0, weight=1)
+    discord.rowconfigure(0, weight=1)
 
     logger.debug("GUI initialised")
 

@@ -11,13 +11,13 @@ ytdiscoveryapi = None
 
 def build_api():
     data = datatools.get_data()
-    if "google" not in data["discord"]["keys"]:
-        logger.critical("No API key found with name 'google'")
-        logger.info("Please add your google API key with name 'google' int the control panel")
+    if "google_api_key" not in data["discord"]["keys"]:
+        logger.critical("No API key found with name 'google_api_key'")
+        logger.info("Please add your google API key with name 'google_api_key' int the control panel")
         return False
 
     logger.debug("Building YouTube discovery API")
-    ytdevkey = data["discord"]["keys"]["google"]
+    ytdevkey = data["discord"]["keys"]["google_api_key"]
     try:
         global ytdiscoveryapi
         ytdiscoveryapi = googleapiclient.discovery.build("youtube", "v3", developerKey=ytdevkey)

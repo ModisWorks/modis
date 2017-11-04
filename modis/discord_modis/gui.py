@@ -25,33 +25,151 @@ class Frame(ttk.Frame):
 
         logger.debug("Initialising frame")
 
-        # Log
-        log = Log(self)
-        log.grid(column=1, row=0, padx=8, pady=8, sticky="W E N S")
-
-        # Bot control panel
-        botcontrol = BotControl(self, discord_token, discord_client_id)
-        botcontrol.grid(
-            column=0, row=1, columnspan=2, padx=8, pady=8, sticky="W E N")
-
-        # Module tabs
-        moduletabs = ModuleTabs(self)
-        moduletabs.grid(column=0, row=0, padx=8, pady=8, sticky="W E N S")
+        # Create the main control panel
+        nav = ttk.Notebook(self)
+        module_frame = ModuleFrame(nav)
+        nav.add(GlobalFrame(nav, discord_token, discord_client_id, module_frame), text="Global")
+        nav.add(module_frame, text="Modules")
+        nav.grid(column=0, row=0, sticky="W E N S")
 
         # Status bar
         statusbar = StatusBar(self)
-        statusbar.grid(column=0, row=2, columnspan=2, sticky="W E S")
+        statusbar.grid(column=0, row=1, sticky="W E S")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+
+class GlobalFrame(tk.Frame):
+    """The frame that has all global elements for the bot"""
+
+    def __init__(self, parent, discord_token, discord_client_id, module_frame):
+        super(GlobalFrame, self).__init__(parent)
+
+        # Log
+        log = Log(self)
+        log.grid(column=0, row=0, padx=8, pady=8, sticky="W E N S")
+
+        # Bot control panel
+        botcontrol = BotControl(self, discord_token, discord_client_id, module_frame)
+        botcontrol.grid(
+            column=0, row=1, padx=8, pady=8, sticky="W E S")
+
+        # Configure stretch ratios
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=0)
+
+
+class ModuleFrame(tk.Frame):
+    """The frame that has all global elements for the bot"""
+
+    def __init__(self, parent):
+        """
+        Create a new module frame and add it to the given parent.
+
+        Args:
+            parent: A tk or ttk object
+        """
+
+        super(ModuleFrame, self).__init__(parent)
+        logger.debug("Initialising module tabs")
+
+        # Setup styles
+        style = ttk.Style()
+        style.configure("Module.TFrame", background="white")
+
+        self.module_buttons = {}
+        self.current_button = None
+
+        # Module view
+        self.module_list = ttk.Frame(self, width=150, style="Module.TFrame")
+        self.module_list.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
+        self.module_list.columnconfigure(0, weight=1)
+        self.module_list.rowconfigure(0, weight=0)
+        self.module_list.rowconfigure(1, weight=1)
+        # Header
+        header = tk.Label(self.module_list, text="Modules", bg="white", fg="#484848")
+        header.grid(column=0, row=0, padx=0, pady=0, sticky="W E N")
+        # Module selection list
+        self.module_selection = ttk.Frame(self.module_list, style="Module.TFrame")
+        self.module_selection.grid(column=0, row=1, padx=0, pady=0, sticky="W E N S")
+        self.module_selection.columnconfigure(0, weight=1)
+        # Module UI view
+        self.module_ui = ttk.Frame(self)
+        self.module_ui.grid(column=1, row=0, padx=0, pady=0, sticky="W E N S")
+        self.module_ui.columnconfigure(0, weight=1)
+        self.module_ui.rowconfigure(0, weight=1)
+
+        self.clear_modules()
+
+        # Configure stretch ratios
+        self.columnconfigure(0, minsize=150)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
+
+    def clear_modules(self):
+        """Clears all modules from the list"""
+        for child in self.module_selection.winfo_children():
+            child.destroy()
+
+        self.clear_ui()
+
+        tk.Label(self.module_ui, text="Start Modis and select a module").grid(
+            column=0, row=0, padx=0, pady=0, sticky="W E N S")
+
+        if self.current_button is not None:
+            self.current_button.config(bg="white")
+
+        self.module_buttons = {}
+        self.current_button = None
+
+    def clear_ui(self):
+        """Clears everything in the UI"""
+        for child in self.module_ui.winfo_children():
+            child.destroy()
+
+    def add_module(self, module_name, module_ui):
+        m_button = tk.Label(self.module_selection, text=module_name, bg="white", anchor="w")
+        m_button.grid(column=0, row=len(self.module_selection.winfo_children()), padx=0, pady=0, sticky="W E N S")
+
+        self.module_buttons[module_name] = m_button
+        m_button.bind("<Button-1>", lambda e: self.module_selected(module_name, module_ui))
+
+    def module_selected(self, module_name, module_ui):
+        if self.current_button == self.module_buttons[module_name]:
+            return
+
+        logger.debug("{}, {}".format(module_name, module_ui))
+        self.module_buttons[module_name].config(bg="#cacaca")
+        if self.current_button is not None:
+            self.current_button.config(bg="white")
+        self.current_button = self.module_buttons[module_name]
+
+        self.clear_ui()
+
+        if module_ui is not None:
+            try:
+                # Create the UI
+                module_ui_frame = module_ui.ModuleUIFrame(self.module_ui)
+                module_ui_frame.grid(column=0, row=0, sticky="W E N S")
+            except Exception as e:
+                logger.error("Could not load UI for {}".format(module_name))
+                logger.exception(e)
+                # Create a error UI
+                tk.Label(self.module_ui, text="Could not load UI for {}".format(module_name)).grid(
+                    column=0, row=0, padx=0, pady=0, sticky="W E N S")
+        else:
+            # Create a default UI
+            tk.Label(self.module_ui, text="{} has no _ui.py".format(module_name)).grid(
+                column=0, row=0, padx=0, pady=0, sticky="W E N S")
 
 
 class BotControl(ttk.Labelframe):
     """The control panel for the Modis bot."""
 
-    def __init__(self, parent, discord_token, discord_client_id):
+    def __init__(self, parent, discord_token, discord_client_id, module_frame):
         """
         Create a new control panel and add it to the parent.
 
@@ -84,6 +202,9 @@ class BotControl(ttk.Labelframe):
         self.button_key_add.grid(column=2, row=1, padx=4, pady=4, sticky="W E N S")
         self.button_key_add.state(["disabled"])
 
+        # Module frame
+        self.module_frame = module_frame
+
         # Stop button
         self.button_stop = ttk.Button(
             self, command=lambda: self.stop(), text="Stop Modis")
@@ -106,14 +227,17 @@ class BotControl(ttk.Labelframe):
 
         logger.info("----------------STARTING DISCORD MODIS----------------")
 
-        from modis.discord_modis import main
+        # Clear the module list
+        self.module_frame.clear_modules()
 
+        # Start Modis
+        from modis.discord_modis import main
         logger.debug("Creating event loop")
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         self.discord_thread = threading.Thread(
             target=main.start,
-            args=[discord_token, discord_client_id, loop])
+            args=[discord_token, discord_client_id, loop, self.module_frame.add_module])
         logger.debug("Starting event loop")
         self.discord_thread.start()
 
@@ -144,33 +268,6 @@ class BotControl(ttk.Labelframe):
         self.key_val.set("")
 
 
-class ModuleTabs(ttk.Labelframe):
-    """The notebook showing the tabs for all the modules."""
-
-    def __init__(self, parent):
-        """
-        Create a new notebook and add it to the given parent.
-
-        Args:
-            parent: A tk or ttk object
-        """
-        logger.debug("Initialising module tabs")
-
-        super(ModuleTabs, self).__init__(parent, padding=8, text="Module tabs")
-
-        # Module tabs notebook
-        self.module_notebook = ttk.Notebook(self)
-        self.module_notebook.grid(
-            column=0, row=0, padx=4, pady=4, sticky="W E N S")
-
-        # Configure stretch ratios
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
-
-        # Add initial tab
-        self.module_notebook.add(ttk.Frame(self), text="No modules loaded")
-
-
 class Log(ttk.Labelframe):
     """The text box showing the Python console log."""
 
@@ -187,7 +284,7 @@ class Log(ttk.Labelframe):
 
         # Log text box
         log = tk.Text(self, wrap="none")
-        log.grid(column=0, row=0, padx=4, pady=4, sticky="W E N S")
+        log.grid(column=0, row=0, sticky="W E N S")
         log.insert("end", "Welcome to Modis for Discord Beta v0.2.3\n")
 
         # Vertical Scrollbar
@@ -206,6 +303,7 @@ class Log(ttk.Labelframe):
                 logging.Handler.__init__(self)
 
                 self.text_widget = text_widget
+                self.text_widget.config(state=tk.DISABLED)
 
             def flush(self):
                 self.text_widget.see("end")
@@ -213,7 +311,9 @@ class Log(ttk.Labelframe):
             def emit(self, record):
                 msg = self.format(record)
                 msg = msg[:9] + msg[29:]
+                self.text_widget.config(state=tk.NORMAL)
                 self.text_widget.insert("end", msg + "\n")
+                self.text_widget.config(state=tk.DISABLED)
                 self.flush()
 
         discord_logger = logging.getLogger("modis.discord_modis")

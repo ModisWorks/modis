@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def start(token, client_id, loop):
+def start(token, client_id, loop, module_found_handler=None):
     """Start the Discord client and log Modis into Discord."""
     import discord
     import asyncio
@@ -33,7 +33,7 @@ def start(token, client_id, loop):
 
     # Import event handlers
     logger.info("Importing event handlers")
-    event_handlers = _get_event_handlers()
+    event_handlers = _get_event_handlers(module_found_handler)
 
     # Create event handler combiner
     logger.debug("Compiling event handlers")
@@ -86,7 +86,7 @@ def start(token, client_id, loop):
             client.loop.close()
 
 
-def _get_event_handlers():
+def _get_event_handlers(module_found_handler):
     """
     Gets dictionary of event handlers and the modules that define them
 
@@ -140,9 +140,19 @@ def _get_event_handlers():
 
         # Iterate through files in module
         if os.path.isdir(module_dir) and not module_name.startswith("_"):
-
             # Add all defined event handlers in module files
             module_event_handlers = os.listdir(module_dir)
+
+            if module_found_handler:
+                if "_ui.py" in module_event_handlers:
+                    import_name = ".discord_modis.modules.{}.{}".format(
+                        module_name, "_ui")
+                    logger.info(
+                        "Found module UI file {}".format(import_name[23:]))
+
+                    module_found_handler(module_name, importlib.import_module(import_name, "modis"))
+                else:
+                    module_found_handler(module_name, None)
 
             for event_handler in event_handlers.keys():
                 if "{}.py".format(event_handler) in module_event_handlers:

@@ -1,0 +1,43 @@
+{
+  "Commands": {
+    "play": {
+      "params": ["query/link"],
+      "description": "Starts playing the first result of the query or link"
+    },
+    "playnext": {
+      "params": ["query/link"],
+      "description": "Starts playing the query or link after the current song has finished"
+    },
+    "playnow": {
+      "params": ["query/link"],
+      "description": "Stops playing the current song and starts playing the query or link"
+    },
+    "pause": {
+      "description": "Pauses the currently playing song"
+    },
+    "resume": {
+      "description": "Resumes the currently playing song"
+    },
+    "shuffle": {
+      "description": "Randomly shuffles the remaining songs in the queue"
+    },
+    "skip": {
+      "params": ["n=1"],
+      "description": "Skips the next [n] songs"
+    },
+    "volume": {
+      "params": ["v"],
+      "description": "Sets the volume to [v]% (must be between 0% and 200%)"
+    },
+    "stop": {
+      "description": "Stops the currently playing song, clears the queue, and disconnects from voice"
+    },
+    "destroy": {
+      "description": "Stops and removes the music player"
+    },
+    "front": {
+      "description": "Moves the music player to the front of the channel the command was sent from"
+    }
+  },
+  "About": "Music plays videos and playlists from YouTube, and music files stored on the internet."
+}
