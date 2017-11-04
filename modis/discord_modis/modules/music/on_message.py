@@ -33,7 +33,6 @@ async def on_message(message):
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
-        logger.info("New message received in {}".format(server.id))
         # Commands section
         if content.startswith(data["discord"]["servers"][server.id]["prefix"]):
             # Parse message
