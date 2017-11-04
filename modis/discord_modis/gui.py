@@ -141,7 +141,6 @@ class ModuleFrame(tk.Frame):
         if self.current_button == self.module_buttons[module_name]:
             return
 
-        logger.debug("{}, {}".format(module_name, module_ui))
         self.module_buttons[module_name].config(bg="#cacaca")
         if self.current_button is not None:
             self.current_button.config(bg="white")
@@ -205,25 +204,28 @@ class BotControl(ttk.Labelframe):
         # Module frame
         self.module_frame = module_frame
 
-        # Stop button
-        self.button_stop = ttk.Button(
-            self, command=lambda: self.stop(), text="Stop Modis")
-        self.button_stop.grid(column=3, row=0, padx=4, pady=4, sticky="W E N S")
-        self.button_stop.state(["disabled"])
-
-        # Start button
-        self.button_start = ttk.Button(
-            self, command=lambda: self.start(discord_token, discord_client_id), text="Start Modis")
-        self.button_start.grid(column=3, row=1, padx=4, pady=4, sticky="W E N S")
+        # Toggle button
+        self.state = "off"
+        self.button_toggle_text = tk.StringVar(value="Start Modis")
+        self.button_toggle = ttk.Button(
+            self, command=lambda: self.toggle(discord_token, discord_client_id), textvariable=self.button_toggle_text)
+        self.button_toggle.grid(column=3, row=1, padx=4, pady=4, sticky="W E N S")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=2)
 
+    def toggle(self, discord_token, discord_client_id):
+        """Toggles Modis on or off"""
+        if self.state == 'off':
+            self.start(discord_token, discord_client_id)
+        elif self.state == 'on':
+            self.stop()
+
     def start(self, discord_token, discord_client_id):
         """Start Modis and log it into Discord."""
-        self.button_stop.state(['!disabled'])
-        self.button_start.state(['disabled'])
+        self.button_toggle_text.set("Stop Modis")
+        self.state = "on"
 
         logger.info("----------------STARTING DISCORD MODIS----------------")
 
@@ -243,8 +245,8 @@ class BotControl(ttk.Labelframe):
 
     def stop(self):
         """Stop Modis and log it out of Discord."""
-        self.button_stop.state(['disabled'])
-        self.button_start.state(['!disabled'])
+        self.button_toggle_text.set("Start Modis")
+        self.state = "off"
 
         logger.info("Stopping Discord Modis")
 
