@@ -21,6 +21,9 @@ def start(token, client_id, loop, module_found_handler=None):
     else:
         # Create a blank data file
         data = {"discord": {}}
+
+    # Save default server info to data
+    if "servers" not in data["discord"]:
         data["discord"]["servers"] = {}
 
     # Save default key info to data

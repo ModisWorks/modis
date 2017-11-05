@@ -1,6 +1,6 @@
 import logging
 
-from .... import datatools
+from modis import datatools
 
 import googleapiclient.discovery
 

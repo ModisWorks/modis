@@ -1,7 +1,6 @@
-from ..._client import client
-from .... import datatools
-
+from modis import datatools
 from . import _data
+from ..._client import client
 
 
 async def on_message(message):
@@ -17,17 +16,16 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    # Make sure this module is in serverdata for this server
     data = datatools.get_data()
-    if _data.modulename not in data["discord"]["servers"][server.id]:
-        data["discord"]["servers"][server.id][_data.modulename] = _data.sd_structure
-        datatools.write_data(data)
+
+    if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
+        return
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
-        # Retrieve replies from serverdata
-        normal_replies = datatools.get_data()["discord"]["servers"][server.id][_data.modulename]["normal"]
-        tts_replies = datatools.get_data()["discord"]["servers"][server.id][_data.modulename]["tts"]
+        # Retrieve replies from server data
+        normal_replies = data["discord"]["servers"][server.id][_data.modulename]["normal"]
+        tts_replies = data["discord"]["servers"][server.id][_data.modulename]["tts"]
 
         # Check normal replies
         for r in normal_replies.keys():
