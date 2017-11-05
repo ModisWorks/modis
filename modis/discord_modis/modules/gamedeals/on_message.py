@@ -24,10 +24,11 @@ async def on_message(message):
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Commands section
-        if content.startswith(data["discord"]["servers"][server.id]["prefix"]):
+        prefix = data["discord"]["servers"][server.id]["prefix"]
+        if content.startswith(prefix):
             # Parse message
             package = content.split(" ")
-            command = package[0][1:]
+            command = package[0][len(prefix):]
             args = package[1:]
             arg = ' '.join(args)
 

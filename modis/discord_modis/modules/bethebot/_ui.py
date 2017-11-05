@@ -4,6 +4,7 @@ import os
 import tkinter as tk
 from tkinter import ttk
 
+from modis import datatools
 from .._tools import helptools
 from ..._client import client
 
@@ -95,6 +96,11 @@ def send_message(channel_id, message):
     if channel is None:
         logger.info("{} is not a channel".format(channel_id))
         return
+
+    # Check that it's enabled in the server
+    data = datatools.get_data()
+    if not data["discord"]["servers"][channel.server.id]["activated"]:
+        logger.info("This module has been disabled in {} ({})".format(channel.server.name, channel.server.id))
 
     try:
         runcoro(client.send_message(channel, message))

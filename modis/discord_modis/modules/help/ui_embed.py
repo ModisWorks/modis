@@ -3,7 +3,8 @@ from ._data import *
 
 
 def success(channel, title, datapacks):
-    """Creates an embed UI containing the Rocket League stats
+    """
+    Creates an embed UI containing the help message
 
     Args:
         channel (discord.Channel): The Discord channel to bind the embed to
@@ -11,7 +12,7 @@ def success(channel, title, datapacks):
         datapacks (list): The hex value
 
     Returns:
-        embed: The sent embed
+        ui (ui_embed.UI): The embed UI object
     """
 
     # Create embed UI object

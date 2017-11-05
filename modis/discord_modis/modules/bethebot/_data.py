@@ -2,4 +2,6 @@ modulename = "BeTheBot"
 
 creator = "Infraxion"
 
-sd_structure = {}
+sd_structure = {
+    "activated": True
+}

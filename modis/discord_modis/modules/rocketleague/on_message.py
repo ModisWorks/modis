@@ -24,19 +24,23 @@ async def on_message(message):
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Commands section
-        if content.startswith(data["discord"]["servers"][server.id]["prefix"]):
+        prefix = data["discord"]["servers"][server.id]["prefix"]
+        if content.startswith(prefix):
+            # Parse message
+            package = content.split(" ")
+            command = package[0][len(prefix):]
+            args = package[1:]
+
             alias_steam = ["steam", "pc"]
             alias_ps = ["ps", "psn", "playstation", "ps4", "playstation 4"]
             alias_xbox = ["xbox", "xb", "xb1", "xbone", "xbox one", "xbox one"]
 
-            # Parse message
-            package = content.split(" ")
-            command = package[0][1:]
-            args = package[1:]
-
             platform = "steam"
             if len(args) > 0:
                 player_name = args[0]
+            else:
+                return
+
             if len(args) > 1:
                 platform = ' '.join(args[1:]).lower()
 
