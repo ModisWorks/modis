@@ -1,5 +1,5 @@
 # Discord.py:
-    discord.py
+    discord
     aiohttp
     websockets
     chardet
@@ -12,7 +12,7 @@
 
 
 # All Modis external packages:
-    discord.py
+    discord
     youtube_dl
     pynacl
     google-api-python-client
@@ -20,27 +20,27 @@
     lxml
 
 music module:
-    discord.py
+    discord
     youtube_dl
     pynacl
     google-api-python-client
 
 replies module:
-    discord.py
+    discord
 
 tableflip module:
-    discord.py
+    discord
 
 chatbot module:
-    discord.py
+    discord
     requests
     lxml
 
 gamedeals module:
-    discord.py
+    discord
     praw
 
 rocketleague module:
-    discord.py
+    discord
     requests
     lxml
