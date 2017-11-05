@@ -1,13 +1,11 @@
+import asyncio as _asyncio
+import logging
+import os
 import tkinter as tk
 from tkinter import ttk
 
-import asyncio as _asyncio
-
-import os
 from .._tools import helptools
 from ..._client import client
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +41,8 @@ class ModuleUIFrame(ttk.Frame):
 
 
 class ChatFrame(ttk.LabelFrame):
+    """The chat frame for the BeTheBot module"""
+
     def __init__(self, parent):
         """Send messages from the bot
 
@@ -82,6 +82,14 @@ class ChatFrame(ttk.LabelFrame):
 
 
 def send_message(channel_id, message):
+    """
+    Send a message to a channel
+
+    Args:
+        channel_id (str): The id of the channel to send the message to
+        message (str): The message to send to the channel
+    """
+
     channel = client.get_channel(channel_id)
 
     if channel is None:

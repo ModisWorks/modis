@@ -1,8 +1,8 @@
 import logging
 
-from .... import datatools
-
 import praw
+
+from modis import datatools
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,6 @@
+from modis import datatools
+from . import _data, api_rocketleaguestats, ui_embed
 from ..._client import client
-from .... import datatools
-
-from . import _data
-
-from . import api_rocketleaguestats
-from . import ui_embed
 
 
 async def on_message(message):
@@ -20,20 +16,19 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    alias_steam = ["steam", "pc"]
-    alias_ps = ["ps", "psn", "playstation", "ps4", "playstation 4"]
-    alias_xbox = ["xbox", "xb", "xb1", "xbone", "xbox one", "xbox one"]
-
-    # Make sure this module is in serverdata for this server
     data = datatools.get_data()
-    if _data.modulename not in data["discord"]["servers"][server.id]:
-        data["discord"]["servers"][server.id][_data.modulename] = _data.sd_structure
-        datatools.write_data(data)
+
+    if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
+        return
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Commands section
-        if content.startswith(datatools.get_data()["discord"]["servers"][server.id]["prefix"]):
+        if content.startswith(data["discord"]["servers"][server.id]["prefix"]):
+            alias_steam = ["steam", "pc"]
+            alias_ps = ["ps", "psn", "playstation", "ps4", "playstation 4"]
+            alias_xbox = ["xbox", "xb", "xb1", "xbone", "xbox one", "xbox one"]
+
             # Parse message
             package = content.split(" ")
             command = package[0][1:]
