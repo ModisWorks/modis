@@ -3,7 +3,8 @@ from ._data import *
 
 
 def success(channel, image, hex_str):
-    """Creates an embed UI containing the Rocket League stats
+    """
+    Creates an embed UI containing a hex color message
 
     Args:
         channel (discord.Channel): The Discord channel to bind the embed to
@@ -11,7 +12,7 @@ def success(channel, image, hex_str):
         hex_str (str): The hex value
 
     Returns:
-
+        ui (ui_embed.UI): The embed UI object that was created
     """
 
     hex_number = int(hex_str, 16)
@@ -31,7 +32,8 @@ def success(channel, image, hex_str):
 
 
 def fail_api(channel):
-    """Creates an embed UI for when the API call didn't work
+    """
+    Creates an embed UI for when the API call didn't work
 
     Args:
         channel (discord.Channel): The Discord channel to bind the embed to

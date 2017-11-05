@@ -28,7 +28,7 @@ async def on_message(message):
         if content.startswith(prefix):
             # Parse message
             package = content.split(" ")
-            command = package[0][1:]
+            command = package[0][len(prefix):]
             args = package[1:]
             arg = ' '.join(args)
 
@@ -50,13 +50,3 @@ async def on_message(message):
                         await client.send_typing(channel)
                         embed = ui_embed.success(channel, arg, datapacks)
                         await embed.send()
-
-
-def convert_hex_to_url(hex_value):
-    """
-    Converts a hex value to a url for an image of that value
-
-    Returns:
-        url (str): A url referencing an image of the given hex value
-    """
-    return "https://dummyimage.com/250.png/{0}/{0}".format(hex_value)

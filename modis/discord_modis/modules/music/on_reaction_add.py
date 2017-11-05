@@ -21,7 +21,7 @@ async def on_reaction_add(reaction, user):
 
     data = datatools.get_data()
 
-    if not data["discord"]["servers"][server.id]["activated"]:
+    if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
         return
 
     # Commands section
