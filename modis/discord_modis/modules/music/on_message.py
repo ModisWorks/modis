@@ -39,7 +39,7 @@ async def on_message(message):
             arg = ' '.join(args)
 
             # Lock on to server if not yet locked
-            if server.id not in _data.cache:
+            if server.id not in _data.cache or _data.cache[server.id].state == 'destroyed':
                 _data.cache[server.id] = _musicplayer.MusicPlayer(server.id)
 
             # Remove message

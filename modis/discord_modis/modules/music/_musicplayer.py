@@ -132,7 +132,7 @@ class MusicPlayer:
         """Destroy the whole gui and music player"""
 
         self.logger.debug("destroy command")
-        self.state = 'destroying'
+        self.state = 'destroyed'
 
         self.nowplayinglog.info("---")
         self.statuslog.info("Destroying")
@@ -159,8 +159,6 @@ class MusicPlayer:
         if self.embed:
             await self.embed.delete()
             self.embed = None
-
-        self.state = 'off'
 
     async def toggle(self):
         """Toggles between paused and not paused command"""
@@ -639,8 +637,11 @@ def runcoro(async_function):
         async_function (Coroutine): The asynchronous function to run
     """
 
-    print(async_function)
+    try:
+        print(async_function)
 
-    future = asyncio.run_coroutine_threadsafe(async_function, client.loop)
-    result = future.result()
-    return result
+        future = asyncio.run_coroutine_threadsafe(async_function, client.loop)
+        result = future.result()
+        return result
+    except Exception as e:
+        logger.exception(e)

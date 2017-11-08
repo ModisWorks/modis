@@ -26,6 +26,9 @@ async def on_reaction_add(reaction, user):
 
     # Commands section
     if user != reaction.message.channel.server.me:
+        if server.id not in _data.cache or _data.cache[server.id].state == 'destroyed':
+            return
+
         try:
             valid_reaction = reaction.message.id == _data.cache[server.id].embed.sent_embed.id
         except AttributeError:
