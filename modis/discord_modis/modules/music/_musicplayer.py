@@ -132,7 +132,7 @@ class MusicPlayer:
         """Destroy the whole gui and music player"""
 
         self.logger.debug("destroy command")
-        self.state = 'destroying'
+        self.state = 'destroyed'
 
         self.nowplayinglog.info("---")
         self.statuslog.info("Destroying")
@@ -159,8 +159,6 @@ class MusicPlayer:
         if self.embed:
             await self.embed.delete()
             self.embed = None
-
-        self.state = 'off'
 
     async def toggle(self):
         """Toggles between paused and not paused command"""
