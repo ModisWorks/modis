@@ -10,8 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 async def on_message(message):
-    """
-    The on_message event handler for this module
+    """The on_message event handler for this module
 
     Args:
         message (discord.Message): Input message
@@ -40,7 +39,7 @@ async def on_message(message):
             arg = ' '.join(args)
 
             # Lock on to server if not yet locked
-            if server.id not in _data.cache or _data.cache[server.id].state == 'destroyed':
+            if server.id not in _data.cache:
                 _data.cache[server.id] = _musicplayer.MusicPlayer(server.id)
 
             # Remove message
