@@ -52,18 +52,15 @@ def get_help_datapacks(filepath, prefix="!"):
 
         if d == "Commands":
             for c in help_contents[d]:
-                if "name" not in c:
-                    continue
-
                 content += "`"
-                command = prefix + c["name"]
+                command = prefix + c
                 content += "{}".format(command)
-                if "params" in c:
-                    for param in c["params"]:
+                if "params" in help_contents[d][c]:
+                    for param in help_contents[d][c]["params"]:
                         content += " [{}]".format(param)
                 content += "`: "
-                if "description" in c:
-                    content += c["description"]
+                if "description" in help_contents[d][c]:
+                    content += help_contents[d][c]["description"]
                 content += "\n"
         else:
             content += help_contents[d]
@@ -104,17 +101,14 @@ def add_help_text(parent, filepath, prefix="!"):
 
         if d == "Commands":
             for c in help_contents[d]:
-                if "name" not in c:
-                    continue
-
-                command = prefix + c["name"]
+                command = prefix + c
                 text.insert('end', command, ("command", "description"))
-                if "params" in c:
-                    for param in c["params"]:
+                if "params" in help_contents[d][c]:
+                    for param in help_contents[d][c]["params"]:
                         text.insert('end', " [{}]".format(param), ("param", "description"))
                 text.insert('end', ": ")
-                if "description" in c:
-                    text.insert('end', c["description"], "description")
+                if "description" in help_contents[d][c]:
+                    text.insert('end', help_contents[d][c]["description"], "description")
 
                 text.insert('end', '\n')
 

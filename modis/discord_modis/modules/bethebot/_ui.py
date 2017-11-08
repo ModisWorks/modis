@@ -1,9 +1,11 @@
 import asyncio as _asyncio
 import logging
+import os
 import tkinter as tk
 from tkinter import ttk
 
 from modis import datatools
+from .._tools import helptools
 from ..._client import client
 
 logger = logging.getLogger(__name__)
@@ -19,12 +21,24 @@ class ModuleUIFrame(ttk.Frame):
             parent: tk or ttk element
         """
 
-        super(ModuleUIFrame, self).__init__(parent)
+        super(ModuleUIFrame, self).__init__(parent, padding=8)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
         chat = ChatFrame(self)
         chat.grid(column=0, row=0, sticky="W E N S")
+
+        # Help frame
+        help_frame = ttk.LabelFrame(self, padding=8, text="Help")
+        help_frame.grid(row=1, column=0, sticky="W E N S")
+        help_frame.columnconfigure(0, weight=1)
+        help_frame.rowconfigure(0, weight=1)
+        # Find the help path
+        _dir = os.path.realpath(
+            os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        help_path = "{}/{}".format(_dir, "_help.json")
+        # Load the text
+        helptools.add_help_text(help_frame, help_path)
 
 
 class ChatFrame(ttk.LabelFrame):

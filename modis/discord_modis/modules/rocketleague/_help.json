@@ -1,15 +1,9 @@
 {
-  "Commands": [
-    {
-      "name": "rlstats",
-      "params": ["userid"],
-      "description": "Displays the stats for the given Steam user"
-    },
-    {
-      "name": "rlstats",
-      "params": ["userid", "playform"],
+  "Commands": {
+    "rlstats": {
+      "params": ["userid", "playform='steam'"],
       "description": "Displays the stats for the given user on the specified platform"
     }
-  ],
+  },
   "About": "rocketleague lets you look up player's Rocket League stats."
 }
