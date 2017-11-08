@@ -1,11 +1,10 @@
 import asyncio as _asyncio
 import logging
-import os
 import tkinter as tk
 from tkinter import ttk
 
 from modis import datatools
-from modis import helptools
+from ._data import *
 from ..._client import client
 
 logger = logging.getLogger(__name__)
@@ -87,7 +86,7 @@ def send_message(channel_id, message):
 
     # Check that it's enabled in the server
     data = datatools.get_data()
-    if not data["discord"]["servers"][channel.server.id]["activated"]:
+    if not data["discord"]["servers"][channel.server.id][modulename]["activated"]:
         logger.info("This module has been disabled in {} ({})".format(channel.server.name, channel.server.id))
 
     try:
