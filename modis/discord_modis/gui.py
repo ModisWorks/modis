@@ -1,12 +1,13 @@
 """Base GUI for Modis."""
 
+import asyncio
 import logging
-
+import os
+import threading
 import tkinter as tk
 import tkinter.ttk as ttk
 
-import threading
-import asyncio
+from modis import helptools
 
 logger = logging.getLogger(__name__)
 
@@ -148,21 +149,57 @@ class ModuleFrame(tk.Frame):
 
         self.clear_ui()
 
-        if module_ui is not None:
-            try:
-                # Create the UI
-                module_ui_frame = module_ui.ModuleUIFrame(self.module_ui)
-                module_ui_frame.grid(column=0, row=0, sticky="W E N S")
-            except Exception as e:
-                logger.error("Could not load UI for {}".format(module_name))
-                logger.exception(e)
-                # Create a error UI
-                tk.Label(self.module_ui, text="Could not load UI for {}".format(module_name)).grid(
-                    column=0, row=0, padx=0, pady=0, sticky="W E N S")
-        else:
-            # Create a default UI
-            tk.Label(self.module_ui, text="{} has no _ui.py".format(module_name)).grid(
+        try:
+            # Create the UI
+            module_ui_frame = ModuleUIBaseFrame(self.module_ui, module_name, module_ui)
+            module_ui_frame.grid(column=0, row=0, sticky="W E N S")
+        except Exception as e:
+            logger.error("Could not load UI for {}".format(module_name))
+            logger.exception(e)
+            # Create a error UI
+            tk.Label(self.module_ui, text="Could not load UI for {}".format(module_name)).grid(
                 column=0, row=0, padx=0, pady=0, sticky="W E N S")
+
+
+class ModuleUIBaseFrame(ttk.Frame):
+    """A base frame for a module's UI"""
+
+    def __init__(self, parent, module_name, module_ui):
+        """
+        Create a new base for a module UI
+
+        Args:
+            parent: A tk or ttk object
+            module_name (str): The name of the module
+            module_ui: The _ui.py file to add for the module
+        """
+
+        super(ModuleUIBaseFrame, self).__init__(parent, padding=8)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+
+        if module_ui is not None:
+            # Module UI frame
+            module_ui.ModuleUIFrame(self).grid(row=0, column=0, sticky="W E N S")
+        else:
+            logger.debug("No _ui.py found for '{}'".format(module_name))
+
+        # Help frame
+        help_frame = ttk.LabelFrame(self, padding=8, text="Help")
+        help_frame.grid(row=1, column=0, sticky="W E N S")
+        help_frame.columnconfigure(0, weight=1)
+        help_frame.rowconfigure(0, weight=1)
+        # Find the help path
+        _dir = os.path.realpath(
+            os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        help_path = "{}/modules/{}/{}".format(_dir, module_name, "_help.json")
+        if os.path.isfile(help_path):
+            # Load the text
+            helptools.add_help_text(help_frame, help_path)
+        else:
+            # Default message
+            tk.Label(help_frame, text="No _help.json file found for '{}'".format(module_name)).grid(row=0, column=0,
+                                                                                                    sticky="W E N S")
 
 
 class BotControl(ttk.Labelframe):
@@ -308,7 +345,10 @@ class Log(ttk.Labelframe):
                 self.text_widget.config(state=tk.DISABLED)
 
             def flush(self):
-                self.text_widget.see("end")
+                try:
+                    self.text_widget.see("end")
+                except:
+                    pass
 
             def emit(self, record):
                 msg = self.format(record)

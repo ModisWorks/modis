@@ -1,17 +1,20 @@
 {
-  "Commands": {
-    "activate": {
+  "Commands": [
+    {
+      "name": "activate",
       "params": ["module"],
       "description": "Activates the given module for this server"
     },
-    "deactivate": {
+    {
+      "name": "deactivate",
       "params": ["module"],
       "description": "Deactivates the given module for this server"
     },
-    "prefix": {
+    {
+      "name": "prefix",
       "params": ["prefix"],
       "description": "Updates the prefix for the server"
     }
-  },
+  ],
   "About": "manager allows users to activate and deactivate modules within a server, and change the server prefix for Modis."
 }

@@ -1,6 +1,6 @@
 import os
 
-from .._tools import helptools
+from modis import helptools
 
 
 def get_help_datapacks(module_name, server_prefix):
