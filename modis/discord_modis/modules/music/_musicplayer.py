@@ -1,14 +1,12 @@
+import asyncio
 import logging
-
-from ..._client import client
-from .._tools import ui_embed
-
-from . import api_youtube
-from . import _data
+import random
 
 import discord
-import asyncio
-import random
+
+from . import _data, api_youtube
+from .._tools import ui_embed
+from ..._client import client
 
 logger = logging.getLogger(__name__)
 
@@ -219,6 +217,7 @@ class MusicPlayer:
         """
 
         if not self.state == 'ready':
+            logger.debug("Trying to skip from wrong state '{}'".format(self.state))
             return
 
         if query == "":
@@ -243,8 +242,8 @@ class MusicPlayer:
 
             try:
                 self.streamer.stop()
-            except AttributeError:
-                pass
+            except Exception as e:
+                logger.exception(e)
 
     async def shuffle(self):
         """The shuffle command"""
@@ -482,19 +481,13 @@ class MusicPlayer:
 
         self.statuslog.info("Queueing {}".format(query))
 
-        if "/" in query and "youtube" not in query:
-            if front:
-                self.queue.push([query, query])
-            else:
-                self.queue.append([query, query])
+        yt_videos = api_youtube.parse_query(query, self.statuslog)
+        if front:
+            self.queue = yt_videos + self.queue
         else:
-            if front:
-                self.queue = api_youtube.get_ytvideos(query, self.statuslog) + self.queue
-            else:
-                self.queue = self.queue + api_youtube.get_ytvideos(query, self.statuslog)
+            self.queue = self.queue + yt_videos
 
         self.update_queue()
-
         self.statuslog.info("Queued {}".format(query))
 
     def update_queue(self):
@@ -521,10 +514,6 @@ class MusicPlayer:
             logger.error("Attempt to play song from wrong state ('{}'), must be 'ready'.".format(self.state))
             return
 
-        if self.streamer is not None:
-            logger.error("Streamer already exists")
-            return
-
         self.state = "starting streamer"
 
         self.logger.debug("Playing next in queue")
@@ -539,13 +528,16 @@ class MusicPlayer:
             self.queue.pop(0)
 
             try:
-                self.streamer = await self.vclient.create_ytdl_player(song, after=lambda: runcoro(self.vafter()))
+                self.streamer = await self.vclient.create_ytdl_player(song, after=self.vafter_ts)
                 self.state = "ready"
 
                 self.streamer.volume = self.volume / 100
                 self.streamer.start()
 
-                self.statuslog.info("Playing")
+                if self.streamer.is_live:
+                    self.statuslog.info("Streaming")
+                else:
+                    self.statuslog.info("Playing")
                 self.nowplayinglog.info(songname)
             except Exception as e:
                 self.nowplayinglog.info("Error playing {}".format(songname))
@@ -572,6 +564,13 @@ class MusicPlayer:
 
             await self.stop()
 
+    def vafter_ts(self):
+        future = asyncio.run_coroutine_threadsafe(self.vafter(), client.loop)
+        try:
+            future.result()
+        except:
+            pass
+
     async def vafter(self):
         """Function that is called after a song finishes playing"""
 
@@ -582,10 +581,10 @@ class MusicPlayer:
 
         try:
             if self.streamer.error is None:
-                self.streamer = None
                 await self.vplay()
             else:
                 await self.destroy()
+                self.statuslog.error(self.streamer.error)
                 self.statuslog.critical("Encountered an error while playing :/")
         except Exception as e:
             try:
@@ -613,7 +612,8 @@ class EmbedLogHandler(logging.Handler):
     def flush(self):
         try:
             asyncio.run_coroutine_threadsafe(self.usend_when_ready(), client.loop)
-        except discord.DiscordException:
+        except Exception as e:
+            logger.exception(e)
             return
 
     async def usend_when_ready(self):
@@ -627,21 +627,3 @@ class EmbedLogHandler(logging.Handler):
         except AttributeError:
             return
         self.flush()
-
-
-def runcoro(async_function):
-    """
-    Runs an asynchronous function without needing to use await - useful for lambda
-
-    Args:
-        async_function (Coroutine): The asynchronous function to run
-    """
-
-    try:
-        print(async_function)
-
-        future = asyncio.run_coroutine_threadsafe(async_function, client.loop)
-        result = future.result()
-        return result
-    except Exception as e:
-        logger.exception(e)
