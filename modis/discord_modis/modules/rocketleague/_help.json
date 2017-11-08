@@ -7,7 +7,7 @@
     },
     {
       "name": "rlstats",
-      "params": ["userid", "playform"],
+      "params": ["userid", "platform"],
       "description": "Displays the stats for the given user on the specified platform"
     }
   ],

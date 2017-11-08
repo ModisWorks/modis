@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from modis import datatools
-from .._tools import helptools
+from modis import helptools
 from ..._client import client
 
 logger = logging.getLogger(__name__)
