@@ -1,46 +1,31 @@
-# Discord.py:
-    discord
-    aiohttp
-    websockets
-    chardet
-    multidict
-    async-timeout
+# Quick install list:
+    # pip install:
+        discord.py
+        youtube-dl
+        pynacl
+        google-api-python-client
+        requests
+        lxml
+        praw
+    # ffmpeg/bin/ in system PATH variables
 
+
+# core:
     youtube-dl
+    # ffmpeg/bin/ in system PATH variables
 
-    # Needs ffmpeg/bin/ in path
-
-
-# All Modis external packages:
-    discord
-    youtube_dl
-    pynacl
-    google-api-python-client
-    requests
-    lxml
-
-music module:
-    discord
-    youtube_dl
+# music module:
+    youtube-dl
     pynacl
     google-api-python-client
 
-replies module:
-    discord
-
-tableflip module:
-    discord
-
-chatbot module:
-    discord
+# chatbot module:
     requests
     lxml
 
-gamedeals module:
-    discord
+# gamedeals module:
     praw
 
-rocketleague module:
-    discord
+# rocketleague module:
     requests
     lxml
