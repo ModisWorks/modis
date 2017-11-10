@@ -181,3 +181,66 @@ Then, in our `on_message.py`, we want to add some code to abort the function if 
 if not data["discord"]["servers"][message.server.id][_data.modulename]["activated"]:
     return
 ```
+
+You'll also need to import `_data.py`, so your `on_message.py` should now look something like this:
+
+```python
+from modis import datatools
+from modis.discord_modis.modules.pingpong import _data
+from ..._client import client
+
+
+async def on_message(message):
+    # Get the data from the data.json
+    data = datatools.get_data()
+    # Check to see if the module has been activated
+    if not data["discord"]["servers"][message.server.id][_data.modulename]["activated"]:
+        return
+
+    # Only reply to server messages and don't reply to myself
+    if message.server is not None and message.author != message.channel.server.me:
+        # Get the server prefix from the data
+        prefix = data["discord"]["servers"][message.server.id]["prefix"]
+        # Check if the message starts with the prefix
+        if message.content.startswith(prefix):
+            # Parse the message
+            package = message.content.split(" ")
+            command = package[0][len(prefix):]
+            arg = ' '.join(package[1:])
+
+            # Only send one pong if no arg is specified
+            if not arg:
+                arg = "1"
+
+            # Check that the command is 'ping'
+            if command == "ping":
+                try:
+                    # Try and parse the argument
+                    repeats = int(arg)
+                except ValueError:
+                    # Could not parse, respond with an error
+                    response = "'{}' is not a number".format(arg)
+                    await client.send_typing(message.channel)
+                    await client.send_message(message.channel, response)
+                    return
+
+                # Check that there aren't going to be too many 'pong's
+                if repeats >= 200:
+                    response = "'{}' is too many pongs".format(repeats)
+                    await client.send_typing(message.channel)
+                    await client.send_message(message.channel, response)
+                    return
+
+                # Check that there are going to be enough 'pong's
+                if repeats <= 0:
+                    response = "'{}' is not enough pongs".format(repeats)
+                    await client.send_typing(message.channel)
+                    await client.send_message(message.channel, response)
+                    return
+
+                # Respond with "pong"s
+                response = ("pong " * repeats).strip()
+                if response:
+                    await client.send_typing(message.channel)
+                    await client.send_message(message.channel, response)
+```
