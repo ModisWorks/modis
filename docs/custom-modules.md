@@ -1,7 +1,7 @@
 # Custom Modules
 In this guide you will learn, step by step, how to make a basic 'ping pong' module for Modis.
 
-This guide assumes you already have Modis set up and working, if not check out the (Installing Modis guide)[./getting-started.md]
+This guide assumes you already have Modis set up and working, if not check out the [Installing Modis guide](.\getting-started.md)
 
 After completing this you will know how to:
 * Set up a message receiver
