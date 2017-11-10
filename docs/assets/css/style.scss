@@ -33,3 +33,12 @@ body {
   color: $text-color;
   background-color: $background-color;
 }
+
+.highlight {
+  background-color: transparent;
+}
+
+.main-content code {
+  color: $text-color;
+  background-color: rgba($background-color-alt, 0.1);
+}
