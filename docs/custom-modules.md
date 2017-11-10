@@ -1,7 +1,7 @@
 # Custom Modules
 In this guide you will learn, step by step, how to make a basic 'ping pong' module for Modis.
 
-This guide assumes you already have Modis set up and working, if not check out the [Installing Modis guide](.\getting-started.md)
+This guide assumes you already have Modis set up and working, if not check out the [Installing Modis guide](./getting-started.md)
 
 After completing this you will know how to:
 * Set up a message receiver
@@ -73,4 +73,62 @@ async def on_message(message):
                 # Respond with "pong"
                 await client.send_typing(message.channel)
                 await client.send_message(message.channel, "pong")
+```
+
+Next, we want to parse the argument. This must be an integer, so any non-integer values will be rejected. It also must not be too large, or Discord will get upset because we tried to send too many 'pong's.
+
+```python
+from ..._client import client
+from modis import datatools
+
+
+async def on_message(message):
+    # Get the data from the data.json
+    data = datatools.get_data()
+    # Only reply to server messages and don't reply to myself
+    if message.server is not None and message.author != message.channel.server.me:
+        # Get the server prefix from the data
+        prefix = data["discord"]["servers"][message.server.id]["prefix"]
+        # Check if the message starts with the prefix
+        if message.content.startswith(prefix):
+            # Parse the message
+            package = message.content.split(" ")
+            command = package[0][len(prefix):]
+            arg = ' '.join(package[1:])
+
+            # Only send one pong if no arg is specified
+            if not arg:
+                arg = "1"
+
+            # Check that the command is 'ping'
+            if command == "ping":
+                try:
+                    # Try and parse the argument
+                    repeats = int(arg)
+                except ValueError:
+                    # Could not parse, respond with an error
+                    response = "'{}' is not a number".format(arg)
+                    await client.send_typing(message.channel)
+                    await client.send_message(message.channel, response)
+                    return
+
+                # Check that there aren't going to be too many 'pong's
+                if repeats >= 200:
+                    response = "'{}' is too many pongs".format(repeats)
+                    await client.send_typing(message.channel)
+                    await client.send_message(message.channel, response)
+                    return
+
+                # Check that there are going to be enough 'pong's
+                if repeats <= 0:
+                    response = "'{}' is not enough pongs".format(repeats)
+                    await client.send_typing(message.channel)
+                    await client.send_message(message.channel, response)
+                    return
+
+                # Respond with "pong"s
+                response = ("pong " * repeats).strip()
+                if response:
+                    await client.send_typing(message.channel)
+                    await client.send_message(message.channel, response)
 ```
