@@ -244,3 +244,5 @@ async def on_message(message):
                     await client.send_typing(message.channel)
                     await client.send_message(message.channel, response)
 ```
+
+Enabling a disabling `pingpong` by using the `!activate pingpong` and `!deactivate pingpong` should now work.
