@@ -1,23 +1,30 @@
 ---
 ---
 
+$primary-color: #AAFF00;
+$secondary-color: #00AAFF;
+$background-color: #111111;
+$background-color-alt: rgba(255, 255, 255, 0.1);
+$text-color: rgba(255, 255, 255, 0.9);
+$text-color-alt: rgba(0, 0, 0, 0.9);
+
 // Heading
-$header-heading-color: rgba(0, 0, 0, 0.9);
-$header-bg-color: #88FF00;
-$header-bg-color-secondary: #0088FF;
+$header-heading-color: $text-color-alt;
+$header-bg-color: $primary-color;
+$header-bg-color-secondary: $secondary-color;
 
 // Code
-$code-bg-color: rgba(255, 255, 255, 0.1);
-$code-text-color: rgba(255, 255, 255, 0.9);
+$code-bg-color: $background-color-alt;
+$code-text-color: $text-color;
 
 // Text
-$section-headings-color: #AAFF00;
-$body-text-color: rgba(0, 0, 0, 0.9);
-$body-link-color: #00AAFF;
+$section-headings-color: $primary-color;
+$body-text-color: $text-color-alt;
+$body-link-color: $secondary-color;
 
 @import "{{ site.theme }}";
 
 body {
-  color: rgba(255, 255, 255, 0.9);
-  background-color: #111111;
+  color: $text-color;
+  background-color: $background-color;
 }
