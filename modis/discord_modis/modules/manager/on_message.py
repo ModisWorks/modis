@@ -57,7 +57,7 @@ async def on_message(message):
                 return
 
             if command == "prefix" and args:
-                new_prefix = arg.lstrip()
+                new_prefix = arg.replace(" ", "").strip()
                 data["discord"]["servers"][server.id]["prefix"] = new_prefix
                 # Write the data
                 datatools.write_data(data)
