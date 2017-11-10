@@ -2,7 +2,7 @@
 ---
 
 // Code
-$code-bg-color: #cacaca;
+$code-bg-color: rgba(0, 0, 0, 0.1);
 $code-text-color: rgba(0, 0, 0, 0.8);
 
 // Text
@@ -11,3 +11,7 @@ $body-text-color: rgba(0, 0, 0, 0.8);
 $body-link-color: #00AAFF;
 
 @import "{{ site.theme }}";
+
+body {
+  background-color: #212121;
+}
