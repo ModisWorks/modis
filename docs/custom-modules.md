@@ -173,3 +173,11 @@ sd_structure = {
     "activated": True
 }
 ```
+
+Then, in our `on_message.py`, we want to add some code to abort the function if the module is not activated. After we declare `data = datatools.get_data()`, add the following:
+
+```python
+# Check to see if the module has been activated
+if not data["discord"]["servers"][message.server.id][_data.modulename]["activated"]:
+    return
+```
