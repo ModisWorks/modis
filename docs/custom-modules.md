@@ -9,7 +9,6 @@ After completing this you will know how to:
 * Listen for commands
 * Create a `help.json` file for a module
 * Activate and deactivate your module
-* Use Modis' embed features
 
 This guide describes commands using the default `!` prefix, but the code will work no matter what the server prefix is set to.
 
@@ -247,8 +246,6 @@ async def on_message(message):
 
 Enabling a disabling `pingpong` by using the `!activate pingpong` and `!deactivate pingpong` should now work.
 
-## Embeds
+## Summary
 
-Many Modis modules use Discord's embed features to display information. Embeds are useful for displaying and ordering blocks of information. For example, the `help` module uses an embed to organise a list of commands.
-
-![Help embed](./img/helpembed.png?raw=true "Help embed")
+These are the basics for any module for Modis. The documentation has more information about Modis' features, or you can look at the other modules to figure out how things works for yourself.
