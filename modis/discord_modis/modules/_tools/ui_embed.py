@@ -53,8 +53,8 @@ class UI:
 
         embed.set_author(
             name="Modis",
-            url="https://infraxion.github.io/modis/",
-            icon_url="http://infraxion.ddns.net/modis/dp/modis64t.png")
+            url="https://musicbyango.com/modis/",
+            icon_url="http://musicbyango.com/modis/dp/modis64t.png")
 
         for pack in self.datapacks:
             embed.add_field(
@@ -65,7 +65,7 @@ class UI:
 
         embed.set_footer(
             text="{} module by {}".format(self.modulename, self.creator),
-            icon_url="http://infraxion.ddns.net/modis/dp/{}64.jpg".format(self.creator)
+            icon_url="http://musicbyango.com/modis/dp/{}64.jpg".format(self.creator)
         )
 
         return embed
