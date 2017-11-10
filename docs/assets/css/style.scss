@@ -14,8 +14,8 @@ $header-bg-color: $primary-color;
 $header-bg-color-secondary: $secondary-color;
 
 // Code
-$code-bg-color: $background-color-alt;
-$code-text-color: $text-color-alt;
+$code-bg-color: rgba($background-color-alt, 0.08);
+$code-text-color: $text-color;
 
 // Text
 $section-headings-color: $primary-color;
