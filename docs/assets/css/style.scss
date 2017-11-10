@@ -51,7 +51,12 @@ body {
   right: 0;
   height: 2em;
   
-  .page-tab {
+  background-color: $background-color-alt;
+  max-width: $large-breakpoint;
+  
+  a {
     float: left;
+    
+    color: $text-color-alt;
   }
 }
