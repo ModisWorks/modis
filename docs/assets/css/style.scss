@@ -33,12 +33,3 @@ body {
   color: $text-color;
   background-color: $background-color;
 }
-
-.highlight {
-  background-color: none;
-}
-
-.highlighter-rouge {
-  color: $text-color-alt;
-  background-color: rgba($background-color-alt, 0.1);
-}
