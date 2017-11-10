@@ -3,9 +3,13 @@
 TestModis.py
 OfficialModis.py
 data.json
+modis/discord_modis/modules/pingpong/
 
 ######## PYCHARM ########
 .idea
+
+######## RUBY ########
+Gemfile
 
 ######## WINDOWS ########
 # Windows thumbnail cache files
@@ -132,11 +136,5 @@ ENV/
 # mypy
 .mypy_cache/
 
-# Local data
-data.json
-
-# Atom build
+######## ATOM ########
 .atom-build.*
-
-# Ping pong module
-modis/discord_modis/modules/pingpong/
