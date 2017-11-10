@@ -139,5 +139,4 @@ data.json
 .atom-build.*
 
 # Ping pong module
-modis/discord_modis/modules/pongping/
-modis/discord_modis/modules/pingpong/on_message.py
+modis/discord_modis/modules/pingpong/
