@@ -12,4 +12,5 @@ After completing this you will know how to:
 
 ## Making a new module
 Modis looks in the `modis\discord-modis\modules\` folder for Discord modules. To start making our module, make a new folder there called `pingpong`.
-![Module folder structure](/img/pingpongfolder.png?raw=true)
+
+![Module folder structure](./img/pingpongfolder.png?raw=true)
