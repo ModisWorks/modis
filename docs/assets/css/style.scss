@@ -1,13 +1,18 @@
 ---
 ---
 
+// Heading
+$header-heading-color: rgba(0, 0, 0, 0.9);
+$header-bg-color: #88FF00;
+$header-bg-color-secondary: #0088FF;
+
 // Code
 $code-bg-color: rgba(0, 0, 0, 0.1);
-$code-text-color: rgba(0, 0, 0, 0.8);
+$code-text-color: rgba(0, 0, 0, 0.9);
 
 // Text
 $section-headings-color: #AAFF00;
-$body-text-color: rgba(0, 0, 0, 0.8);
+$body-text-color: rgba(0, 0, 0, 0.9);
 $body-link-color: #00AAFF;
 
 @import "{{ site.theme }}";
