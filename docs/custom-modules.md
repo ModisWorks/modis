@@ -142,7 +142,7 @@ All modules in Modis should have a `help.json` file. This is what the `help` mod
 
 `help.json` files should contain an array of commands, with the key `Commands`, and an about string with the key `About`. The `help.json` for the `pingpong` module should look something like this.
 
-```javascript
+```js
 {
   "Commands": [
     {
