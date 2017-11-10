@@ -44,19 +44,23 @@ body {
 }
 
 // Tabs
-.page-tabs {
+.page-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 2em;
+  height: 3em;
+  width: 100%;
   
   background-color: $background-color-alt;
-  max-width: $large-breakpoint;
   
-  a {
-    float: left;
-    
-    color: $text-color-alt;
+  .page-tabs {
+    max-width: $large-breakpoint;
+    height: 100%;
+  
+    a {
+      vertical-align: middle;
+      color: $text-color-alt;
+    }
   }
 }
