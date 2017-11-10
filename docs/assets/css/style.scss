@@ -28,7 +28,7 @@ $table-border-color: $background-color-alt;
 $hr-border-color: $background-color-alt;
 
 @import "{{ site.theme }}";
-@import "code"
+@import "code";
 
 body {
   color: $text-color;
