@@ -163,7 +163,7 @@ Custom heading are also accepted, and will be formatted in the help message.
 
 So that users can control your module, you should allow it to be deactivated on a per-server basis. To do this, make a `_data.py` file in the `pingpong` module. The `_data.py` contains information specific to your module. Most importantly, Modis creates the `sd_structure` dictionary in the `data.json` for each server Modis is in, which allows you to store settings and objects on a per-server basis.
 
-```js
+```python
 modulename = "PingPong"
 
 creator = "<your name>"
