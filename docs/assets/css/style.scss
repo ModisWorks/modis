@@ -42,3 +42,16 @@ body {
   color: $text-color;
   background-color: rgba($background-color-alt, 0.1);
 }
+
+// Tabs
+.page-tabs {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2em;
+  
+  .page-tab {
+    float: left;
+  }
+}
