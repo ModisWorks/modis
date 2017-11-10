@@ -5,19 +5,26 @@ from modis import datatools, logger
 from ..._client import client
 
 
-def update_server_data(server_id):
+async def update_server_data(server):
     """
     Updates the server info for the given server
 
     Args:
-        server_id (int): The Discord server to update info for
+        server: The Discord server to update info for
     """
 
     data = datatools.get_data()
     # Add the server to server data if it doesn't yet exist
-    if server_id not in data["discord"]["servers"]:
+    if server.id not in data["discord"]["servers"]:
         logger.debug("Adding new server to serverdata")
-        data["discord"]["servers"][server_id] = {"prefix": "!"}
+        data["discord"]["servers"][server.id] = {"prefix": "!"}
+        # Display a welcome message
+        if server.default_channel:
+            hello_message = "Hello! I'm Modis.\n\n" + \
+                            "The prefix is currently `!`, and can be changed at any time using `!prefix`\n\n" + \
+                            "You can use `!help` to get help commands for all modules, " + \
+                            "or {} me to get the server prefix and help commands.".format(server.me.mention)
+            await client.send_message(server.default_channel, hello_message)
 
     # Make sure all modules are in the server
     _dir = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -31,8 +38,8 @@ def update_server_data(server_id):
             import_name = ".discord_modis.modules.{}.{}".format(module_name, "_data")
             _data = importlib.import_module(import_name, "modis")
 
-            if _data.modulename not in data["discord"]["servers"][server_id]:
-                data["discord"]["servers"][server_id][_data.modulename] = _data.sd_structure
+            if _data.modulename not in data["discord"]["servers"][server.id]:
+                data["discord"]["servers"][server.id][_data.modulename] = _data.sd_structure
                 datatools.write_data(data)
         except Exception as e:
             logger.error("Could not initialise module {}".format(module_name))

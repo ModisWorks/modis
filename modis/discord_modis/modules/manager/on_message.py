@@ -28,8 +28,14 @@ async def on_message(message):
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
-        # Commands section
         prefix = data["discord"]["servers"][server.id]["prefix"]
+        # Check for mentions reply to mentions
+        if channel.server.me in message.mentions:
+            await client.send_typing(channel)
+            response = "The current server prefix is `{0}`. Type `{0}help` for help.".format(prefix)
+            await client.send_message(channel, response)
+
+        # Commands section
         if content.startswith(prefix):
             # Parse message
             package = content.split(" ")
