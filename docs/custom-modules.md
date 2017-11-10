@@ -121,6 +121,7 @@ async def on_message(message):
 
                 # Respond with "pong"s
                 response = ("pong " * repeats).strip()
-                await client.send_typing(message.channel)
-                await client.send_message(message.channel, response)
+                if response:
+                    await client.send_typing(message.channel)
+                    await client.send_message(message.channel, response)
 ```
