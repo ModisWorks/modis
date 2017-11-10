@@ -22,6 +22,11 @@ $section-headings-color: $primary-color;
 $body-text-color: $text-color-alt;
 $body-link-color: $secondary-color;
 
+// Borders
+$border-color: #000000;
+$table-border-color: $background-color-alt;
+$hr-border-color: $background-color-alt;
+
 @import "{{ site.theme }}";
 
 body {
