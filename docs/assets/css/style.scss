@@ -28,7 +28,7 @@ $table-border-color: $background-color-alt;
 $hr-border-color: $background-color-alt;
 
 @import "{{ site.theme }}";
-@import "./code";
+@import "https://github.com/Infraxion/modis/master/docs/assets/css/code";
 
 body {
   color: $text-color;
