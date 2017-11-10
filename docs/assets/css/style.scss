@@ -50,17 +50,16 @@ body {
   left: 0;
   right: 0;
   height: 3em;
-  width: 100%;
   
-  background-color: $background-color-alt;
+  background-color: $background-color;
   
   .page-tabs {
-    max-width: $large-breakpoint;
-    height: 100%;
+    position: absolute;
+    margin: auto;
   
     a {
       vertical-align: middle;
-      color: $text-color-alt;
+      color: $text-color;
     }
   }
 }
