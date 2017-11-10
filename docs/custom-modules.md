@@ -246,3 +246,9 @@ async def on_message(message):
 ```
 
 Enabling a disabling `pingpong` by using the `!activate pingpong` and `!deactivate pingpong` should now work.
+
+## Embeds
+
+Many Modis modules use Discord's embed features to display information. Embeds are useful for displaying and ordering blocks of information. For example, the `help` module uses an embed to organise a list of commands.
+
+![Help embed](./img/helpembed.png?raw=true "Help embed")
