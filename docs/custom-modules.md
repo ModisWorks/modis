@@ -11,6 +11,8 @@ After completing this you will know how to:
 * Activate and deactivate your module
 * Use Modis' embed features
 
+This guide describes commands using the default `!` prefix, but the code will work no matter what the server prefix is set to.
+
 
 ## Making a new module
 Modis looks in the `modis\discord-modis\modules\` folder for Discord modules. To start making our module, make a new folder there called `pingpong`.
@@ -131,4 +133,43 @@ async def on_message(message):
                 if response:
                     await client.send_typing(message.channel)
                     await client.send_message(message.channel, response)
+```
+
+If you run Modis now, and type `!ping 4` into your server, you should get a response of `pong pong pong pong` from Modis.
+
+## Help
+
+All modules in Modis should have a `help.json` file. This is what the `help` module looks for when generating help information. To begin, create a `help.json` file in your `pingpong` folder.
+
+`help.json` files should contain an array of commands, with the key `Commands`, and an about string with the key `About`. The `help.json` for the `pingpong` module should look something like this.
+
+```json
+{
+  "Commands": [
+    {
+      "name": "ping",
+      "params": ["n"],
+      "description": "Sends a message with [n] 'pong's"
+    }
+  ],
+  "About": "A module to pong your pings."
+}
+```
+
+If the `help.json` file is formatted correctly, then running `!help pingpong` should give a response with the data from `help.json`.
+
+Custom heading are also accepted, and will be formatted in the help message.
+
+## Activating and deactivating the module
+
+So that users can control your module, you should allow it to be deactivated on a per-server basis. To do this, make a `_data.py` file in the `pingpong` module. The `_data.py` contains information specific to your module.
+
+```python
+modulename = "PingPong"
+
+creator = "<your name>"
+
+sd_structure = {
+    "activated": True
+}
 ```
