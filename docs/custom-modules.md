@@ -113,8 +113,15 @@ async def on_message(message):
                     return
 
                 # Check that there aren't going to be too many 'pong's
-                if repeats > 200:
+                if repeats >= 200:
                     response = "'{}' is too many pongs".format(repeats)
+                    await client.send_typing(message.channel)
+                    await client.send_message(message.channel, response)
+                    return
+
+                # Check that there are going to be enough 'pong's
+                if repeats <= 0:
+                    response = "'{}' is not enough pongs".format(repeats)
                     await client.send_typing(message.channel)
                     await client.send_message(message.channel, response)
                     return
