@@ -1,6 +1,6 @@
 ---
 title: Events
-permalink: /events/
+permalink: /documentation/events/
 ---
 
 # Discord Events

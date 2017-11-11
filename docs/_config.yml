@@ -23,7 +23,12 @@ markdown: kramdown
 theme: jekyll-theme-cayman
 
 sass:
-    sass_dir: _scss
+  sass_dir: _scss
+
+header_pages: 
+- index.md
+- doc/guides.md
+- doc/documentation.md
 
 github: [metadata]
 

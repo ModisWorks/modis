@@ -1,6 +1,6 @@
 ---
 title: Setup
-permalink: /setup/
+permalink: /guides/setup/
 ---
 
 # Installing Modis
@@ -67,7 +67,7 @@ Extract it into a nice, cozy folder.
 ## Running Modis
 Modis is now fully installed, but you still need to make a launch.
 We'll be streamlining this in the future so you don't have to do it, but for now, you're going to have to put in some work.
-As of writing, the launcher.py file should consist of this:
+As of writing, the `launcher.py` file should look like this:
 
 ```python
 import modis

@@ -1,0 +1,115 @@
+body {
+    color: $text-color;
+    background-color: $background-color;
+
+    font-family: "Work Sans", Arial, Helvetica, sans-serif;
+    font-weight: 300;
+}
+
+h1 {
+    font-family: "Josefin Sans", "Work Sans", Arial, Helvetica, sans-serif;
+    font-weight: 300;
+}
+
+.main-content h1 {
+    margin-left: -0.09em;
+
+    text-transform: uppercase;
+
+    font-size: 3em;
+    font-weight: 300;
+
+    @media (max-width: $medium-breakpoint) {
+        font-size: 2em;
+    }
+}
+
+.main-content h2,
+.main-content h3 {
+    margin-left: -0.05em;
+
+    font-weight: 300;
+}
+
+.page-header {
+    padding-top: 92px;
+
+    .project-name {
+        text-transform: uppercase;
+
+        opacity: 1;
+        color: $header-heading-color;
+
+        font-size: 4em;
+        font-weight: 300;
+    }
+
+    .project-tagline {
+        opacity: 0.9;
+        color: $header-heading-color;
+
+        font-family: "Work Sans", Arial, Helvetica, sans-serif;
+        font-weight: 400;
+    }
+}
+
+.page-tabs {
+    background-color: $background-color-alt;
+    box-shadow: 0 -4px 6px rgba(0, 0 ,0, 0.15);
+
+    .page-tabs-inner {
+        display: table;
+
+        margin: auto;
+    }
+
+    a {
+        display: inline-block;
+
+        padding: 12px;
+
+        transition: background-color 0.1s ease, color 0.1s ease;
+        text-align: center;
+        text-decoration: none;
+
+        color: $text-color-alt;
+        background-color: $background-color-alt;
+
+        font-weight: 400;
+
+        @media (min-width: $small-breakpoint) {
+            min-width: 100px;
+        }
+
+        @media (min-width: $medium-breakpoint) {
+            min-width: 200px;
+        }
+
+        &:focus {
+            outline: none;
+            background-color: darken($background-color-alt, 15%);
+        }
+
+        &:hover {
+            background-color: darken($background-color-alt, 10%);
+        }
+
+        &.page-link-current {
+            color: $text-color;
+            background-color: $background-color;
+
+            &:focus {
+                color: darken($text-color, 40%);
+                outline: none;
+            }
+        }
+    }
+}
+
+.main-content {
+    padding-top: 68px;
+}
+
+.highlight {
+    background-color: transparent;
+}
