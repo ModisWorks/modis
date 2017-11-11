@@ -1,6 +1,6 @@
 ---
-title: Setup
-permalink: /setup/
+title: Events
+permalink: /events/
 ---
 
 # Discord Events
