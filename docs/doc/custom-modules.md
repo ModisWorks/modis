@@ -1,7 +1,12 @@
+---
+title: Custom Modules
+permalink: /custom-modules/
+---
+
 # Custom Modules
 In this guide you will learn, step by step, how to make a basic 'ping pong' module for Modis.
 
-This guide assumes you already have Modis set up and working, if not check out the [Installing Modis guide](./getting-started.md)
+This guide assumes you already have Modis set up and working, if not check out the [Installing Modis](/setup/) guide.
 
 After completing this you will know how to:
 * Set up a message receiver
@@ -16,11 +21,11 @@ This guide describes commands using the default `!` prefix, but the code will wo
 ## Making a new module
 Modis looks in the `modis\discord-modis\modules\` folder for Discord modules. To start making our module, make a new folder there called `pingpong`.
 
-![Module folder structure](./img/pingpongfolder.png?raw=true "Module folder structure")
+![Module folder structure](/doc/img/pingpongfolder.png?raw=true "Module folder structure")
 
 
 ## Listening for messages
-To listen to Discord events, a module needs a file with the name of the event. For a message, the file should be named `on_message.py` (a full list of Discord events can be found on the [events page](./events.md)). To start listening to messages, create a file names `on_message.py` in your `pingpong` folder, and define a new function called `on_message` with a `message` parameter. This function *must* be marked as `async` for it to work.
+To listen to Discord events, a module needs a file with the name of the event. For a message, the file should be named `on_message.py` (a full list of Discord events can be found on the [events page](/events/)). To start listening to messages, create a file names `on_message.py` in your `pingpong` folder, and define a new function called `on_message` with a `message` parameter. This function *must* be marked as `async` for it to work.
 
 ```python
 async def on_message(message):

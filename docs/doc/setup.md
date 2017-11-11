@@ -1,3 +1,8 @@
+---
+title: Setup
+permalink: /setup/
+---
+
 # Installing Modis
 If you want to run Modis for yourself, you'll need a bunch of different files, which we still can't seem to get right every time.
 Hopefully this guide will make it easier to install Modis for all of us.

@@ -10,6 +10,11 @@ modis/discord_modis/modules/pingpong/
 
 ######## RUBY ########
 Gemfile
+Gemfile.lock
+
+######## GITHUB ########
+docs/_site/
+docs/.sass-cache/
 
 ######## WINDOWS ########
 # Windows thumbnail cache files

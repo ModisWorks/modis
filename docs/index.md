@@ -1,13 +1,17 @@
+---
+title: Modis
+---
+
 # MODIS
 Modis is a Discord bot that runs with a GUI and is designed to be as modular as possible so that anyone with some basic Python knowledge can quickly and easily create new modules that run on the bot.
 
 
 ## Getting started
-To get started hosting your own version of Modis, check out the [Installing Modis](./getting-started.md) guide.
+To get started hosting your own version of Modis, check out the [Setup](/setup/) guide.
 
 
 ## Custom modules
-If you're interested in making your own modules for Modis, have a look at the [Ping Pong Module](./custom-modules.md) guide
+If you're interested in making your own modules for Modis, have a look at the [Ping Pong Module](/custom-modules/) guide.
 
 
 ## Currently available modules
