@@ -17,7 +17,7 @@ title: Modis
 description: A modular Discord bot written in Python with the discord.py API
 repository: Infraxion/modis
 github_username: Infraxion
-url: https://infraxion.github.io/modis/
+url: https://infraxion.github.io/modis
 
 # Build settings
 markdown: kramdown
