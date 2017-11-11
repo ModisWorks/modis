@@ -33,7 +33,7 @@ async def on_message(message):
     print("message received")
 ```
 
-Next, we want to check if the message says `"ping"`, and if it does we want to respond with `"pong"`. We also want to check that the message is sent by a user, and not by Modis. To do this, we'll need to import `client` from `discord_modis`.
+Next, we want to check if the message says `"!ping"`, and if it does we want to respond with `"!pong"`. We also want to check that the message is sent by a user, and not by Modis. To do this, we'll need to import `client` from `discord_modis`.
 
 ```python
 from ..._client import client

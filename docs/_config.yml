@@ -22,9 +22,11 @@ github_username: Infraxion
 markdown: kramdown
 theme: jekyll-theme-cayman
 
+# Dir for sass files
 sass:
   sass_dir: _scss
 
+# Pages to appear in the tabs row under the title
 header_pages: 
 - index.md
 - doc/guides.md
