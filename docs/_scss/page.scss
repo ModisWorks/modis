@@ -52,6 +52,7 @@ h1 {
     transition: height 0.4s ease, padding 0.4s ease;
 
     @media (max-width: $medium-breakpoint) {
+        height: 18em;
         padding-top: 72px;
         padding-bottom: 60px;
     }
