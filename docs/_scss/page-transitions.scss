@@ -60,6 +60,13 @@
     .main-content {
         animation-name: page-out;
         animation-timing-function: ease-in;
+
+        a {
+            &::before {
+                border-color: transparent;
+                background-color: transparent;
+            }
+        }
     }
 
     .page-tabs a {

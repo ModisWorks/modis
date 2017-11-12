@@ -170,16 +170,21 @@ a {
             margin: -4px;
 
             content: "";
-            transition: opacity 0.1s ease;
+            transition: background-color 0.1s ease, border-color 0.05s ease;
 
-            opacity: 0;
-            border: 1px solid rgba($background-color-alt, 0.5);
+            border: 1px solid transparent;
             border-radius: 4px;
-            background-color: rgba($background-color-alt, 0.1);
+            background-color: transparent;
         }
 
         &:focus::before {
-            opacity: 1;
+            border-color: rgba($background-color-alt, 0.5);
+            background-color: rgba($background-color-alt, 0.05);
+        }
+
+        &:active::before {
+            border-color: rgba($background-color-alt, 0.2);
+            background-color: transparent;
         }
     }
 }
