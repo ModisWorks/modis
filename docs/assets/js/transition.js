@@ -7,7 +7,7 @@ $(function () {
         scroll: false,
         cacheLength: 2,
         onStart: {
-            duration: 200,
+            duration: 100,
             render: function ($container) {
                 // Animate tabs out
                 $(".page-tabs a").removeClass("page-link-current");
@@ -18,7 +18,7 @@ $(function () {
 
                 // Scroll to top
                 var $pageTabs = $(".page-tabs");
-                var t = $pageTabs.offset().top;
+                var t = $pageTabs.offset().top + 1;
                 var h = $pageTabs.offset().top + $pageTabs.height();
                 if (window.scrollY > t && window.scrollY < h) {
                     $("html, body").animate({ scrollTop: t }, 150);
@@ -35,7 +35,7 @@ $(function () {
 
                 // Scroll to top
                 var $pageTabs = $(".page-tabs");
-                var h = $pageTabs.offset().top + $pageTabs.height();
+                var h = $pageTabs.offset().top + $pageTabs.height() + 1;
                 if (window.scrollY > h) {
                     window.scrollTo(0, h);
                 }

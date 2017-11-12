@@ -44,6 +44,10 @@ h1 {
 @include font-subheading;
 }
 
+a {
+    outline: none;
+}
+
 .page-header {
     padding-top: 92px;
     padding-bottom: 80px;
@@ -101,10 +105,11 @@ h1 {
 
     a {
         position: relative;
-        z-index: 1;
+        z-index: 2;
 
-        display: inline-block;
+        display: table-cell;
 
+        margin: 0;
         padding: 12px;
 
         transition: background-color 0.1s ease, color 0.1s ease;
@@ -134,10 +139,11 @@ h1 {
             bottom: 0;
 
             content: "";
-            transition: transform 0.125s ease;
+            transition: transform 0.1s ease;
             transform: scaleY(0);
             transform-origin: 50% 100%;
 
+            border-radius: 0;
             background-color: $background-color;
         }
     }
@@ -149,6 +155,32 @@ h1 {
 
     code {
         @include font-code;
+    }
+
+    a {
+        position: relative;
+
+        &::before {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+
+            margin: -4px;
+
+            content: "";
+            transition: opacity 0.1s ease;
+
+            opacity: 0;
+            border: 1px solid rgba($background-color-alt, 0.5);
+            border-radius: 4px;
+            background-color: rgba($background-color-alt, 0.1);
+        }
+
+        &:focus::before {
+            opacity: 1;
+        }
     }
 }
 

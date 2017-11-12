@@ -31,7 +31,6 @@
         background-color: transparent;
 
         &:focus {
-            outline: none;
             background-color: darken($background-color-alt, 15%);
         }
 
@@ -48,7 +47,6 @@
 
             &:focus {
                 color: darken($text-color, 40%);
-                outline: none;
             }
 
             &::before {
