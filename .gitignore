@@ -8,13 +8,8 @@ modis/discord_modis/modules/pingpong/
 ######## PYCHARM ########
 .idea
 
-######## RUBY ########
-Gemfile
-Gemfile.lock
-
 ######## GITHUB ########
 docs/_site/
-docs/.sass-cache/
 
 ######## WINDOWS ########
 # Windows thumbnail cache files

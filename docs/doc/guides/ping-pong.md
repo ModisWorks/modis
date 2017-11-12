@@ -26,7 +26,7 @@ Modis looks in the `modis\discord-modis\modules\` folder for Discord modules. To
 
 ## Listening for messages
 
-To listen to Discord events, a module needs a file with the name of the event. For a message, the file should be named `on_message.py` (a full list of Discord events can be found on the [events page](/doc/documentation/events.md)). To start listening to messages, create a file names `on_message.py` in your `pingpong` folder, and define a new function called `on_message` with a `message` parameter. This function *must* be marked as `async` for it to work.
+To listen to Discord events, a module needs a file with the name of the event. For a message, the file should be named `on_message.py` (a full list of Discord events can be found on the [events page](../documentation/events.md)). To start listening to messages, create a file names `on_message.py` in your `pingpong` folder, and define a new function called `on_message` with a `message` parameter. This function *must* be marked as `async` for it to work.
 
 ```python
 async def on_message(message):

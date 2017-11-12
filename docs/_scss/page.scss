@@ -1,4 +1,10 @@
+@import "page-transitions";
+
+
 body {
+    overflow-x: hidden;
+    overflow-y: scroll;
+
     color: $text-color;
     background-color: $background-color;
 
@@ -39,19 +45,28 @@ h1 {
 }
 
 .page-header {
+    height: 21em;
     padding-top: 92px;
     padding-bottom: 80px;
+
+    transition: height 0.4s ease, padding 0.4s ease;
 
     @media (max-width: $medium-breakpoint) {
         padding-top: 72px;
         padding-bottom: 60px;
     }
 
+    .project-name,
+    .project-tagline {
+        transition: opacity 0.1s ease;
+
+        color: $header-heading-color;
+    }
+
     .project-name {
         text-transform: uppercase;
 
         opacity: 1;
-        color: $header-heading-color;
 
         font-size: 4em;
 
@@ -68,13 +83,16 @@ h1 {
 
     .project-tagline {
         opacity: 0.9;
-        color: $header-heading-color;
 
 @include font-subtitle;
     }
 }
 
 .page-tabs {
+    position: absolute;
+
+    width: 100%;
+
     background-color: $background-color-alt;
     box-shadow: 0 -4px 6px rgba(0, 0 ,0, 0.15);
 
@@ -87,6 +105,9 @@ h1 {
     }
 
     a {
+        position: relative;
+        z-index: 1;
+
         display: inline-block;
 
         padding: 12px;
@@ -94,9 +115,6 @@ h1 {
         transition: background-color 0.1s ease, color 0.1s ease;
         text-align: center;
         text-decoration: none;
-
-        color: $text-color-alt;
-        background-color: $background-color-alt;
 
         font-weight: 400;
 
@@ -112,29 +130,27 @@ h1 {
             min-width: 200px;
         }
 
-        &:focus {
-            outline: none;
-            background-color: darken($background-color-alt, 15%);
-        }
+        &::before {
+            position: absolute;
+            z-index: -1;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
 
-        &:hover {
-            background-color: darken($background-color-alt, 10%);
-        }
+            content: "";
+            transition: transform 0.125s ease;
+            transform: scaleY(0);
+            transform-origin: 50% 100%;
 
-        &.page-link-current {
-            color: $text-color;
             background-color: $background-color;
-
-            &:focus {
-                color: darken($text-color, 40%);
-                outline: none;
-            }
         }
     }
 }
 
 .main-content {
-    padding-top: 68px;
+    min-height: calc(100vh);
+    padding-top: calc(96px + 1em);
 
     code {
         @include font-code;

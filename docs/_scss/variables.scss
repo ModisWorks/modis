@@ -25,38 +25,9 @@ $border-color: rgba($background-color-alt, 0.05);
 $table-border-color: rgba($background-color-alt, 0.15);
 $hr-border-color: rgba($background-color-alt, 0.15);
 
+// Fonts
+@import "fonts";
+
 // Breakpoints
 $small-breakpoint: 24em;
 $tiny-breakpoint: 12em;
-
-// Fonts
-// Update html to include these fonts when adding new fonts
-@mixin font-title {
-    font-family: "Josefin Sans", Arial, Helvetica, sans-serif;
-    font-weight: 300;
-}
-
-@mixin font-subtitle {
-    font-family: "Work Sans", Arial, Helvetica, sans-serif;
-    font-weight: 400;
-}
-
-@mixin font-heading {
-    font-family: "Josefin Sans", Arial, Helvetica, sans-serif;
-    font-weight: 300;
-}
-
-@mixin font-subheading {
-    font-family: "Work Sans", Arial, Helvetica, sans-serif;
-    font-weight: 300;
-}
-
-@mixin font-body {
-    font-family: "Work Sans", Arial, Helvetica, sans-serif;
-    font-weight: 300;
-}
-
-@mixin font-code {
-    font-family: "Source Code Pro", Consolas, Courier, monospace;
-    font-weight: 400;
-}
