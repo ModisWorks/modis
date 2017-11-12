@@ -12,8 +12,8 @@
         <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400' rel='stylesheet' type='text/css'>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="../assets/js/jquery.smoothState.min.js"></script>
-        <script src="../assets/js/transition.js"></script>
+        <script src="{{ '/assets/js/transition.js' | asset_url | script_tag }}"></script>
+        <script src="{{ '/assets/js/jquery.smoothState.min.js' | asset_url | script_tag }}"></script>
 
         <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
     </head>
