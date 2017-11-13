@@ -70,6 +70,8 @@
     }
 
     .page-tabs a {
+        padding: $tabs-padding;
+
         &.page-link-current {
             color: $text-color;
         }

@@ -98,6 +98,18 @@ a {
         position: absolute;
 
         box-shadow: 0 -4px 6px rgba(0, 0 ,0, 0.15);
+
+        @media (max-height: $medium-breakpoint), (max-width: $small-breakpoint) {
+            a {
+                padding: $tabs-padding;
+            }
+
+            &.hidden {
+                a {
+                    padding: $tabs-padding-small;
+                }
+            }
+        }
     }
 
     &.fixed {
@@ -107,6 +119,18 @@ a {
         top: 0;
 
         transform: translateZ(0);
+
+        @media (max-height: $medium-breakpoint), (max-width: $small-breakpoint) {
+            a {
+                padding: $tabs-padding-small;
+            }
+
+            &.hidden {
+                a {
+                    padding: $tabs-padding;
+                }
+            }
+        }
     }
 
     &.hidden {
@@ -128,9 +152,9 @@ a {
         display: table-cell;
 
         margin: 0;
-        padding: 12px;
+        padding: $tabs-padding;
 
-        transition: background-color 0.1s ease, color 0.1s ease;
+        transition: background-color 0.1s ease, color 0.1s ease, padding 0.15s ease;
         text-align: center;
         text-decoration: none;
 
