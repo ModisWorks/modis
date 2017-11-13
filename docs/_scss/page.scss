@@ -120,6 +120,8 @@ a {
 
         transform: translateZ(0);
 
+        box-shadow: 0 4px 6px $background-color;
+
         @media (max-height: $medium-breakpoint), (max-width: $small-breakpoint) {
             a {
                 padding: $tabs-padding-small;
