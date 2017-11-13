@@ -15,14 +15,6 @@ $(function () {
                 $container.addClass('page-out');
                 // Restart your animation
                 smoothState.restartCSSAnimations();
-
-                // Scroll to top
-                var $pageTabs = $(".page-tabs");
-                var t = $pageTabs.offset().top + 1;
-                var h = $pageTabs.offset().top + $pageTabs.height();
-                if (window.scrollY > t && window.scrollY < h) {
-                    $("html, body").animate({ scrollTop: t }, 150);
-                }
             }
         },
         onReady: {
@@ -34,8 +26,8 @@ $(function () {
                 $container.html($newContent);
 
                 // Scroll to top
-                var $pageTabs = $(".page-tabs");
-                var h = $pageTabs.offset().top + $pageTabs.height() + 1;
+                var $pageTabsPage = $("#PageTabsPage");
+                var h = $pageTabsPage.offset().top + 1;
                 if (window.scrollY > h) {
                     window.scrollTo(0, h);
                 }
@@ -50,4 +42,27 @@ $(function () {
             $(this).addClass("page-link-current");
         }
     });
+
+    var updateTabs = function () {
+        var $pageTabsPage = $("#PageTabsPage");
+        var $pageTabsFixed = $("#PageTabsFixed");
+
+        console.log(window.scrollY);
+        var t = $pageTabsPage.offset().top;
+        if (window.scrollY > t) {
+            if (!$pageTabsPage.hasClass("hidden") || $pageTabsFixed.hasClass("hidden")) {
+                $pageTabsPage.addClass("hidden");
+                $pageTabsFixed.removeClass("hidden");
+            }
+        } else {
+            if ($pageTabsPage.hasClass("hidden") || !$pageTabsFixed.hasClass("hidden")) {
+                $pageTabsPage.removeClass("hidden");
+                $pageTabsFixed.addClass("hidden");
+            }
+        }
+    }
+
+    // Update tab bar
+    updateTabs();
+    window.onscroll = updateTabs;
 });
