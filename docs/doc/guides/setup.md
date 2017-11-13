@@ -2,13 +2,15 @@
 title: Setup
 permalink: /guides/setup/
 ---
-
 # Installing Modis
+
 If you want to run Modis for yourself, you'll need a bunch of different files, which we still can't seem to get right every time.
 Hopefully this guide will make it easier to install Modis for all of us.
 
 ## Python 3.6
-### Windows
+
+### Python on Windows
+
 Modis runs on Python 3.6. If you don't have a recent version of Python running on your machine, you'll need to get it on the [Official Python website](https://www.python.org/downloads/release).
 Any release starting with 3.6 should work.
 As of writing, the current latest 3.6 release is [3.6.3](https://www.python.org/downloads/release/python-363/).
@@ -18,10 +20,12 @@ Pick the one that matches your OS and architecture and install Python.
 
 When you're installing Python on Windows, make sure you check the option that adds Python to PATH. This makes it a bit easier later on when we're installing packages.
 
-### OS X
+### Python on OS X
+
 [Homebrew](https://brew.sh/) is a package manager for OS X. It will make setting up Modis easier and you should install it if you haven't already. To install Python, open Terminal and run `brew install python`.
 
 ## Python packages
+
 You can find all the package requirements in the requirements.txt file.
 To install the packages, open a command processor (CMD or Terminal for Windows and OS X) and type `pip install [packagename]`.
 
@@ -35,9 +39,10 @@ Below are a list of commands you'll need to run as of writing if you're too lazy
 - `pip install lxml`
 - `pip install praw`
 
-
 ## FFmpeg
-### Windows
+
+### FFmpeg on Windows
+
 For the audio stuff to work, you'll need the FFmpeg library in your PATH.
 Go to the FFmpeg org's [official website](https://www.ffmpeg.org/download.html) to get a download for FFmpeg.
 *DON'T* press the big green download button.
@@ -56,15 +61,18 @@ Up to you.
 Click on "Browse" in the window that pops up and find the /bin folder inside the extracted FFmpeg build.
 Click "OK" or "Apply" or whatever until everything is all nice and packed up.
 
-### OS X
+### FFmpeg on OS X
+
 If you're using Homebrew, just run `brew install ffmpeg` and `brew install opus` in Terminal. This will install the required libraries for voice and audio that Modis needs.
 
 ## Modis package
+
 Now you have all the requirements for Modis installed, but you still need to download Modis.
 You can get the latest release on Modis' [release page](https://github.com/Infraxion/modis/releases).
 Extract it into a nice, cozy folder.
 
 ## Running Modis
+
 Modis is now fully installed, but you still need to make a launch.
 We'll be streamlining this in the future so you don't have to do it, but for now, you're going to have to put in some work.
 As of writing, the `launcher.py` file should look like this:
