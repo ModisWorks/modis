@@ -92,6 +92,8 @@ a {
 
     width: 100%;
 
+    transform: translateZ(0);
+
     background-color: $background-color-alt;
 
     &.page {
@@ -100,14 +102,12 @@ a {
         box-shadow: 0 -4px 6px rgba(0, 0 ,0, 0.15);
 
         @media (max-height: $medium-breakpoint), (max-width: $small-breakpoint) {
-            a {
-                padding: $tabs-padding;
+            .page-tabs-inner {
+                height: $tabs-height;
             }
 
-            &.hidden {
-                a {
-                    padding: $tabs-padding-small;
-                }
+            &.hidden .page-tabs-inner {
+                height: $tabs-height-small;
             }
         }
     }
@@ -118,19 +118,15 @@ a {
         right: 0;
         top: 0;
 
-        transform: translateZ(0);
-
         box-shadow: 0 4px 6px $background-color;
 
         @media (max-height: $medium-breakpoint), (max-width: $small-breakpoint) {
-            a {
-                padding: $tabs-padding-small;
+            .page-tabs-inner {
+                height: $tabs-height-small;
             }
 
-            &.hidden {
-                a {
-                    padding: $tabs-padding;
-                }
+            &.hidden .page-tabs-inner {
+                height: $tabs-height;
             }
         }
     }
@@ -142,8 +138,10 @@ a {
     .page-tabs-inner {
         display: table;
 
+        height: $tabs-height;
         margin: auto;
 
+        transition: height 0.15s ease;
         text-align: center;
     }
 
@@ -154,10 +152,10 @@ a {
         display: table-cell;
 
         margin: 0;
-        padding: $tabs-padding;
 
-        transition: background-color 0.1s ease, color 0.1s ease, padding 0.15s ease;
+        transition: background-color 0.1s ease, color 0.1s ease;
         text-align: center;
+        vertical-align: middle;
         text-decoration: none;
 
         font-weight: 400;
