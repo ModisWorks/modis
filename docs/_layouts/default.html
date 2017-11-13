@@ -25,19 +25,7 @@
                 <h2 class="project-tagline">{{ site.description | default: site.github.project_tagline }}</h2>
             </section>
 
-            <section id="PageTabsPage" class="page-tabs page">
-                <div class="page-tabs-inner">
-                    {% for path in page_paths %}
-                    {% assign my_page = site.pages | where: "path", path | first %}
-                    {% if my_page.title %}
-                    <a class="page-link {% if page.url == my_page.url %} page-link-current {% endif %}" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-            </section>
-
-            <!-- TODO: This could be cleaner rather than repeated -->
-            <section id="PageTabsFixed" class="page-tabs fixed hidden">
+            <section id="PageTabs" class="page-tabs">
                 <div class="page-tabs-inner">
                     {% for path in page_paths %}
                     {% assign my_page = site.pages | where: "path", path | first %}

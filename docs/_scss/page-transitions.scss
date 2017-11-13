@@ -69,10 +69,12 @@
         }
     }
 
-    .page-tabs a {
-        height: $tabs-height;
+    .page-tabs {
+        .page-tabs-inner {
+            height: $tabs-height;
+        }
 
-        &.page-link-current {
+        a.page-link-current {
             color: $text-color;
         }
     }

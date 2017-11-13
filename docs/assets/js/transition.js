@@ -26,8 +26,8 @@ $(function () {
                 $container.html($newContent);
 
                 // Scroll to top
-                var $pageTabsPage = $("#PageTabsPage");
-                var t = $pageTabsPage.offset().top + 1;
+                var $mainContent = $(".main-content");
+                var t = $mainContent.offset().top + 1;
                 if (window.scrollY > t) {
                     window.scrollTo(0, t);
                 }
@@ -49,19 +49,17 @@ $(function () {
 });
 
 function updateTabs() {
-    var $pageTabsPage = $("#PageTabsPage");
-    var $pageTabsFixed = $("#PageTabsFixed");
+    var $mainContent = $(".main-content");
+    var $pageTabs = $("#PageTabs");
 
-    var t = $pageTabsPage.offset().top + 1;
+    var t = $mainContent.offset().top + 1;
     if (window.scrollY > t) {
-        if (!$pageTabsPage.hasClass("hidden") || $pageTabsFixed.hasClass("hidden")) {
-            $pageTabsPage.addClass("hidden");
-            $pageTabsFixed.removeClass("hidden");
+        if (!$pageTabs.hasClass("fixed")) {
+            $pageTabs.addClass("fixed")
         }
     } else {
-        if ($pageTabsPage.hasClass("hidden") || !$pageTabsFixed.hasClass("hidden")) {
-            $pageTabsPage.removeClass("hidden");
-            $pageTabsFixed.addClass("hidden");
+        if ($pageTabs.hasClass("fixed")) {
+            $pageTabs.removeClass("fixed")
         }
     }
 }

@@ -88,6 +88,7 @@ a {
 }
 
 .page-tabs {
+    position: absolute;
     z-index: 2;
 
     width: 100%;
@@ -95,21 +96,16 @@ a {
     transform: translateZ(0);
 
     background-color: $background-color-alt;
+    box-shadow: 0 -4px 6px rgba(0, 0 ,0, 0.15);
 
-    &.page {
-        position: absolute;
+    .page-tabs-inner {
+        display: table;
 
-        box-shadow: 0 -4px 6px rgba(0, 0 ,0, 0.15);
+        height: $tabs-height;
+        margin: auto;
 
-        @media (max-height: $medium-breakpoint), (max-width: $small-breakpoint) {
-            .page-tabs-inner {
-                height: $tabs-height;
-            }
-
-            &.hidden .page-tabs-inner {
-                height: $tabs-height-small;
-            }
-        }
+        transition: height 0.15s ease;
+        text-align: center;
     }
 
     &.fixed {
@@ -124,25 +120,7 @@ a {
             .page-tabs-inner {
                 height: $tabs-height-small;
             }
-
-            &.hidden .page-tabs-inner {
-                height: $tabs-height;
-            }
         }
-    }
-
-    &.hidden {
-        visibility: hidden;
-    }
-
-    .page-tabs-inner {
-        display: table;
-
-        height: $tabs-height;
-        margin: auto;
-
-        transition: height 0.15s ease;
-        text-align: center;
     }
 
     a {
