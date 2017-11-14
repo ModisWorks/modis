@@ -58,6 +58,9 @@ class Frame(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
+        # Update with version data
+        datatools.log_compare_version(logger)
+
 
 class GlobalFrame(tk.Frame):
     """The frame that has all global elements for the bot"""

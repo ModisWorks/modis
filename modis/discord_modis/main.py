@@ -35,7 +35,7 @@ def start(token, client_id, loop, module_found_handler=None, on_ready_handler=No
     datatools.write_data(data)
 
     # Import event handlers
-    logger.info("Importing event handlers")
+    logger.debug("Importing event handlers")
     event_handlers = _get_event_handlers(module_found_handler)
 
     # Create event handler combiner
@@ -65,7 +65,7 @@ def start(token, client_id, loop, module_found_handler=None, on_ready_handler=No
         client.event(create_event_handler(event_handler))
 
     # Run the client loop
-    logger.debug("Connecting to Discord")
+    logger.info("Connecting to Discord")
     try:
         client.loop.run_until_complete(client.login(token))
     except:
@@ -153,7 +153,7 @@ def _get_event_handlers(module_found_handler):
                 if "_ui.py" in module_event_handlers:
                     import_name = ".discord_modis.modules.{}.{}".format(
                         module_name, "_ui")
-                    logger.info(
+                    logger.debug(
                         "Found module UI file {}".format(import_name[23:]))
 
                     module_found_handler(module_name, importlib.import_module(import_name, "modis"))
@@ -164,8 +164,7 @@ def _get_event_handlers(module_found_handler):
                 if "{}.py".format(event_handler) in module_event_handlers:
                     import_name = ".discord_modis.modules.{}.{}".format(
                         module_name, event_handler)
-                    logger.info(
-                        "Found event handler {}".format(import_name[23:]))
+                    logger.debug("Found event handler {}".format(import_name[23:]))
 
                     event_handlers[event_handler].append(
                         importlib.import_module(import_name, "modis"))

@@ -3,8 +3,10 @@
 import logging
 import sys
 
+from modis import datatools
+
 logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
+logger.setLevel("INFO")
 
 formatter = logging.Formatter(
     "{asctime} {levelname:8} {name} - {message}", style="{")
@@ -28,7 +30,10 @@ def console(discord_token, discord_client_id):
         discord_token (str): The bot token for your Discord application
         discord_client_id: The bot's client ID
     """
+
     logger.info("Starting Modis in console")
+
+    datatools.log_compare_version(logger)
 
     import threading
     import asyncio
@@ -66,6 +71,7 @@ def gui(discord_token, discord_client_id):
         discord_token (str): The bot token for your Discord application
         discord_client_id: The bot's client ID
     """
+
     logger.info("Starting Modis in GUI")
 
     import tkinter as tk
