@@ -1,11 +1,11 @@
+$link-font-size: 24px;
+
 a.header-link {
-    position: relative;
+    position: absolute;
 
     margin-left: calc(0.25em + 0.3rem);
 
     color: $text-color;
-
-    font-size: calc(0.75em + 0.5rem);
 
     &::before {
         display: none;
@@ -18,6 +18,8 @@ a.header-link {
         vertical-align: middle;
 
         opacity: 0;
+
+        font-size: $link-font-size;
 
         &::before {
             position: absolute;
@@ -56,7 +58,13 @@ a.header-link {
     }
 }
 
+// JoSeFiN sAnS hAs GoOd VeRtIcAl AlIgNmEnT
+.main-content h1 a.header-link {
+    margin-top: -0.2em;
+}
+
 a.header-link:focus,
+h1:hover .header-link,
 h2:hover .header-link,
 h3:hover .header-link,
 h4:hover .header-link,

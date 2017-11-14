@@ -2,6 +2,15 @@ h1 {
     @include font-heading;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: 1;
+}
+
 .main-content h1 {
     margin-left: -0.09em;
 
