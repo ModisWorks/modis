@@ -25,6 +25,9 @@ $(function () {
                 // Inject the new content
                 $container.html($newContent);
 
+                // Add the anchors
+                addMarkdownAnchors();
+
                 // Scroll to top
                 var $mainContent = $(".main-content");
                 var t = $mainContent.offset().top + 1;
@@ -46,6 +49,9 @@ $(function () {
     // Update tab bar
     updateTabs();
     window.onscroll = updateTabs;
+
+    // Add the anchors
+    addMarkdownAnchors();
 });
 
 function updateTabs() {

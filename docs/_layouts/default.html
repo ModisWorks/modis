@@ -7,18 +7,29 @@
         <meta charset="UTF-8"> {% seo %}
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#141414">
-        <link href='https://fonts.googleapis.com/css?family=Josefin+Sans:300' rel='stylesheet' type='text/css'>
-        <link href='https://fonts.googleapis.com/css?family=Work+Sans:300,400,700' rel='stylesheet' type='text/css'>
-        <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400' rel='stylesheet' type='text/css'>
+        <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300" rel='stylesheet' type='text/css'>
+        <link href="https://fonts.googleapis.com/css?family=Work+Sans:300,400,700" rel='stylesheet' type='text/css'>
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400" rel='stylesheet' type='text/css'>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+        <script src="{{site.baseurl}}/assets/js/anchors.js"></script>
+
         <script src="{{site.baseurl}}/assets/js/jquery.smoothState.min.js"></script>
         <script src="{{site.baseurl}}/assets/js/transition.js"></script>
 
         <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
-    </head>
 
-    <body>
+        <script>
+            var shiftWindow = function() { scrollBy(0, -50) };
+            window.addEventListener("hashchange", shiftWindow);
+            function load() { if (window.location.hash) shiftWindow(); }
+        </script>
+    </head>
+    
+
+    <body onload="load()">
         <div id="main" class="main">
             <section class="page-header">
                 <h1 class="project-name">{{ site.title | default: site.github.repository_name }}</h1>
