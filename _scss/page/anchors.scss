@@ -58,6 +58,30 @@ a.header-link {
     }
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    &::before {
+        position: relative;
+
+        display: block;
+
+        width: 0;
+        height: $tabs-height;
+        margin-top: -$tabs-height;
+
+        content: "";
+
+        @media (max-height: $medium-breakpoint), (max-width: $small-breakpoint) {
+            height: $tabs-height-small;
+            margin-top: -$tabs-height-small;
+        }
+    }
+}
+
 // JoSeFiN sAnS hAs GoOd VeRtIcAl AlIgNmEnT
 .main-content h1 a.header-link {
     margin-top: -0.2em;

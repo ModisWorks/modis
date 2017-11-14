@@ -131,6 +131,7 @@ ENV/
 .ropeproject
 
 # mkdocs documentation
+/_site
 /site
 
 # mypy

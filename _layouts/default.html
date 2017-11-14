@@ -20,22 +20,16 @@
         <script src="{{site.baseurl}}/assets/js/transition.js"></script>
 
         <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
-
-        <script>
-            var shiftWindow = function() { scrollBy(0, -60) };
-            window.addEventListener("hashchange", shiftWindow);
-            function load() { if (window.location.hash) shiftWindow(); }
-        </script>
     </head>
     
-    <body onload="load()">
+    <body>
         <div id="main" class="main">
             <section class="page-header">
                 <h1 class="project-name">{{ site.title | default: site.github.repository_name }}</h1>
                 <h2 class="project-tagline">{{ site.description | default: site.github.project_tagline }}</h2>
             </section>
 
-            <section id="PageTabs" class="page-tabs">
+            <header id="PageTabs" class="page-tabs">
                 <div class="page-tabs-inner">
                     {% for path in page_paths %}
                     {% assign my_page = site.pages | where: "path", path | first %}
@@ -44,7 +38,7 @@
                     {% endif %}
                     {% endfor %}
                 </div>
-            </section>
+            </header>
 
             <section class="main-content">
                 {{ content }}
