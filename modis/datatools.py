@@ -7,6 +7,8 @@ from collections import OrderedDict
 _dir = _os.path.dirname(_os.path.realpath(__file__))
 _datafile = "{}/../data.json".format(_dir)
 
+version = "0.3 pre-release"
+
 
 def has_data() -> bool:
     """
@@ -65,6 +67,7 @@ def sort_recursive(data: dict):
             newdict[i[0]] = i[1]
 
     return OrderedDict(sorted(newdict.items(), key=lambda item: (compare_type(type(item[1])), item[0])))
+
 
 def compare_type(t):
     """

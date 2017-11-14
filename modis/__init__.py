@@ -69,7 +69,6 @@ def gui(discord_token, discord_client_id):
     logger.info("Starting Modis in GUI")
 
     import tkinter as tk
-    import tkinter.ttk as ttk
 
     logger.debug("Loading packages")
     from modis.discord_modis import gui as discord_modis_gui

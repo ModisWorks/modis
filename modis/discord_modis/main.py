@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def start(token, client_id, loop, module_found_handler=None):
+def start(token, client_id, loop, module_found_handler=None, on_ready_handler=None):
     """Start the Discord client and log Modis into Discord."""
     import discord
     import asyncio
@@ -52,6 +52,9 @@ def start(token, client_id, loop, module_found_handler=None):
                 except Exception as e:
                     logger.error("An error occured in '{}'".format(module_event_handler))
                     logger.exception(e)
+
+            if on_ready_handler is not None and event_handler_type == "on_ready":
+                await on_ready_handler()
 
         func.__name__ = event_handler_type
         return func

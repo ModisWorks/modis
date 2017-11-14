@@ -91,7 +91,7 @@ Uses Reddit to find current sales and bundles on popular games.
 ### rocketleague
 Gets Rocket League stats of players using Rocket League Tracker Network. Currently only works for Steam players.
 
-**Commands:**
+**Commands**
 - `!rl [steamid]` Shows the Rocket League stats of the Steam user `steamid`.
 - `!rlstats [userid] [platform]`: Displays the stats for the given user on the specified platform.
 

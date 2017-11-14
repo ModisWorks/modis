@@ -7,7 +7,7 @@ import threading
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from modis import helptools
+from modis import datatools, helptools
 
 logger = logging.getLogger(__name__)
 
@@ -26,16 +26,33 @@ class Frame(ttk.Frame):
 
         logger.debug("Initialising frame")
 
-        # Create the main control panel
-        nav = ttk.Notebook(self)
-        module_frame = ModuleFrame(nav)
-        nav.add(GlobalFrame(nav, discord_token, discord_client_id, module_frame), text="Global")
-        nav.add(module_frame, text="Modules")
-        nav.grid(column=0, row=0, sticky="W E N S")
-
         # Status bar
         statusbar = StatusBar(self)
         statusbar.grid(column=0, row=1, sticky="W E S")
+
+        # Create the main control panel
+        nav = ttk.Notebook(self)
+        module_frame = ModuleFrame(nav)
+        nav.add(GlobalFrame(nav, discord_token, discord_client_id, module_frame, statusbar), text="Global")
+        nav.add(module_frame, text="Modules")
+        nav.grid(column=0, row=0, sticky="W E N S")
+
+        def on_closing():
+            """Called when the window closes"""
+            try:
+                from ._client import client
+                if client.loop:
+                    asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
+            except RuntimeError:
+                pass
+            except Exception as e:
+                logger.exception(e)
+
+            parent.destroy()
+            import sys
+            sys.exit(0)
+
+        parent.protocol("WM_DELETE_WINDOW", on_closing)
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
@@ -45,7 +62,7 @@ class Frame(ttk.Frame):
 class GlobalFrame(tk.Frame):
     """The frame that has all global elements for the bot"""
 
-    def __init__(self, parent, discord_token, discord_client_id, module_frame):
+    def __init__(self, parent, discord_token, discord_client_id, module_frame, status_bar):
         super(GlobalFrame, self).__init__(parent)
 
         # Log
@@ -53,7 +70,7 @@ class GlobalFrame(tk.Frame):
         log.grid(column=0, row=0, padx=8, pady=8, sticky="W E N S")
 
         # Bot control panel
-        botcontrol = BotControl(self, discord_token, discord_client_id, module_frame)
+        botcontrol = BotControl(self, discord_token, discord_client_id, module_frame, status_bar)
         botcontrol.grid(
             column=0, row=1, padx=8, pady=8, sticky="W E S")
 
@@ -132,6 +149,13 @@ class ModuleFrame(tk.Frame):
             child.destroy()
 
     def add_module(self, module_name, module_ui):
+        """
+        Adds a module to the list
+
+        Args:
+            module_name (str): The name of the module
+            module_ui: The function to call to create the module's UI
+        """
         m_button = tk.Label(self.module_selection, text=module_name, bg="white", anchor="w")
         m_button.grid(column=0, row=len(self.module_selection.winfo_children()), padx=0, pady=0, sticky="W E N S")
 
@@ -139,6 +163,13 @@ class ModuleFrame(tk.Frame):
         m_button.bind("<Button-1>", lambda e: self.module_selected(module_name, module_ui))
 
     def module_selected(self, module_name, module_ui):
+        """
+        Called when a module is selected
+
+        Args:
+            module_name (str): The name of the module
+            module_ui: The function to call to create the module's UI
+        """
         if self.current_button == self.module_buttons[module_name]:
             return
 
@@ -205,7 +236,7 @@ class ModuleUIBaseFrame(ttk.Frame):
 class BotControl(ttk.Labelframe):
     """The control panel for the Modis bot."""
 
-    def __init__(self, parent, discord_token, discord_client_id, module_frame):
+    def __init__(self, parent, discord_token, discord_client_id, module_frame, status_bar):
         """
         Create a new control panel and add it to the parent.
 
@@ -240,6 +271,8 @@ class BotControl(ttk.Labelframe):
 
         # Module frame
         self.module_frame = module_frame
+        # Status bar
+        self.status_bar = status_bar
 
         # Toggle button
         self.state = "off"
@@ -264,6 +297,8 @@ class BotControl(ttk.Labelframe):
         self.button_toggle_text.set("Stop Modis")
         self.state = "on"
 
+        self.status_bar.set_status(1)
+
         logger.info("----------------STARTING DISCORD MODIS----------------")
 
         # Clear the module list
@@ -276,9 +311,13 @@ class BotControl(ttk.Labelframe):
         asyncio.set_event_loop(loop)
         self.discord_thread = threading.Thread(
             target=main.start,
-            args=[discord_token, discord_client_id, loop, self.module_frame.add_module])
+            args=[discord_token, discord_client_id, loop, self.module_frame.add_module, self.on_ready])
         logger.debug("Starting event loop")
         self.discord_thread.start()
+
+    async def on_ready(self):
+        """Called when the client is ready"""
+        self.status_bar.set_status(2)
 
     def stop(self):
         """Stop Modis and log it out of Discord."""
@@ -289,6 +328,7 @@ class BotControl(ttk.Labelframe):
 
         from ._client import client
         asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
+        self.status_bar.set_status(0)
 
     def key_changed(self):
         """Checks if the key name and value fields have been set, and updates the add key button"""
@@ -324,7 +364,7 @@ class Log(ttk.Labelframe):
         # Log text box
         log = tk.Text(self, wrap="none")
         log.grid(column=0, row=0, sticky="W E N S")
-        log.insert("end", "Welcome to Modis for Discord Beta v0.2.3\n")
+        log.insert("end", "Welcome to Modis for Discord v{}\n".format(datatools.version))
 
         # Vertical Scrollbar
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=log.yview)
@@ -384,17 +424,37 @@ class StatusBar(ttk.Frame):
 
         super(StatusBar, self).__init__(parent)
 
+        self.status = tk.StringVar()
         # Status bar
-        self.statusbar = ttk.Label(
-            self,
-            # textvariable=self.status,
-            text="OFFLINE",
-            padding=2,
-            # borderwidth=1,
-            # relief="sunken",
-            background="#FFBBBB",
-            anchor="center")
+        self.statusbar = ttk.Label(self, textvariable=self.status, padding=2, anchor="center")
         self.statusbar.grid(column=0, row=0, sticky="W E")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
+
+        # Set default status
+        self.set_status(False)
+
+    def set_status(self, status):
+        """
+        Updates the status text
+
+        Args:
+            status (int): The offline/starting/online status of Modis
+                0: offline, 1: starting, 2: online
+        """
+
+        text = ""
+        colour = "#FFFFFF"
+        if status == 0:
+            text = "OFFLINE"
+            colour = "#EF9A9A"
+        elif status == 1:
+            text = "STARTING"
+            colour = "#FFE082"
+        elif status == 2:
+            text = "ONLINE"
+            colour = "#A5D6A7"
+
+        self.status.set(text)
+        self.statusbar.config(background=colour)
