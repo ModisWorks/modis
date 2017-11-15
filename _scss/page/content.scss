@@ -49,7 +49,7 @@ a {
             margin: -4px;
 
             content: "";
-            transition: background-color 0.1s ease, border-color 0.05s ease, transform 0.075s ease-in;
+            transition: background-color 0.15s $m-ease, border-color 0.15s $m-ease, transform 0.15s $m-ease-in;
             transform: scale(1.5);
 
             border: 1px solid transparent;
@@ -58,15 +58,15 @@ a {
         }
 
         &:focus::before {
-            transition: background-color 0.1s ease, border-color 0.05s ease, transform 0.075s ease-out;
+            transition: background-color 0.15s $m-ease, border-color 0.15s $m-ease, transform 0.15s $m-ease-out;
             transform: scale(1);
 
             border-color: $table-border-color;
-            background-color: rgba($background-color-alt, 0.05);
+            background-color: rgba($background-color-alt, 0.12);
         }
 
         &:active::before {
-            transition: background-color 0.1s ease, border-color 0.05s ease, transform 0s linear;
+            transition: background-color 0.1s $m-ease, border-color 0.1s $m-ease, transform 0s linear;
 
             background-color: transparent;
         }

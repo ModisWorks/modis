@@ -1,6 +1,12 @@
+// Easings
+$m-ease: cubic-bezier(0.4, 0.0, 0.2, 1);
+$m-ease-in: cubic-bezier(0.4, 0.0, 1, 1);
+$m-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+$m-ease-in-out: cubic-bezier(0.4, 0.0, 0.6, 1);
+
 // Colors
 $primary-color: #2e2f34;
-$secondary-color: #00aaff;
+$secondary-color: #1e88e5;
 $background-color: #ffffff;
 $background-color-alt: #2e2f34;
 $text-color: rgba(0, 0, 0, 0.87);

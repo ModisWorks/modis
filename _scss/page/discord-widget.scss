@@ -1,16 +1,24 @@
 $discord-widget-margin: 1.2em;
+$yt-width: 16;
+$yt-height: 9;
 
-.main-content iframe {
+
+iframe {
+    transform: scale(0.9);
+
     opacity: 0;
 
     &.visible {
-        transition: opacity 0.2s ease;
+        transition: opacity 0.2s $m-ease, transform 0.2s $m-ease-out;
+        transform: scale(1);
 
         opacity: 1;
     }
 }
 
 .main-content .widget-discord {
+    position: relative;
+
     float: right;
 
     max-width: 100%;
@@ -34,9 +42,9 @@ $discord-widget-margin: 1.2em;
 
     width: 100%;
     height: 0;
-    padding-bottom: 56.27198%;
+    padding-bottom: 100% / $yt-width * $yt-height;
 
-    background-color: $background-color-alt;
+    background-color: transparent;
 
     &::before {
         position: absolute;
@@ -47,7 +55,7 @@ $discord-widget-margin: 1.2em;
         content: "Loading YouTube";
         text-align: center;
 
-        color: $text-color-alt;
+        color: $text-color;
 
         font-size: 1rem;
         line-height: 0;

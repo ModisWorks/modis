@@ -22,7 +22,7 @@
     .main-content {
         animation-name: page-in;
         animation-duration: 0.1s;
-        animation-timing-function: ease-out;
+        animation-timing-function: $m-ease-out;
         animation-fill-mode: both;
     }
 
@@ -31,15 +31,15 @@
         background-color: transparent;
 
         &:focus {
-            background-color: darken($background-color-alt, 15%);
-        }
-
-        &:hover {
             background-color: darken($background-color-alt, 10%);
         }
 
+        &:hover {
+            background-color: darken($background-color-alt, 5%);
+        }
+
         &:active {
-            background-color: darken($background-color-alt, 15%);
+            background-color: darken($background-color-alt, 10%);
         }
 
         &.page-link-current {
@@ -59,7 +59,7 @@
 .main.page-out {
     .main-content {
         animation-name: page-out;
-        animation-timing-function: ease-in;
+        animation-timing-function: $m-ease-in;
 
         a {
             &::before {

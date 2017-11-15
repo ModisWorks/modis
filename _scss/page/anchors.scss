@@ -14,7 +14,7 @@ a.header-link {
     i {
         position: relative;
 
-        transition: opacity 0.1s ease;
+        transition: opacity 0.15s $m-ease;
         vertical-align: middle;
 
         opacity: 0;
@@ -31,18 +31,18 @@ a.header-link {
             margin: -4px;
 
             content: "";
-            transition: opacity 0.1s ease, transform 0.075s ease-in;
+            transition: opacity 0.15s $m-ease, transform 0.15s $m-ease-in;
             transform: scale(1.5);
 
             opacity: 0;
             border: 1px solid $table-border-color;
             border-radius: 50%;
-            background-color: rgba($background-color-alt, 0.1);
+            background-color: rgba($background-color-alt, 0.12);
         }
     }
 
     &:focus i::before {
-        transition: opacity 0.1s ease, transform 0.075s ease-out;
+        transition: opacity 0.15s $m-ease, transform 0.15s $m-ease-out;
         transform: scale(1);
 
         opacity: 1;
@@ -50,7 +50,7 @@ a.header-link {
 
 
     &:active i::before {
-        transition: opacity 0.1s ease, transform 0s linear;
+        transition: opacity 0.1s $m-ease, transform 0s linear;
         transform: scale(1);
 
         opacity: 1;
