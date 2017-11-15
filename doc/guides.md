@@ -9,6 +9,7 @@ permalink: /guides/
 Get Modis running on your own machine.
 
 - [Installing Modis](./guides/setup.md)
+- [Raspberry Pi](./guides/raspberry-pi.md)
 
 ## Ping Pong Module
 
