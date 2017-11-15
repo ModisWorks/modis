@@ -1,0 +1,16 @@
+---
+layout: default
+---
+
+<div>
+    <script type="text/javascript">
+        function iframe_loaded(frame) {
+            console.log("widget loaded");
+            $(frame).addClass("visible")
+        }
+    </script>
+
+    <iframe class="widget-discord" onload="iframe_loaded(this)" src="https://discordapp.com/widget?id=379959693306494979&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0"></iframe>
+
+    {{ content }}
+</div>

@@ -1,5 +1,5 @@
 function addMarkdownAnchors() {
-    return $("h1, h2, h3, h4, h5, h6").each(function (i, el) {
+    return $("h2, h3, h4, h5, h6").each(function (i, el) {
         var $el, icon, id;
         $el = $(el);
         id = $el.attr('id');

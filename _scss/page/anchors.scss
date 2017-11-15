@@ -58,7 +58,6 @@ a.header-link {
     }
 }
 
-h1,
 h2,
 h3,
 h4,
@@ -82,13 +81,7 @@ h6 {
     }
 }
 
-// JoSeFiN sAnS hAs GoOd VeRtIcAl AlIgNmEnT
-.main-content h1 a.header-link {
-    margin-top: -0.2em;
-}
-
 a.header-link:focus,
-h1:hover .header-link,
 h2:hover .header-link,
 h3:hover .header-link,
 h4:hover .header-link,

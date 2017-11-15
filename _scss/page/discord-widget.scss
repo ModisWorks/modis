@@ -1,0 +1,27 @@
+$discord-widget-margin: 0.8em;
+
+.main-content .widget-discord {
+    float: right;
+
+    max-width: 100%;
+    max-height: 60vh;
+    margin-top: -$discord-widget-margin;
+    margin-bottom: $discord-widget-margin;
+    margin-left: $discord-widget-margin;
+
+    opacity: 0;
+
+    @media (max-width: $large-breakpoint) {
+        max-width: 50%;
+    }
+
+    @media (max-width: $medium-breakpoint) {
+        display: none;
+    }
+
+    &.visible {
+        transition: opacity 0.2s ease;
+
+        opacity: 1;
+    }
+}
