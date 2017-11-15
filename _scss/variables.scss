@@ -43,3 +43,8 @@ $tiny-breakpoint: 12em;
 // Sizes
 $tabs-height: 3em;
 $tabs-height-small: 2.5em;
+
+// Header
+@mixin header-background {
+    background-image: url("https://thumb1.shutterstock.com/display_pic_with_logo/175351/412139623/stock-photo-disgusted-dietitian-nutritionist-checking-examine-sweet-roll-bun-with-stethoscope-woman-with-412139623.jpg");
+}
