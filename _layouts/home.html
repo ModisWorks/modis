@@ -3,28 +3,25 @@ layout: default
 ---
 
 <div>
-    <script type="text/javascript">
-        function iframe_loaded(frame) {
-            console.log("widget loaded");
-            $(frame).addClass("visible")
-        }
-    </script>
-    
     <script type="text/javascript" src="//cdn.jsdelivr.net/discord-widget/latest/discord-widget.min.js"></script>
     <script type="text/javascript">
-        discordWidget.init({
-            serverId: '379959693306494979',
-            title: 'Modis Discord Server',
-            join: true,
-            alphabetical: false,
-            theme: 'none',
-            hideChannels: [],
-            showAllUsers: true,
-            allUsersDefaultState: true,
-            showNick: false
-        });
+        $(function () {
+            if ($(".discord-widget")) {
+                discordWidget.init({
+                    serverId: '379959693306494979',
+                    title: 'Modis Discord Server',
+                    join: true,
+                    alphabetical: false,
+                    theme: 'none',
+                    hideChannels: [],
+                    showAllUsers: true,
+                    allUsersDefaultState: true,
+                    showNick: false
+                });
 
-        discordWidget.render();
+                discordWidget.render();
+            }
+        });
     </script>
 
     <div class="discord-widget"></div>

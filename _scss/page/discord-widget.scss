@@ -2,7 +2,9 @@ $discord-widget-width: 18rem;
 $discord-widget-height: 28rem;
 $discord-widget-margin: 1.2rem;
 $discord-widget-padding: 1.2rem;
-$discord-widget-color: rgba(#242424, 0.9);
+$discord-widget-background-color: $background-color-alt;
+$discord-widget-heading-color: rgba(255, 255, 255, 0.9);
+$discord-widget-text-color: rgba(255, 255, 255, 0.9);
 
 @keyframes widget-in {
     from {
@@ -42,6 +44,8 @@ $discord-widget-color: rgba(#242424, 0.9);
 
     animation: widget-in 0.1s ease;
 
+    color: $discord-widget-text-color;
+
     @media (max-width: $large-breakpoint) {
         max-width: 50%;
     }
@@ -64,7 +68,24 @@ $discord-widget-color: rgba(#242424, 0.9);
 
         border: 1px solid $border-color;
         border-radius: $border-radius;
-        background-color: $discord-widget-color;
+        background-color: $discord-widget-background-color;
+    }
+
+    ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+
+        background-color: transparent;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border: 1px solid $border-color;
+        border-radius: $border-radius;
+        background-color: $discord-widget-text-color;
     }
 
     .discord-title h3 {
@@ -72,6 +93,8 @@ $discord-widget-color: rgba(#242424, 0.9);
         margin-top: 0.2em;
 
         animation: content-in 0.1s ease;
+
+        color: $discord-widget-heading-color;
 
         font-size: 1rem;
         font-style: normal;
@@ -150,10 +173,10 @@ $discord-widget-color: rgba(#242424, 0.9);
 
             transition: background-color 0.05s ease;
 
-            color: $primary-color;
+            color: $discord-widget-heading-color;
             border: 1px solid $border-color;
             border-radius: $border-radius;
-            background-color: lighten($discord-widget-color, 4%);
+            background-color: lighten($discord-widget-background-color, 4%);
 
             &::before {
                 display: none;
@@ -162,11 +185,11 @@ $discord-widget-color: rgba(#242424, 0.9);
 
         &:hover a,
         &:focus a {
-            background-color: lighten($discord-widget-color, 8%);
+            background-color: lighten($discord-widget-background-color, 8%);
         }
 
         &:active a {
-            background-color: lighten($discord-widget-color, 6%);
+            background-color: lighten($discord-widget-background-color, 6%);
         }
     }
 }
