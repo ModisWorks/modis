@@ -4,6 +4,26 @@ $discord-widget-margin: 1.2rem;
 $discord-widget-padding: 1.2rem;
 $discord-widget-color: rgba(#242424, 0.9);
 
+@keyframes widget-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes content-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
 
 .main-content .discord-widget {
     position: relative;
@@ -19,6 +39,8 @@ $discord-widget-color: rgba(#242424, 0.9);
     margin-right: $discord-widget-padding;
     margin-bottom: $discord-widget-margin + $discord-widget-padding;
     margin-left: $discord-widget-margin + $discord-widget-padding;
+
+    animation: widget-in 0.1s ease;
 
     @media (max-width: $large-breakpoint) {
         max-width: 50%;
@@ -49,6 +71,8 @@ $discord-widget-color: rgba(#242424, 0.9);
         margin: 0 0.21em;
         margin-top: 0.2em;
 
+        animation: content-in 0.1s ease;
+
         font-size: 1rem;
         font-style: normal;
 
@@ -70,6 +94,8 @@ $discord-widget-color: rgba(#242424, 0.9);
 
         margin-top: 1.4rem;
         margin-bottom: 3.2rem;
+
+        animation: content-in 0.1s ease;
 
         li {
             position: relative;
@@ -98,6 +124,8 @@ $discord-widget-color: rgba(#242424, 0.9);
 
         margin: 0;
         padding: 0;
+
+        animation: content-in 0.1s ease;
     }
 
     .discord-join {
@@ -105,6 +133,8 @@ $discord-widget-color: rgba(#242424, 0.9);
         left: 0;
         right: 0;
         bottom: 0;
+
+        animation: content-in 0.1s ease;
 
         background-color: transparent;
 
