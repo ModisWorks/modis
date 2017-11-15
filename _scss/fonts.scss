@@ -4,6 +4,7 @@
 @mixin font-title {
     font-family: "Josefin Sans", Arial, Helvetica, sans-serif;
     font-weight: 400;
+    font-size: 100px;
 	text-transform: lowercase;
 }
 
@@ -14,18 +15,17 @@
 }
 
 @mixin font-heading {
-    font-family: "Josefin Sans", Arial, Helvetica, sans-serif;
+    font-family: "Open Sans", Arial, Helvetica, sans-serif;
     font-weight: 400;
-	text-transform: lowercase;
 }
 
 @mixin font-subheading {
-    font-family: "Work Sans", Arial, Helvetica, sans-serif;
+    font-family: "Open Sans", Arial, Helvetica, sans-serif;
     font-weight: 400;
 }
 
 @mixin font-body {
-    font-family: "Work Sans", Arial, Helvetica, sans-serif;
+    font-family: "Open Sans", Arial, Helvetica, sans-serif;
     font-weight: 400;
 }
 
