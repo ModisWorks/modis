@@ -1,11 +1,11 @@
-$discord-widget-margin: 0.8em;
+$discord-widget-margin: 1.2em;
 
 .main-content .widget-discord {
     float: right;
 
     max-width: 100%;
     max-height: 60vh;
-    margin-top: -$discord-widget-margin;
+    margin-top: $discord-widget-margin;
     margin-bottom: $discord-widget-margin;
     margin-left: $discord-widget-margin;
 
