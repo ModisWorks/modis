@@ -46,8 +46,8 @@ $tabs-height-small: 2.5em;
 
 // Header
 @mixin header-background {
-    background-image: url("https://github.com/Infraxion/modis/blob/gh-pages/banner.png");
+	background-image: url("https://github.com/Infraxion/modis/raw/gh-pages/banner.png");
 	background-repeat: no-repeat;
 	background-position: center center;
-	background-size: 1;
+	background-size: 100%;
 }
