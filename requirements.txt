@@ -11,6 +11,7 @@
 
 
 # core:
+    discord
     youtube-dl
     # ffmpeg/bin/ in system PATH variables
 
