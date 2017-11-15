@@ -9,8 +9,25 @@ layout: default
             $(frame).addClass("visible")
         }
     </script>
+    
+    <script type="text/javascript" src="//cdn.jsdelivr.net/discord-widget/latest/discord-widget.min.js"></script>
+    <script type="text/javascript">
+        discordWidget.init({
+            serverId: '379959693306494979',
+            title: 'Modis Discord Server',
+            join: true,
+            alphabetical: false,
+            theme: 'none',
+            hideChannels: [],
+            showAllUsers: true,
+            allUsersDefaultState: true,
+            showNick: false
+        });
 
-    <iframe class="widget-discord" onload="iframe_loaded(this)" src="https://discordapp.com/widget?id=379959693306494979&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0"></iframe>
+        discordWidget.render();
+    </script>
+
+    <div class="discord-widget"></div>
 
     {{ content }}
 </div>

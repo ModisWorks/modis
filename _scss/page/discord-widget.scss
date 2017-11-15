@@ -1,15 +1,24 @@
-$discord-widget-margin: 0.8em;
+$discord-widget-width: 18rem;
+$discord-widget-height: 28rem;
+$discord-widget-margin: 1.2rem;
+$discord-widget-padding: 1.2rem;
+$discord-widget-color: rgba(#242424, 0.9);
 
-iframe.widget-discord {
+
+.main-content .discord-widget {
+    position: relative;
+    z-index: 2;
+
     float: right;
 
+    width: $discord-widget-width;
     max-width: 100%;
-    max-height: 70vh;
-    margin-top: -$discord-widget-margin;
-    margin-bottom: $discord-widget-margin;
-    margin-left: $discord-widget-margin;
-
-    opacity: 0;
+    height: $discord-widget-height;
+    max-height: 40vh;
+    margin-top: $discord-widget-padding;
+    margin-right: $discord-widget-padding;
+    margin-bottom: $discord-widget-margin + $discord-widget-padding;
+    margin-left: $discord-widget-margin + $discord-widget-padding;
 
     @media (max-width: $large-breakpoint) {
         max-width: 50%;
@@ -19,9 +28,115 @@ iframe.widget-discord {
         display: none;
     }
 
-    &.visible {
-        transition: opacity 0.2s ease;
+    &::before {
+        position: absolute;
+        z-index: -1;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
 
-        opacity: 1;
+        margin: -$discord-widget-padding;
+
+        content: "";
+
+        border: 1px solid $border-color;
+        border-radius: $border-radius;
+        background-color: $discord-widget-color;
+    }
+
+    .discord-title h3 {
+        margin: 0 0.21em;
+        margin-top: 0.2em;
+
+        font-size: 1rem;
+        font-style: normal;
+
+@include font-subheading;
+
+        &::before {
+            display: none;
+        }
+    }
+
+    ul {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+
+        overflow-y: auto;
+
+        margin-top: 1.4rem;
+        margin-bottom: 3.2rem;
+
+        li {
+            position: relative;
+
+            padding: 0.2em 0;
+        }
+
+        ul {
+            position: relative;
+
+            height: auto;
+            margin: 0;
+
+            .discord-user-status {
+                left: 15px;
+                top: 18px;
+            }
+        }
+    }
+
+    .discord-users-online {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 2rem;
+
+        margin: 0;
+        padding: 0;
+    }
+
+    .discord-join {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        background-color: transparent;
+
+        a {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            display: block;
+
+            padding: 0;
+
+            transition: background-color 0.05s ease;
+
+            color: $primary-color;
+            border: 1px solid $border-color;
+            border-radius: $border-radius;
+            background-color: lighten($discord-widget-color, 4%);
+
+            &::before {
+                display: none;
+            }
+        }
+
+        &:hover a,
+        &:focus a {
+            background-color: lighten($discord-widget-color, 8%);
+        }
+
+        &:active a {
+            background-color: lighten($discord-widget-color, 6%);
+        }
     }
 }
