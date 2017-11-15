@@ -1,195 +1,28 @@
-$discord-widget-width: 18rem;
-$discord-widget-height: 28rem;
-$discord-widget-margin: 1.2rem;
-$discord-widget-padding: 1.2rem;
-$discord-widget-background-color: $background-color-alt;
-$discord-widget-heading-color: rgba(255, 255, 255, 0.9);
-$discord-widget-text-color: rgba(255, 255, 255, 0.9);
+$discord-widget-margin: 0.8em;
 
-@keyframes widget-in {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes content-in {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-
-.main-content .discord-widget {
-    position: relative;
-    z-index: 2;
-
+.main-content .widget-discord {
     float: right;
 
-    width: $discord-widget-width;
     max-width: 100%;
-    height: $discord-widget-height;
-    max-height: 40vh;
-    margin-top: $discord-widget-padding;
-    margin-right: $discord-widget-padding;
-    margin-bottom: $discord-widget-margin + $discord-widget-padding;
-    margin-left: $discord-widget-margin + $discord-widget-padding;
+    max-height: 60vh;
+    margin-top: -$discord-widget-margin;
+    margin-bottom: $discord-widget-margin;
+    margin-left: $discord-widget-margin;
 
-    animation: widget-in 0.1s ease;
-
-    color: $discord-widget-text-color;
+    opacity: 0;
 
     @media (max-width: $large-breakpoint) {
         max-width: 50%;
     }
 
     @media (max-width: $medium-breakpoint) {
-        display: none;
+        min-width: 100%;
+        max-width: 100%;
     }
 
-    &::before {
-        position: absolute;
-        z-index: -1;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
+    &.visible {
+        transition: opacity 0.2s ease;
 
-        margin: -$discord-widget-padding;
-
-        content: "";
-
-        border: 1px solid $border-color;
-        border-radius: $border-radius;
-        background-color: $discord-widget-background-color;
-    }
-
-    ::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
-
-        background-color: transparent;
-    }
-
-    ::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        border: 1px solid $border-color;
-        border-radius: $border-radius;
-        background-color: $discord-widget-text-color;
-    }
-
-    .discord-title h3 {
-        margin: 0 0.21em;
-        margin-top: 0.2em;
-
-        animation: content-in 0.1s ease;
-
-        color: $discord-widget-heading-color;
-
-        font-size: 1rem;
-        font-style: normal;
-
-@include font-subheading;
-
-        &::before {
-            display: none;
-        }
-    }
-
-    ul {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-
-        overflow-y: auto;
-
-        margin-top: 1.4rem;
-        margin-bottom: 3.2rem;
-
-        animation: content-in 0.1s ease;
-
-        li {
-            position: relative;
-
-            padding: 0.2em 0;
-        }
-
-        ul {
-            position: relative;
-
-            height: auto;
-            margin: 0;
-
-            .discord-user-status {
-                left: 15px;
-                top: 18px;
-            }
-        }
-    }
-
-    .discord-users-online {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 2rem;
-
-        margin: 0;
-        padding: 0;
-
-        animation: content-in 0.1s ease;
-    }
-
-    .discord-join {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-
-        animation: content-in 0.1s ease;
-
-        background-color: transparent;
-
-        a {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-
-            display: block;
-
-            padding: 0;
-
-            transition: background-color 0.05s ease;
-
-            color: $discord-widget-heading-color;
-            border: 1px solid $border-color;
-            border-radius: $border-radius;
-            background-color: lighten($discord-widget-background-color, 4%);
-
-            &::before {
-                display: none;
-            }
-        }
-
-        &:hover a,
-        &:focus a {
-            background-color: lighten($discord-widget-background-color, 8%);
-        }
-
-        &:active a {
-            background-color: lighten($discord-widget-background-color, 6%);
-        }
+        opacity: 1;
     }
 }

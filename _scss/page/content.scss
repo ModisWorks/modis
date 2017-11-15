@@ -16,13 +16,7 @@ a {
 }
 
 .main-content h1 {
-    margin-left: -0.09em;
-
-    text-transform: uppercase;
-
-    font-size: 3em;
-
-@include font-heading;
+    @include font-heading;
 
     @media (max-width: $medium-breakpoint) {
         font-size: 2em;
@@ -31,9 +25,7 @@ a {
 
 .main-content h2,
 .main-content h3 {
-    margin-left: -0.05em;
-
-@include font-subheading;
+    @include font-subheading;
 }
 
 .main-content {

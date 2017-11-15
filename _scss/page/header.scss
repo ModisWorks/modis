@@ -17,8 +17,6 @@
     .project-name {
         opacity: 1;
 
-        font-size: 4em;
-
 @include font-title;
 
         @media (max-width: $small-breakpoint) {
