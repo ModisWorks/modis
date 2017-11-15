@@ -3,7 +3,8 @@ layout: default
 ---
 
 <div>
-    <script type="text/javascript" src="//cdn.jsdelivr.net/discord-widget/latest/discord-widget.min.js"></script>
+    <div class="discord-widget"></div>
+    
     <script type="text/javascript">
         $(function () {
             if ($(".discord-widget")) {
@@ -23,8 +24,6 @@ layout: default
             }
         });
     </script>
-
-    <div class="discord-widget"></div>
 
     {{ content }}
 </div>
