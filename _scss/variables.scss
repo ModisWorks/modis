@@ -10,6 +10,13 @@ $text-color-alt: rgba(0, 0, 0, 0.9);
 $header-heading-color: $text-color-alt;
 $header-bg-color: $primary-color;
 $header-bg-color-secondary: $secondary-color;
+// Shadows
+@mixin header-shadow-page {
+    box-shadow: 0 -4px 6px rgba(0, 0 ,0, 0.15);
+}
+@mixin header-shadow-fixed {
+    box-shadow: 0 4px 6px $background-color;
+}
 
 // Code
 $code-bg-color: rgba($background-color-alt, 0.08);

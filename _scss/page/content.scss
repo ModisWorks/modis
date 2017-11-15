@@ -84,7 +84,8 @@ a {
     transform: translateZ(0);
 
     background-color: $background-color-alt;
-    box-shadow: 0 -4px 6px rgba(0, 0 ,0, 0.15);
+
+@include header-shadow-page;
 
     .page-tabs-inner {
         display: table;
@@ -102,7 +103,7 @@ a {
         right: 0;
         top: 0;
 
-        box-shadow: 0 4px 6px $background-color;
+@include header-shadow-fixed;
 
         @media (max-height: $medium-breakpoint), (max-width: $small-breakpoint) {
             .page-tabs-inner {
