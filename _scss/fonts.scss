@@ -3,7 +3,8 @@
 // Update html to include these fonts when adding new fonts
 @mixin font-title {
     font-family: "Josefin Sans", Arial, Helvetica, sans-serif;
-    font-weight: 300;
+    font-weight: 600;
+	text-transform: lowercase;
 }
 
 @mixin font-subtitle {
@@ -13,7 +14,8 @@
 
 @mixin font-heading {
     font-family: "Josefin Sans", Arial, Helvetica, sans-serif;
-    font-weight: 300;
+    font-weight: 600;
+	text-transform: lowercase;
 }
 
 @mixin font-subheading {
