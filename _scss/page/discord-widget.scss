@@ -1,15 +1,17 @@
+// Discord
 $discord-widget-margin: 1.2em;
+// YouTube
 $yt-width: 16;
 $yt-height: 9;
 
 
 iframe {
-    transform: scale(0.9);
+    transform: scale(1.05);
 
     opacity: 0;
 
     &.visible {
-        transition: opacity 0.2s $m-ease, transform 0.2s $m-ease-out;
+        transition: opacity 0.25s $m-ease, transform 0.4s $m-ease-out;
         transform: scale(1);
 
         opacity: 1;
