@@ -6,11 +6,15 @@ $yt-height: 9;
 
 
 iframe {
+    visibility: hidden;
+
     transform: scale(1.05);
 
     opacity: 0;
 
     &.visible {
+        visibility: visible;
+
         transition: opacity 0.25s $m-ease, transform 0.4s $m-ease-out;
         transform: scale(1);
 
