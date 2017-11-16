@@ -3,6 +3,7 @@ $discord-widget-margin: 1.2em;
 // YouTube
 $yt-width: 16;
 $yt-height: 9;
+$yt-border-width: 1px;
 
 
 iframe {
@@ -50,6 +51,7 @@ iframe {
     height: 0;
     padding-bottom: 100% / $yt-width * $yt-height;
 
+    border: $yt-border-width solid $table-border-color;
     background-color: transparent;
 
     &::before {
@@ -69,10 +71,10 @@ iframe {
 
     iframe {
         position: absolute;
-        left: 0;
-        top: 0;
+        left: -$yt-border-width;
+        top: -$yt-border-width;
 
-        width: 100%;
-        height: 100%;
+        width: calc(100% + #{$yt-border-width * 2});
+        height: calc(100% + #{$yt-border-width * 2});
     }
 }
