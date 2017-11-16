@@ -22,7 +22,7 @@
     .main-content {
         animation-name: page-in;
         animation-duration: 0.1s;
-        animation-timing-function: $m-ease-out;
+        animation-timing-function: ease;
         animation-fill-mode: both;
     }
 
@@ -59,7 +59,7 @@
 .main.page-out {
     .main-content {
         animation-name: page-out;
-        animation-timing-function: $m-ease-in;
+        animation-timing-function: ease;
 
         a {
             &::before {
