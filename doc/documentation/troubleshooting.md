@@ -7,14 +7,20 @@ permalink: /documentation/troubleshooting/
 
 ## How do I get Modis in my server?
 
-[Discord Permissions Calculator](https://discordapi.com/permissions.html) will generate an invite link for you, or you can make you own by using `https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=2146958455` and replacing `<CLIENT_ID>` with your bot's client id. You don't need to give all the permissions, but some modules won't work without the required permissions.
+[Discord Permissions Calculator](https://discordapi.com/permissions.html) will generate an invite link for you, or you can make you own by pasting
+
+```html
+https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=2146958455
+```
+
+into your web browser and replacing `<CLIENT_ID>` with your bot's client id. You don't need to give all the permissions, but some modules won't work without the required permissions.
 
 ## My data.json has no servers in it
 
 Make sure Modis is in your server. If it is, then this is usually because one or more requirements for Modis are installed, but not up to date. To fix this, run
 
 ```sh
-pip install [packagename] --upgrade`
+pip install [packagename] --upgrade
 ```
 
 or
