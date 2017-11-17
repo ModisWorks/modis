@@ -14,8 +14,8 @@ def build_api():
     if "reddit_api_user_agent" not in data["discord"]["keys"] or \
             "reddit_api_client_id" not in data["discord"]["keys"] or \
             "reddit_api_client_secret" not in data["discord"]["keys"]:
-        logger.error("Please make sure \"reddit_api_user_agent\"," +
-                     "\"reddit_api_client_id\", and \"reddit_api_client_id\" are all added as API keys")
+        logger.warning("For gamedeals to work, please make sure \"reddit_api_user_agent\", " +
+                       "\"reddit_api_client_id\", and \"reddit_api_client_id\" are all added as API keys")
 
     logger.debug("Building Reddit API")
     try:
@@ -27,7 +27,7 @@ def build_api():
         logger.debug("Build successfull")
         return True
     except:
-        logger.critical("Error connecting to Reddit API, build failed")
+        logger.warning("Error connecting to Reddit API, Reddit won't be available")
         return False
 
 

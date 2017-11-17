@@ -30,6 +30,10 @@ def start(token, client_id, loop, module_found_handler=None, on_ready_handler=No
     if "keys" not in data["discord"]:
         data["discord"]["keys"] = {}
 
+    # Save logger info to data
+    if "log_level" not in data:
+        data["log_level"] = "INFO"
+
     data["discord"]["token"] = token
     data["discord"]["client_id"] = client_id
     datatools.write_data(data)
@@ -88,7 +92,7 @@ def start(token, client_id, loop, module_found_handler=None, on_ready_handler=No
             except:
                 pass
         finally:
-            logger.critical("Bot stopped")
+            logger.critical("Bot stopped\n")
             client.loop.close()
 
 

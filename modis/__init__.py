@@ -6,7 +6,11 @@ import sys
 from modis import datatools
 
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+data = datatools.get_data()
+if "log_level" in data:
+    logger.setLevel(data["log_level"])
+else:
+    logger.setLevel("INFO")
 
 formatter = logging.Formatter(
     "{asctime} {levelname:8} {name} - {message}", style="{")
@@ -32,8 +36,7 @@ def console(discord_token, discord_client_id):
     """
 
     logger.info("Starting Modis in console")
-
-    datatools.log_compare_version(logger)
+    logger.info(datatools.get_compare_version())
 
     import threading
     import asyncio

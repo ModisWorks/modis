@@ -12,7 +12,7 @@ ytdiscoveryapi = None
 def build_api():
     data = datatools.get_data()
     if "google_api_key" not in data["discord"]["keys"]:
-        logger.critical("No API key found with name 'google_api_key'")
+        logger.warning("No API key found with name 'google_api_key'")
         logger.info("Please add your google API key with name 'google_api_key' int the control panel")
         return False
 
@@ -24,7 +24,7 @@ def build_api():
         logger.debug("Build successfull")
         return True
     except:
-        logger.critical("HTTP error connecting to YouTube API, build failed")
+        logger.warning("HTTP error connecting to YouTube API, YouTube won't be available")
         return False
 
 
