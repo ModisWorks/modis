@@ -101,16 +101,18 @@ class MusicPlayer:
 
         self.vready = False
 
-        try:
-            self.streamer.stop()
-        except:
-            pass
+        if self.vclient:
+            try:
+                await self.vclient.disconnect()
+            except Exception as e:
+                logger.error(e)
+                pass
 
-        try:
-            await self.vclient.disconnect()
-        except Exception as e:
-            logger.error(e)
-            pass
+        if self.streamer:
+            try:
+                self.streamer.stop()
+            except:
+                pass
 
         self.vclient = None
         self.vchannel = None
@@ -138,16 +140,18 @@ class MusicPlayer:
         self.mready = False
         self.vready = False
 
-        try:
-            self.streamer.stop()
-        except:
-            pass
+        if self.vclient:
+            try:
+                await self.vclient.disconnect()
+            except Exception as e:
+                logger.error(e)
+                pass
 
-        try:
-            await self.vclient.disconnect()
-        except Exception as e:
-            logger.error(e)
-            pass
+        if self.streamer:
+            try:
+                self.streamer.stop()
+            except:
+                pass
 
         self.vclient = None
         self.vchannel = None
