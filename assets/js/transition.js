@@ -29,10 +29,22 @@ $(function () {
                 addMarkdownAnchors();
 
                 // Scroll to top
+                console.log(location.hash);
                 var $mainContent = $(".main-content");
                 var t = $mainContent.offset().top + 1;
                 if (window.scrollY > t) {
                     window.scrollTo(0, t);
+                }
+
+                if (location.hash !== "") {
+                    var dest = 0;
+                    if ($(location.hash).offset().top > $(document).height() - $(window).height()) {
+                        dest = $(document).height() - $(window).height();
+                    } else {
+                        dest = $(location.hash).offset().top;
+                    }
+
+                    window.scrollTo(0, dest);
                 }
             }
         }
