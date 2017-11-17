@@ -9,7 +9,7 @@ import requests
 _dir = _os.path.dirname(_os.path.realpath(__file__))
 _datafile = "{}/../data.json".format(_dir)
 
-version = "0.3"
+version = "0.3.1"
 
 
 def has_data() -> bool:
@@ -115,7 +115,7 @@ def compare_latest_version():
                 return 1, release_version_name
             elif current_version[vi] < release_version[vi]:
                 return -1, release_version_name
-        else:
+        elif release_version[vi] != "0":
             return -1, release_version_name
 
     return 0, release_version_name
@@ -127,6 +127,6 @@ def log_compare_version(logger):
     if state < 0:
         logger.info("A new version of Modis is available (v{})".format(latest_version))
     elif state == 0:
-        logger.info("You are running the latest version of Modis (v{})".format(latest_version))
+        logger.info("You are running the latest version of Modis (v{})".format(version))
     else:
-        logger.info("You are running a preview version of Modis (v{} pre-release)".format(latest_version))
+        logger.info("You are running a preview version of Modis (v{} pre-release)".format(version))
