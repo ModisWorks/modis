@@ -48,7 +48,6 @@ $(function () {
 
     // Update tab bar
     updateTabs();
-    window.onscroll = updateTabs;
 
     // Add the anchors
     addMarkdownAnchors();
@@ -69,3 +68,5 @@ function updateTabs() {
         }
     }
 }
+
+window.onscroll = updateTabs;
