@@ -5,6 +5,7 @@ permalink: /guides/setup/
 # Installing Modis
 
 If you want to run Modis for yourself, you'll need a bunch of different files, which we still can't seem to get right every time.
+
 Hopefully this guide will make it easier to install Modis for all of us.
 
 ## Python 3.6
@@ -77,7 +78,8 @@ Extract it into a nice, cozy folder.
 
 Modis is now fully installed, but you still need to make a launch.
 We'll be streamlining this in the future so you don't have to do it, but for now, you're going to have to put in some work.
-As of writing, the `launcher.py` file should look like this:
+
+The `launcher.py` file should look like this:
 
 ```python
 import modis
@@ -90,6 +92,8 @@ modis.gui(
     discord_client_id=CLIENT_ID
 )
 ```
+
+If you don't know how to make your own Discord Bot, have a look at the [Making a Discord Bot](./api-keys.md#making-a-discord-bot) section for step-by-step instructions.
 
 To make this file, open up a text editor and paste the text. Save this file as `launcher.py` (and make sure that it's saving as a .py file rather than a .txt file). This file should go in the root directory for Modis (the same one with `requirements.txt`).
 
