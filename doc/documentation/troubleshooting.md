@@ -11,7 +11,7 @@ permalink: /documentation/troubleshooting/
 
 ## My data.json has no servers in it
 
-Make sure Modis is in your server. If it is, then this is usually because one or more requirements for Modis are installed, but not up to date. To fix this, run `pip install [packagename] --update`, or `pip uninstall` and then `pip uninstall` each package. Make sure to run `pip install discord.py` 
+Make sure Modis is in your server. If it is, then this is usually because one or more requirements for Modis are installed, but not up to date. To fix this, run `pip install [packagename] --update`, or `pip uninstall` and then `pip uninstall` each package.
 
 ## The search function isn't working for the music module
 
