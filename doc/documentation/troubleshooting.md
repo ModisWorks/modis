@@ -5,9 +5,13 @@ permalink: /documentation/troubleshooting/
 
 # Troubleshooting
 
-## My data.json has no servers in it, even though Modis is in my server
+## How do I get Modis in my server?
 
-This is usually because one or more requirements for Modis are installed, but not up to date. To fix this, run `pip install [packagename] --update`, or `pip uninstall` and then `pip reinstall` each package.
+[Discord Permissions Calculator](https://discordapi.com/permissions.html) will generate an invite link for you, or you can make you own by using `https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=2146958455` and replacing `<CLIENT_ID>` with your bot's client id. You don't need to give all the permissions, but some modules won't work without the required permissions.
+
+## My data.json has no servers in it
+
+Make sure Modis is in your server. If it is, then this is usually because one or more requirements for Modis are installed, but not up to date. To fix this, run `pip install [packagename] --update`, or `pip uninstall` and then `pip reinstall` each package.
 
 ## The search function isn't working for the music module
 
