@@ -1,3 +1,8 @@
+---
+title: Troubleshooting
+permalink: /documentation/troubleshooting/
+---
+
 # Troubleshooting
 
 ## My data.json has no servers in it, even though Modis is in my server
