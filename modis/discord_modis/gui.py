@@ -58,8 +58,11 @@ class Frame(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
+        # Welcome!
+        logger.info("Welcome to Modis v{}".format(datatools.version))
         # Update with version data
-        datatools.log_compare_version(logger)
+        state, response = datatools.get_compare_version()
+        logger.info("{}\n".format(response))
 
 
 class GlobalFrame(tk.Frame):
@@ -367,7 +370,6 @@ class Log(ttk.Labelframe):
         # Log text box
         log = tk.Text(self, wrap="none")
         log.grid(column=0, row=0, sticky="W E N S")
-        log.insert("end", "Welcome to Modis for Discord v{}\n".format(datatools.version))
 
         # Vertical Scrollbar
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=log.yview)

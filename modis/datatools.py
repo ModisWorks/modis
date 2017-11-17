@@ -121,12 +121,19 @@ def compare_latest_version():
     return 0, release_version_name
 
 
-def log_compare_version(logger):
-    """Logs the version comparison to the given logger"""
+def get_compare_version():
+    """
+    Get the version comparison info.
+
+    Returns: (tuple)
+        state (int): -1 for lower version, 0 for same version, 1 for higher version than latest.
+        response (str): The response string.
+    """
+
     state, latest_version = compare_latest_version()
     if state < 0:
-        logger.info("A new version of Modis is available (v{})".format(latest_version))
+        return -1, "A new version of Modis is available (v{})".format(latest_version)
     elif state == 0:
-        logger.info("You are running the latest version of Modis (v{})".format(version))
+        return 0, "You are running the latest version of Modis (v{})".format(version)
     else:
-        logger.info("You are running a preview version of Modis (v{} pre-release)".format(version))
+        return 1, "You are running a preview version of Modis (v{} pre-release)".format(version)
