@@ -9,11 +9,11 @@ permalink: /documentation/troubleshooting/
 
 [Discord Permissions Calculator](https://discordapi.com/permissions.html) will generate an invite link for you, or you can make you own by pasting
 
-```html
-https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=2146958455
+```sh
+https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot&permissions=2146958455
 ```
 
-into your web browser and replacing `<CLIENT_ID>` with your bot's client id. You don't need to give all the permissions, but some modules won't work without the required permissions.
+into your web browser and replacing `CLIENT_ID` with your bot's client id. You don't need to give all the permissions, but some modules won't work without the required permissions.
 
 ## My data.json has no servers in it
 
