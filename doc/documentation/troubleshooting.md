@@ -15,6 +15,6 @@ Make sure Modis is in your server. If it is, then this is usually because one or
 
 ## The search function isn't working for the music module
 
-You need to add your Google API key, either through the module UI or by adding `'google': '<YOUR_KEY>'` to the 'keys' section in your `data.json`. Your API key must have YouTube v3 enabled for Modis to work.
+You need to add your Google API key, either through the module UI or by adding `'google': '<YOUR_KEY>'` to the 'keys' section in your `data.json`. Your API key must have YouTube v3 enabled for Modis to work. If your Google API key has been added, make sure you have restarted Modis for the changes to take effect.
 
 *We'll keep adding to this section as we find solutions to more problems you've found.*
