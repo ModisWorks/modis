@@ -61,9 +61,11 @@ Up to you.
 Click on "Browse" in the window that pops up and find the /bin folder inside the extracted FFmpeg build.
 Click "OK" or "Apply" or whatever until everything is all nice and packed up.
 
+Restart your computer so that Windows updates everything correctly, and continue with the next step.
+
 ### FFmpeg on OS X
 
-If you're using Homebrew, just run `brew install ffmpeg` and `brew install opus` in Terminal. This will install the required libraries for voice and audio that Modis needs.
+If you're using Homebrew, just run `brew install ffmpeg` and `brew install opus` in Terminal. This will install the required libraries for voice and audio that Modis needs. Restart your computer after both packages have downloaded and continue with the next step.
 
 ## Modis package
 
