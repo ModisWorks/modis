@@ -11,14 +11,7 @@ permalink: /documentation/troubleshooting/
 
 ## My data.json has no servers in it
 
-Make sure Modis is in your server. If it is, then this is usually because one or more requirements for Modis are installed, but not up to date. To fix this, run 
-
-```shell
-pip install pip-review
-pip-review --local --interactive
-```
-
-or you can `pip install [packagename] --upgrade`, or `pip uninstall` and then `pip install` each package.
+Make sure Modis is in your server. If it is, then this is usually because one or more requirements for Modis are installed, but not up to date. To fix this, run `pip install [packagename] --upgrade`, or `pip uninstall` and then `pip install` each package.
 
 ## The search function isn't working for the music module
 
