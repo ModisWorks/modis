@@ -18,7 +18,7 @@ pip install pip-review
 pip-review --local --interactive
 ```
 
-or you can `pip install [packagename] --update`, or `pip uninstall` and then `pip install` each package.
+or you can `pip install [packagename] --upgrade`, or `pip uninstall` and then `pip install` each package.
 
 ## The search function isn't working for the music module
 
