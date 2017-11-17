@@ -6,11 +6,11 @@ import sys
 from modis import datatools
 
 logger = logging.getLogger(__name__)
-data = datatools.get_data()
-if "log_level" in data:
-    logger.setLevel(data["log_level"])
-else:
-    logger.setLevel("INFO")
+logger.setLevel("INFO")
+if datatools.has_data():
+    data = datatools.get_data()
+    if "log_level" in data:
+        logger.setLevel(data["log_level"])
 
 formatter = logging.Formatter(
     "{asctime} {levelname:8} {name} - {message}", style="{")

@@ -31,8 +31,11 @@ def get_data() -> dict:
         data (dict): Parsed data.json file
     """
 
-    with open(_datafile, 'r') as file:
-        return _json.load(file)
+    if has_data():
+        with open(_datafile, 'r') as file:
+            return _json.load(file)
+    else:
+        return {}
 
 
 def write_data(data: dict):

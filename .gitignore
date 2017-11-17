@@ -17,6 +17,10 @@ Thumbs.db
 ehthumbs.db
 ehthumbs_vista.db
 
+# Windows batch and build files
+*.bat
+*.vbs
+
 # Dump file
 *.stackdump
 
