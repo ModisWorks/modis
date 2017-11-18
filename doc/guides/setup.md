@@ -99,4 +99,8 @@ To make this file, open up a text editor and paste the text. Save this file as `
 
 To run Modis now, just run `launcher.py`.
 
+## Troubleshooting
+
+If you still have problems, see the [Troubleshooting](../documentation/troubleshooting.md) section for solutions to some common problems. If you don't find a solution there, then feel free to join our Discord Server to ask your questions.
+
 *Guides for getting tokens for Discord bots, Reddit, and Google are coming soon.*
