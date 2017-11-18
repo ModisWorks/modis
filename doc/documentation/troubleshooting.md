@@ -15,9 +15,9 @@ https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot&permission
 
 into your web browser and replacing `CLIENT_ID` with your bot's client id. You don't need to give all the permissions, but some modules won't work without the required permissions.
 
-## My data.json has no servers in it
+## I get errors when starting Modis or sending any message
 
-Make sure Modis is in your server. If it is, then this is usually because one or more requirements for Modis are installed, but not up to date. To fix this, run
+Make sure Modis is in your server. If it is, this can be caused by a few problems, but this is usually because one or more requirements for Modis are  not up to date. To fix this, run
 
 ```sh
 pip install [packagename] --upgrade
