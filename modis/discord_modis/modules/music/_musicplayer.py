@@ -283,7 +283,6 @@ class MusicPlayer:
             self.statuslog.error("Must provide index to remove")
             return
         elif index == "all":
-            self.statuslog.info("Removing all songs")
             self.queue = []
             self.update_queue()
             self.statuslog.info("Removed all songs")
