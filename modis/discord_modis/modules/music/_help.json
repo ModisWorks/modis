@@ -42,10 +42,6 @@
       "description": "Removes the song from the queue at [index]"
     },
     {
-      "name": "remove all",
-      "description": "Removes all songs from the queue"
-    },
-    {
       "name": "volume",
       "params": ["v"],
       "description": "Sets the volume to [v]% (must be between 0% and 200%)"
