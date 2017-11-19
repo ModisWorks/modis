@@ -4,9 +4,7 @@ permalink: /guides/ping-pong/
 ---
 # Ping Pong Module
 
-In this guide you will learn, step by step, how to make a basic 'ping pong' module for Modis.
-
-This guide assumes you already have Modis set up and working, if not check out the [Installing Modis](./setup.md) guide.
+In this guide you will learn, step by step, how to make a basic 'ping pong' module for Modis. This guide assumes you already have Modis set up and working, if not check out the [Installing Modis](./setup.md) guide.
 
 After completing this you will know how to:
 
@@ -16,7 +14,7 @@ After completing this you will know how to:
 * Create a `help.json` file for a module
 * Activate and deactivate your module
 
-This guide describes commands using the default `!` prefix, but the code will work no matter what the server prefix is set to.
+> This guide describes commands using the default `!` prefix, but the code will work no matter what the server prefix is set to. If following this guide with a different prefix, just change the `!` at the start of commands to whatever your server prefix is. The server prefix can be found at any time by @mentioning Modis.
 
 ## Making a new module
 
@@ -33,7 +31,7 @@ async def on_message(message):
     print("message received")
 ```
 
-Next, we want to check if the message says `"!ping"`, and if it does we want to respond with `"!pong"`. We also want to check that the message is sent by a user, and not by Modis. To do this, we'll need to import `client` from `discord_modis`.
+Next, we want to check if the message says `ping`, and if it does we want to respond with `pong`. We also want to check that the message is sent by a user, and not by Modis. To do this, we'll need to import `client` from `discord_modis`.
 
 ```python
 from ..._client import client
@@ -49,13 +47,15 @@ async def on_message(message):
             await client.send_message(message.channel, "pong")
 ```
 
-Now, if you run Modis and send "ping" to a server that Modis is in, Modis should respond with "pong".
+Now, if you run Modis and send `ping` to a server that Modis is in, Modis should respond with `pong`.
 
 ## Commands
 
 Most Modis modules work by using commands to interact with Modis. A command starts with a prefix (`!` by default) followed by the command name. Some commands also have arguments. In this section, we'll expand our ping pong module to use a `ping` command and accept a number argument, and respond with a message containing `pong` repeated as many times as the number argument.
 
-First, we need to check that the message starts with the server command prefix. To do this we'll need to import datatools from modis.
+First, we need to check that the message starts with the server command prefix. To do this we'll need to import `datatools` from `modis`.
+
+> The server command prefix can be changed by using the `!prefix [new prefix]` command.
 
 ```python
 from ..._client import client
@@ -250,7 +250,7 @@ async def on_message(message):
                     await client.send_message(message.channel, response)
 ```
 
-Enabling a disabling `pingpong` by using the `!activate pingpong` and `!deactivate pingpong` should now work.
+Enabling and disabling `pingpong` by using the `!activate pingpong` and `!deactivate pingpong` should now work.
 
 ## Summary
 
