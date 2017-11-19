@@ -6,16 +6,6 @@
       "description": "Starts playing the first result of the query or link"
     },
     {
-      "name": "playnext",
-      "params": ["query/link"],
-      "description": "Starts playing the query or link after the current song has finished"
-    },
-    {
-      "name": "playnow",
-      "params": ["query/link"],
-      "description": "Stops playing the current song and starts playing the query or link"
-    },
-    {
       "name": "pause",
       "description": "Pauses the currently playing song"
     },
@@ -26,10 +16,6 @@
     {
       "name": "shuffle",
       "description": "Randomly shuffles the remaining songs in the queue"
-    },
-    {
-      "name": "skip",
-      "description": "Skips the current song"
     },
     {
       "name": "skip",
@@ -67,5 +53,6 @@
       "description": "Moves the music player to the front of the channel the command was sent from"
     }
   ],
+  "Documentation": "To see all commands, go to https://infraxion.github.io/modis/documentation/modules/music/",
   "About": "music plays videos and playlists from YouTube, and music files stored on the internet."
 }
