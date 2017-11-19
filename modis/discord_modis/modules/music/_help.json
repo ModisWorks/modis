@@ -53,6 +53,6 @@
       "description": "Moves the music player to the front of the channel the command was sent from"
     }
   ],
-  "Documentation": "To see all commands, go to https://infraxion.github.io/modis/documentation/modules/music/",
+  "Documentation": "To see all commands, go to the [Music Module Documentation](https://infraxion.github.io/modis/documentation/modules/music/)",
   "About": "music plays videos and playlists from YouTube, and music files stored on the internet."
 }
