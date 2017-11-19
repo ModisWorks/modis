@@ -11,7 +11,7 @@ After completing this you will know how to:
 * Set up a message receiver
 * Send messages to Discord
 * Listen for commands
-* Create a `help.json` file for a module
+* Create a `_help.json` file for a module
 * Activate and deactivate your module
 
 > This guide describes commands using the default `!` prefix, but the code will work no matter what the server prefix is set to. If following this guide with a different prefix, just change the `!` at the start of commands to whatever your server prefix is. The server prefix can be found at any time by @mentioning Modis.
@@ -144,9 +144,9 @@ If you run Modis now, and type `!ping 4` into your server, you should get a resp
 
 ## Help
 
-All modules in Modis should have a `help.json` file. This is what the `help` module looks for when generating help information. To begin, create a `help.json` file in your `pingpong` folder.
+All modules in Modis should have a `_help.json` file. This is what the `help` module looks for when generating help information. To begin, create a `_help.json` file in your `pingpong` folder.
 
-`help.json` files should contain an array of commands, with the key `Commands`, and an about string with the key `About`. The `help.json` for the `pingpong` module should look something like this.
+`_help.json` files should contain an array of commands, with the key `Commands`, and an about string with the key `About`. The `_help.json` for the `pingpong` module should look something like this.
 
 ```js
 {
@@ -161,7 +161,7 @@ All modules in Modis should have a `help.json` file. This is what the `help` mod
 }
 ```
 
-If the `help.json` file is formatted correctly, then running `!help pingpong` should give a response with the data from `help.json`.
+If the `_help.json` file is formatted correctly, then running `!help pingpong` should give a response with the data from `_help.json`.
 
 Custom heading are also accepted, and will be formatted in the help message.
 
