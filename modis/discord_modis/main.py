@@ -91,7 +91,16 @@ def start(token, client_id, loop, module_found_handler=None, on_ready_handler=No
                 gathered.exception()
             except:
                 pass
+        except Exception as e:
+            pending = asyncio.Task.all_tasks(loop=client.loop)
+            gathered = asyncio.gather(*pending, loop=client.loop)
+            gathered.exception()
         finally:
+            try:
+                client.loop.run_until_complete(client.logout())
+            except Exception as e:
+                logger.exception(e)
+
             logger.critical("Bot stopped\n")
             client.loop.close()
 
