@@ -46,6 +46,14 @@
       "description": "Stops the currently playing song, clears the queue, and disconnects from voice"
     },
     {
+      "name": "settopic",
+      "description": "Sets Modis to update this channel's topic with the currently playing song"
+    },
+    {
+      "name": "cleartopic",
+      "description": "Stops Modis from updating this channel's topic with the currently playing song"
+    },
+    {
       "name": "destroy",
       "description": "Stops and removes the music player"
     },

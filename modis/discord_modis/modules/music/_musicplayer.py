@@ -4,6 +4,7 @@ import random
 
 import discord
 
+from modis import datatools
 from . import _data, api_youtube
 from .._tools import ui_embed
 from ..._client import client
@@ -18,6 +19,8 @@ class MusicPlayer:
         Args:
             server_id (str): The Discord ID of the server to lock on to
         """
+
+        data = datatools.get_data()
 
         # Player variables
         self.server_id = server_id
@@ -48,6 +51,14 @@ class MusicPlayer:
         self.statuslog.setLevel("DEBUG")
         self.statustimer = None
 
+        # Get channel topic
+        self.topic = ""
+        self.topicchannel = None
+        if "topic_id" in data["discord"]["servers"][server_id][_data.modulename]:
+            topic_id = data["discord"]["servers"][server_id][_data.modulename]["topic_id"]
+            if topic_id is not None and topic_id != "":
+                self.topicchannel = client.get_channel(topic_id)
+
     async def setup(self, author, text_channel):
         """
         The setup command
@@ -56,7 +67,9 @@ class MusicPlayer:
             author (discord.Member): The member that called the command
             text_channel (discord.Channel): The channel where the command was called
         """
+
         if self.state == 'off':
+            await self.set_topic("")
             self.state = 'starting'
             # Init the music player
             await self.msetup(text_channel)
@@ -97,6 +110,7 @@ class MusicPlayer:
         self.logger.debug("stop command")
         self.state = 'stopping'
 
+        await self.set_topic("")
         self.nowplayinglog.info("---")
         self.durationlog.info("---")
         self.statuslog.info("Stopping")
@@ -123,6 +137,7 @@ class MusicPlayer:
 
         self.update_queue()
 
+        await self.set_topic("")
         self.nowplayinglog.info("---")
         self.durationlog.info("---")
         self.statuslog.info("Stopped")
@@ -137,6 +152,7 @@ class MusicPlayer:
         self.logger.debug("destroy command")
         self.state = 'destroyed'
 
+        await self.set_topic("")
         self.nowplayinglog.info("---")
         self.durationlog.info("---")
         self.statuslog.info("Destroying")
@@ -341,6 +357,30 @@ class MusicPlayer:
 
         self.statuslog.info("Moved to front")
 
+    async def set_topic_channel(self, channel):
+        """Set the topic channel for this server"""
+        self.topicchannel = channel
+
+        data = datatools.get_data()
+        data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"] = channel.id
+        datatools.write_data(data)
+
+        await self.set_topic(self.topic)
+
+    async def clear_topic_channel(self):
+        """Set the topic channel for this server"""
+        try:
+            if self.topicchannel:
+                await client.edit_channel(self.topicchannel, topic="")
+        except Exception as e:
+            logger.exception(e)
+
+        self.topicchannel = None
+
+        data = datatools.get_data()
+        data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"] = ""
+        datatools.write_data(data)
+
     # Methods
     async def vsetup(self, author):
         """Creates the voice client
@@ -519,6 +559,15 @@ class MusicPlayer:
         self.queuelog.info(''.join(queue_display))
         self.queuelenlog.info(str(len(self.queue)))
 
+    async def set_topic(self, topic):
+        """Sets the topic for the topic channel"""
+        self.topic = topic
+        try:
+            if self.topicchannel:
+                await client.edit_channel(self.topicchannel, topic=topic)
+        except Exception as e:
+            logger.exception(e)
+
     async def vplay(self):
         if self.state != 'ready':
             logger.error("Attempt to play song from wrong state ('{}'), must be 'ready'.".format(self.state))
@@ -544,10 +593,13 @@ class MusicPlayer:
                 self.streamer.volume = self.volume / 100
                 self.streamer.start()
 
+                nowplaying = "Playing {}".format(self.streamer.title)
                 self.statuslog.info("Playing")
-                self.nowplayinglog.info("Playing {}".format(self.streamer.title))
+                await self.set_topic(nowplaying)
+                self.nowplayinglog.info(nowplaying)
                 self.durationlog.info(self.duration_to_string(self.streamer.duration))
             except Exception as e:
+                await self.set_topic("")
                 self.nowplayinglog.info("Error playing {}".format(songname))
                 self.durationlog.info("---")
                 self.statuslog.error("Had a problem playing {}".format(songname))
@@ -596,8 +648,8 @@ class MusicPlayer:
         future = asyncio.run_coroutine_threadsafe(self.vafter(), client.loop)
         try:
             future.result()
-        except:
-            pass
+        except Exception as e:
+            logger.exception(e)
 
     async def vafter(self):
         """Function that is called after a song finishes playing"""

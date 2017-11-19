@@ -44,7 +44,7 @@ async def on_message(message):
 
             # Remove message
             if command in ['play', 'playnext', 'playnow', 'pause', 'resume', 'skip', 'shuffle', 'volume', 'stop',
-                           'destroy', 'front', 'movehere']:
+                           'destroy', 'front', 'movehere', 'settopic', 'cleartopic', 'notopic']:
                 try:
                     await client.delete_message(message)
                 except discord.errors.NotFound:
@@ -85,3 +85,9 @@ async def on_message(message):
 
             elif command == 'front' or command == 'movehere':
                 await _data.cache[server.id].movehere(channel)
+
+            elif command == 'settopic':
+                await _data.cache[server.id].set_topic_channel(channel)
+
+            elif command == 'cleartopic' or 'notopic':
+                await _data.cache[server.id].clear_topic_channel()
