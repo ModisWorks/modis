@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import math
 import random
 
 import discord
@@ -31,6 +32,12 @@ class MusicPlayer:
         self.streamer = None
         self.queue = []
         self.volume = 20
+        # Timebar
+        self.current_duration = 0
+        self.timebar_length = 33
+        self.vclient_starttime = None
+        self.vclient_task = None
+        self.pause_time = None
 
         # Status variables
         self.mready = False
@@ -42,7 +49,8 @@ class MusicPlayer:
         self.embed = None
         self.queue_display = 9
         self.nowplayinglog = logging.getLogger("{}.{}.nowplaying".format(__name__, self.server_id))
-        self.durationlog = logging.getLogger("{}.{}.duration".format(__name__, self.server_id))
+        self.prev_time = ""
+        self.timelog = logging.getLogger("{}.{}.time".format(__name__, self.server_id))
         self.queuelog = logging.getLogger("{}.{}.queue".format(__name__, self.server_id))
         self.queuelenlog = logging.getLogger("{}.{}.queuelen".format(__name__, self.server_id))
         self.volumelog = logging.getLogger("{}.{}.volume".format(__name__, self.server_id))
@@ -80,7 +88,7 @@ class MusicPlayer:
             # Mark as 'ready' if everything is ok
             self.state = 'ready' if self.mready and self.vready else 'off'
 
-    async def play(self, author, text_channel, query, now=False, stop_current=False):
+    async def play(self, author, text_channel, query, now=False, stop_current=False, shuffle=False):
         """
         The play command
 
@@ -90,12 +98,16 @@ class MusicPlayer:
             query (str): The argument that was passed with the command
             now (bool): Whether to play next or at the end of the queue
             stop_current (bool): Whether to stop the currently playing song
+            shuffle (bool): Whether to shuffle the queue after starting
         """
         await self.setup(author, text_channel)
 
         if self.state == 'ready':
             # Queue the song
             self.enqueue(query, now)
+
+            if shuffle:
+                await self.shuffle()
 
             if stop_current:
                 if self.streamer:
@@ -113,10 +125,12 @@ class MusicPlayer:
 
         await self.set_topic("")
         self.nowplayinglog.info("---")
-        self.durationlog.info("---")
+        self.timelog.info(self.make_timebar())
+        self.prev_time = "---"
         self.statuslog.info("Stopping")
 
         self.vready = False
+        self.pause_time = None
 
         if self.vclient:
             try:
@@ -139,7 +153,8 @@ class MusicPlayer:
         self.update_queue()
 
         self.nowplayinglog.info("---")
-        self.durationlog.info("---")
+        self.timelog.info(self.make_timebar())
+        self.prev_time = "---"
         self.statuslog.info("Stopped")
         self.state = 'off'
 
@@ -154,11 +169,13 @@ class MusicPlayer:
 
         await self.set_topic("")
         self.nowplayinglog.info("---")
-        self.durationlog.info("---")
+        self.timelog.info(self.make_timebar())
+        self.prev_time = "---"
         self.statuslog.info("Destroying")
 
         self.mready = False
         self.vready = False
+        self.pause_time = None
 
         if self.vclient:
             try:
@@ -211,6 +228,8 @@ class MusicPlayer:
             if self.streamer.is_playing():
                 self.statuslog.info("Paused")
                 self.streamer.pause()
+
+                self.pause_time = self.vclient.loop.time()
         except Exception as e:
             logger.error(e)
             pass
@@ -227,6 +246,10 @@ class MusicPlayer:
             if not self.streamer.is_playing():
                 self.statuslog.info("Playing")
                 self.streamer.resume()
+
+                if self.pause_time is not None:
+                    self.vclient_starttime += (self.vclient.loop.time() - self.pause_time)
+                self.pause_time = None
         except Exception as e:
             logger.error(e)
             pass
@@ -304,7 +327,7 @@ class MusicPlayer:
                     self.statuslog.error("Index must be between 1 and {}".format(len(self.queue)))
                 return
 
-            self.statuslog.info("Removing {}".format(self.queue[num][1]))
+            self.statuslog.info("Removed {}".format(self.queue[num][1]))
             self.queue.pop(num)
             self.update_queue()
 
@@ -365,7 +388,7 @@ class MusicPlayer:
             try:
                 value = int(value)
             except ValueError:
-                self.statuslog.debug("Volume argument must be +, -, or a %")
+                self.statuslog.error("Volume argument must be +, -, or a %")
             else:
                 if 0 <= value <= 200:
                     self.statuslog.debug("Setting volume")
@@ -376,7 +399,7 @@ class MusicPlayer:
                     except AttributeError:
                         pass
                 else:
-                    self.statuslog.error("Volume must be between 0 and 200%")
+                    self.statuslog.error("Volume must be between 0 and 200")
 
     async def movehere(self, channel):
         """Moves the embed message to a new channel; can also be used to move the musicplayer to the front
@@ -501,8 +524,8 @@ class MusicPlayer:
         # Initial datapacks
         datapacks = [
             ("Now playing", "---", False),
-            ("Duration", "---", True),
-            ("Queue", "```{}```".format(''.join(queue_display)), False),
+            ("Time", "```" + self.make_timebar() + "```", True),
+            ("Queue", "```\n{}\n```".format(''.join(queue_display)), False),
             ("Songs left in queue", "---", True),
             ("Volume", "{}%".format(self.volume), True),
             ("Status", "```---```", False)
@@ -521,13 +544,14 @@ class MusicPlayer:
 
         # Add handlers to update gui
         noformatter = logging.Formatter("{message}", style="{")
-        codeformatter = logging.Formatter("```__{levelname}__\n{message}\n```", style="{")
+        codeformatter = logging.Formatter("```\n{message}\n```", style="{")
+        statusformatter = logging.Formatter("```__{levelname}__\n{message}\n```", style="{")
         volumeformatter = logging.Formatter("{message}%", style="{")
 
         nowplayinghandler = EmbedLogHandler(self, self.embed, 0)
         nowplayinghandler.setFormatter(noformatter)
-        durationhandler = EmbedLogHandler(self, self.embed, 1)
-        durationhandler.setFormatter(noformatter)
+        timehandler = EmbedLogHandler(self, self.embed, 1)
+        timehandler.setFormatter(codeformatter)
         queuehandler = EmbedLogHandler(self, self.embed, 2)
         queuehandler.setFormatter(codeformatter)
         queuelenhandler = EmbedLogHandler(self, self.embed, 3)
@@ -535,10 +559,10 @@ class MusicPlayer:
         volumehandler = EmbedLogHandler(self, self.embed, 4)
         volumehandler.setFormatter(volumeformatter)
         statushandler = EmbedLogHandler(self, self.embed, 5)
-        statushandler.setFormatter(codeformatter)
+        statushandler.setFormatter(statusformatter)
 
         self.nowplayinglog.addHandler(nowplayinghandler)
-        self.durationlog.addHandler(durationhandler)
+        self.timelog.addHandler(timehandler)
         self.queuelog.addHandler(queuehandler)
         self.queuelenlog.addHandler(queuelenhandler)
         self.volumelog.addHandler(volumehandler)
@@ -609,14 +633,36 @@ class MusicPlayer:
         except Exception as e:
             logger.exception(e)
 
+    @asyncio.coroutine
+    def time_loop(self):
+        while True:
+            if self.pause_time is None:
+                diff = self.vclient.loop.time() - self.vclient_starttime
+
+                if self.current_duration > 0:
+                    time_counts = int(math.ceil((diff / self.current_duration) * self.timebar_length))
+                    if time_counts > self.timebar_length:
+                        time_counts = self.timebar_length
+
+                    time_bar = self.make_timebar(time_counts, self.current_duration)
+                else:
+                    time_bar = self.make_timebar()
+
+                if time_bar != self.prev_time:
+                    self.timelog.info(time_bar)
+                    self.prev_time = time_bar
+
+            yield from asyncio.sleep(5)
+
     async def vplay(self):
         if self.state != 'ready':
             logger.error("Attempt to play song from wrong state ('{}'), must be 'ready'.".format(self.state))
             return
 
         self.state = "starting streamer"
-
         self.logger.debug("Playing next in queue")
+
+        self.pause_time = None
 
         # Queue has items
         if self.queue:
@@ -631,6 +677,11 @@ class MusicPlayer:
                 self.streamer = await self.vclient.create_ytdl_player(song, after=self.vafter_ts)
                 self.state = "ready"
 
+                self.current_duration = self.streamer.duration
+
+                self.vclient_starttime = self.vclient.loop.time()
+                self.vclient_task = asyncio.Task(self.time_loop())
+
                 self.streamer.volume = self.volume / 100
                 self.streamer.start()
 
@@ -638,11 +689,11 @@ class MusicPlayer:
                 self.statuslog.info("Playing")
                 await self.set_topic(nowplaying)
                 self.nowplayinglog.info(nowplaying)
-                self.durationlog.info(self.duration_to_string(self.streamer.duration))
             except Exception as e:
                 await self.set_topic("")
                 self.nowplayinglog.info("Error playing {}".format(songname))
-                self.durationlog.info("---")
+                self.timelog.info(self.make_timebar())
+                self.prev_time = "---"
                 self.statuslog.error("Had a problem playing {}".format(songname))
                 logger.exception(e)
 
@@ -678,12 +729,28 @@ class MusicPlayer:
 
         m, s = divmod(duration, 60)
         h, m = divmod(m, 60)
-        if h > 0:
-            return "%d:%02d:%02d" % (h, m, s)
-        elif m > 0:
-            return "%02d:%02d" % (m, s)
-        else:
-            return "%d seconds" % s
+        return "%d:%02d:%02d" % (h, m, s)
+
+    def make_timebar(self, progress=0, duration=0):
+        """
+        Makes a new time bar string
+
+        Args:
+            progress: The number of 'dots' in the time bar
+            duration: The duration of the current song
+
+        Returns:
+            timebar (str): The time bar string
+        """
+
+        if progress > self.timebar_length:
+            progress = self.timebar_length
+
+        time_bar = "|" + ("-" * progress) + (" " * (self.timebar_length - progress)) + "| {}".format(
+            self.duration_to_string(duration)
+        )
+
+        return time_bar
 
     def vafter_ts(self):
         future = asyncio.run_coroutine_threadsafe(self.vafter(), client.loop)
@@ -699,6 +766,14 @@ class MusicPlayer:
         if self.state != 'ready':
             self.logger.debug("Returning because player is in state {}".format(self.state))
             return
+
+        self.current_duration = 0
+        self.pause_time = None
+
+        if self.vclient_task:
+            loop = asyncio.get_event_loop()
+            loop.call_soon(self.vclient_task.cancel)
+            self.vclient_task = None
 
         try:
             if self.streamer.error is None:
