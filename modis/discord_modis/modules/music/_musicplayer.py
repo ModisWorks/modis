@@ -21,7 +21,6 @@ class MusicPlayer:
         """
 
         data = datatools.get_data()
-
         # Player variables
         self.server_id = server_id
         self.logger = logging.getLogger("{}.{}".format(__name__, self.server_id))
@@ -54,9 +53,11 @@ class MusicPlayer:
         # Get channel topic
         self.topic = ""
         self.topicchannel = None
-        if "topic_id" in data["discord"]["servers"][server_id][_data.modulename]:
-            topic_id = data["discord"]["servers"][server_id][_data.modulename]["topic_id"]
+        # Set topic channel
+        if "topic_id" in data["discord"]["servers"][self.server_id][_data.modulename]:
+            topic_id = data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"]
             if topic_id is not None and topic_id != "":
+                logger.debug("TOPIC ID: {}".format(topic_id))
                 self.topicchannel = client.get_channel(topic_id)
 
     async def setup(self, author, text_channel):
@@ -69,8 +70,8 @@ class MusicPlayer:
         """
 
         if self.state == 'off':
-            await self.set_topic("")
             self.state = 'starting'
+            await self.set_topic("")
             # Init the music player
             await self.msetup(text_channel)
             # Connect to voice
@@ -137,7 +138,6 @@ class MusicPlayer:
 
         self.update_queue()
 
-        await self.set_topic("")
         self.nowplayinglog.info("---")
         self.durationlog.info("---")
         self.statuslog.info("Stopped")
@@ -235,7 +235,7 @@ class MusicPlayer:
         """The skip command
 
         Args:
-            query (int): The number of items to skip
+            query (str): The number of items to skip
         """
 
         if not self.state == 'ready':
@@ -250,9 +250,9 @@ class MusicPlayer:
         try:
             num = int(query)
         except TypeError:
-            self.statuslog.debug("Skip argument must be a number")
+            self.statuslog.error("Skip argument must be a number")
         except ValueError:
-            self.statuslog.debug("Skip argument must be a number")
+            self.statuslog.error("Skip argument must be a number")
         else:
             self.statuslog.info("Skipping")
 
@@ -266,6 +266,48 @@ class MusicPlayer:
                 self.streamer.stop()
             except Exception as e:
                 logger.exception(e)
+
+    async def remove(self, index=""):
+        """
+        The remove command
+
+        Args:
+            index (str): The index to remove
+        """
+
+        if not self.state == 'ready':
+            logger.debug("Trying to skip from wrong state '{}'".format(self.state))
+            return
+
+        if index == "":
+            self.statuslog.error("Must provide index to remove")
+            return
+        elif index == "all":
+            self.statuslog.info("Removing all songs")
+            self.queue = []
+            self.update_queue()
+            self.statuslog.info("Removed all songs")
+            return
+
+        try:
+            num = int(index) - 1
+        except TypeError:
+            self.statuslog.error("Remove index must be a number")
+        except ValueError:
+            self.statuslog.error("Remove index must be a number")
+        else:
+            if num < 0 or num >= len(self.queue):
+                if len(self.queue) == 0:
+                    self.statuslog.warning("No songs in queue")
+                elif len(self.queue) == 1:
+                    self.statuslog.error("Index must be 1 (only 1 song in queue)")
+                else:
+                    self.statuslog.error("Index must be between 1 and {}".format(len(self.queue)))
+                return
+
+            self.statuslog.info("Removing {}".format(self.queue[num][1]))
+            self.queue.pop(num)
+            self.update_queue()
 
     async def shuffle(self):
         """The shuffle command"""
@@ -306,7 +348,7 @@ class MusicPlayer:
                 except AttributeError:
                     pass
             else:
-                self.statuslog.debug("Already at maximum volume")
+                self.statuslog.warning("Already at maximum volume")
 
         elif value == '-':
             if self.volume > 0:
@@ -318,7 +360,7 @@ class MusicPlayer:
                 except AttributeError:
                     pass
             else:
-                self.statuslog.debug("Already at minimum volume")
+                self.statuslog.warning("Already at minimum volume")
 
         else:
             try:
@@ -335,7 +377,7 @@ class MusicPlayer:
                     except AttributeError:
                         pass
                 else:
-                    self.statuslog.debug("Volume must be between 0 and 200%")
+                    self.statuslog.error("Volume must be between 0 and 200%")
 
     async def movehere(self, channel):
         """Moves the embed message to a new channel; can also be used to move the musicplayer to the front
@@ -359,12 +401,11 @@ class MusicPlayer:
 
     async def set_topic_channel(self, channel):
         """Set the topic channel for this server"""
-        self.topicchannel = channel
-
         data = datatools.get_data()
         data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"] = channel.id
         datatools.write_data(data)
 
+        self.topicchannel = channel
         await self.set_topic(self.topic)
 
     async def clear_topic_channel(self):
@@ -376,6 +417,7 @@ class MusicPlayer:
             logger.exception(e)
 
         self.topicchannel = None
+        logger.debug("Clearing topic channel")
 
         data = datatools.get_data()
         data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"] = ""
@@ -406,17 +448,17 @@ class MusicPlayer:
             try:
                 self.vclient = await client.join_voice_channel(self.vchannel)
             except discord.ClientException:
-                self.statuslog.info("I'm already connected to a voice channel.")
+                self.statuslog.warning("I'm already connected to a voice channel.")
                 return
             except discord.DiscordException:
-                self.statuslog.info("I couldn't connect to the voice channel. Check my permissions.")
+                self.statuslog.error("I couldn't connect to the voice channel. Check my permissions.")
                 return
             except Exception as e:
-                self.statuslog.info("Internal error connecting to voice, disconnecting.")
+                self.statuslog.error("Internal error connecting to voice, disconnecting.")
                 logger.error("Error connecting to voice {}".format(e))
                 return
         else:
-            self.statuslog.info("You're not connected to a voice channel.")
+            self.statuslog.warning("You're not connected to a voice channel.")
             return
 
         self.vready = True
@@ -480,7 +522,7 @@ class MusicPlayer:
 
         # Add handlers to update gui
         noformatter = logging.Formatter("{message}", style="{")
-        codeformatter = logging.Formatter("```{message}```", style="{")
+        codeformatter = logging.Formatter("```__{levelname}__\n{message}\n```", style="{")
         volumeformatter = logging.Formatter("{message}%", style="{")
 
         nowplayinghandler = EmbedLogHandler(self, self.embed, 0)
@@ -618,7 +660,7 @@ class MusicPlayer:
 
         # Queue exhausted
         else:
-            self.statuslog.error("Finished Queue")
+            self.statuslog.info("Finished Queue")
             self.state = "ready"
 
             self.update_queue()
@@ -702,6 +744,9 @@ class EmbedLogHandler(logging.Handler):
 
     def emit(self, record):
         msg = self.format(record)
+        msg = msg.replace("__DEBUG__", "").replace("__INFO__", "")
+        msg = msg.replace("__WARNING__", "css").replace("__ERROR__", "http").replace("__CRITICAL__", "http")
+
         try:
             self.embed.update_data(self.line, msg)
         except AttributeError:
