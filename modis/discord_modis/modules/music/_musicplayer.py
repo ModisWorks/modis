@@ -40,6 +40,7 @@ class MusicPlayer:
         self.embed = None
         self.queue_display = 9
         self.nowplayinglog = logging.getLogger("{}.{}.nowplaying".format(__name__, self.server_id))
+        self.durationlog = logging.getLogger("{}.{}.duration".format(__name__, self.server_id))
         self.queuelog = logging.getLogger("{}.{}.queue".format(__name__, self.server_id))
         self.queuelenlog = logging.getLogger("{}.{}.queuelen".format(__name__, self.server_id))
         self.volumelog = logging.getLogger("{}.{}.volume".format(__name__, self.server_id))
@@ -97,6 +98,7 @@ class MusicPlayer:
         self.state = 'stopping'
 
         self.nowplayinglog.info("---")
+        self.durationlog.info("---")
         self.statuslog.info("Stopping")
 
         self.vready = False
@@ -122,6 +124,7 @@ class MusicPlayer:
         self.update_queue()
 
         self.nowplayinglog.info("---")
+        self.durationlog.info("---")
         self.statuslog.info("Stopped")
         self.state = 'off'
 
@@ -135,6 +138,7 @@ class MusicPlayer:
         self.state = 'destroyed'
 
         self.nowplayinglog.info("---")
+        self.durationlog.info("---")
         self.statuslog.info("Destroying")
 
         self.mready = False
@@ -172,11 +176,9 @@ class MusicPlayer:
 
         try:
             if self.streamer.is_playing():
-                self.statuslog.info("Paused")
-                self.streamer.pause()
+                await self.pause()
             else:
-                self.statuslog.info("Playing")
-                self.streamer.resume()
+                await self.resume()
         except Exception as e:
             logger.error(e)
             pass
@@ -364,17 +366,17 @@ class MusicPlayer:
             try:
                 self.vclient = await client.join_voice_channel(self.vchannel)
             except discord.ClientException:
-                self.statuslog.error("I'm already connected to a voice channel.")
+                self.statuslog.info("I'm already connected to a voice channel.")
                 return
             except discord.DiscordException:
-                self.statuslog.error("I couldn't connect to the voice channel. Check my permissions.")
+                self.statuslog.info("I couldn't connect to the voice channel. Check my permissions.")
                 return
             except Exception as e:
-                self.statuslog.error("Internal error connecting to voice, disconnecting")
+                self.statuslog.info("Internal error connecting to voice, disconnecting.")
                 logger.error("Error connecting to voice {}".format(e))
                 return
         else:
-            self.statuslog.error("You're not connected to a voice channel.")
+            self.statuslog.info("You're not connected to a voice channel.")
             return
 
         self.vready = True
@@ -418,6 +420,7 @@ class MusicPlayer:
         # Initial datapacks
         datapacks = [
             ("Now playing", "---", False),
+            ("Duration", "---", True),
             ("Queue", "```{}```".format(''.join(queue_display)), False),
             ("Songs left in queue", "---", True),
             ("Volume", "{}%".format(self.volume), True),
@@ -442,16 +445,19 @@ class MusicPlayer:
 
         nowplayinghandler = EmbedLogHandler(self, self.embed, 0)
         nowplayinghandler.setFormatter(noformatter)
-        queuehandler = EmbedLogHandler(self, self.embed, 1)
+        durationhandler = EmbedLogHandler(self, self.embed, 1)
+        durationhandler.setFormatter(noformatter)
+        queuehandler = EmbedLogHandler(self, self.embed, 2)
         queuehandler.setFormatter(codeformatter)
-        queuelenhandler = EmbedLogHandler(self, self.embed, 2)
+        queuelenhandler = EmbedLogHandler(self, self.embed, 3)
         queuelenhandler.setFormatter(noformatter)
-        volumehandler = EmbedLogHandler(self, self.embed, 3)
+        volumehandler = EmbedLogHandler(self, self.embed, 4)
         volumehandler.setFormatter(volumeformatter)
-        statushandler = EmbedLogHandler(self, self.embed, 4)
+        statushandler = EmbedLogHandler(self, self.embed, 5)
         statushandler.setFormatter(codeformatter)
 
         self.nowplayinglog.addHandler(nowplayinghandler)
+        self.durationlog.addHandler(durationhandler)
         self.queuelog.addHandler(queuehandler)
         self.queuelenlog.addHandler(queuelenhandler)
         self.volumelog.addHandler(volumehandler)
@@ -538,13 +544,12 @@ class MusicPlayer:
                 self.streamer.volume = self.volume / 100
                 self.streamer.start()
 
-                if self.streamer.is_live:
-                    self.statuslog.info("Streaming")
-                else:
-                    self.statuslog.info("Playing")
-                self.nowplayinglog.info(songname)
+                self.statuslog.info("Playing")
+                self.nowplayinglog.info("Playing {}".format(self.streamer.title))
+                self.durationlog.info(self.duration_to_string(self.streamer.duration))
             except Exception as e:
                 self.nowplayinglog.info("Error playing {}".format(songname))
+                self.durationlog.info("---")
                 self.statuslog.error("Had a problem playing {}".format(songname))
                 logger.exception(e)
 
@@ -561,12 +566,31 @@ class MusicPlayer:
 
         # Queue exhausted
         else:
-            self.statuslog.info("Finished queue")
+            self.statuslog.error("Finished Queue")
             self.state = "ready"
 
             self.update_queue()
 
             await self.stop()
+
+    def duration_to_string(self, duration):
+        """
+        Converts a duration to a string
+
+        Args:
+            duration (int): The duration in seconds to convert
+
+        Returns s (str): The duration as a string
+        """
+
+        m, s = divmod(duration, 60)
+        h, m = divmod(m, 60)
+        if h > 0:
+            return "%d:%02d:%02d" % (h, m, s)
+        elif m > 0:
+            return "%02d:%02d" % (m, s)
+        else:
+            return "%d seconds" % s
 
     def vafter_ts(self):
         future = asyncio.run_coroutine_threadsafe(self.vafter(), client.loop)
@@ -589,7 +613,7 @@ class MusicPlayer:
             else:
                 await self.destroy()
                 self.statuslog.error(self.streamer.error)
-                self.statuslog.critical("Encountered an error while playing :/")
+                self.statuslog.error("Encountered an error")
         except Exception as e:
             try:
                 await self.destroy()
