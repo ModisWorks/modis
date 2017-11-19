@@ -4,9 +4,7 @@ permalink: /guides/setup/
 ---
 # Installing Modis
 
-If you want to run Modis for yourself, you'll need a bunch of different files, which we still can't seem to get right every time.
-
-Hopefully this guide will make it easier to install Modis for all of us.
+If you want to run Modis for yourself there's a few things you'll need to install. You might already have some of these installed, so if you know what you're doing feel free to skip those steps.
 
 ## Python 3.6
 
@@ -32,13 +30,15 @@ To install the packages, open a command processor (CMD or Terminal for Windows a
 
 Below are a list of commands you'll need to run as of writing if you're too lazy to check requirements.txt:
 
-- `pip install discord.py`
-- `pip install youtube-dl`
-- `pip install pynacl`
-- `pip install google-api-python-client`
-- `pip install requests`
-- `pip install lxml`
-- `pip install praw`
+```sh
+pip install discord.py
+pip install youtube-dl
+pip install pynacl
+pip install google-api-python-client
+pip install requests
+pip install lxml
+pip install praw
+```
 
 ## FFmpeg
 
@@ -46,21 +46,19 @@ Below are a list of commands you'll need to run as of writing if you're too lazy
 
 For the audio stuff to work, you'll need the FFmpeg library in your PATH.
 Go to the FFmpeg org's [official website](https://www.ffmpeg.org/download.html) to get a download for FFmpeg.
-*DON'T* press the big green download button.
-That gives you an uncompiled version of FFmpeg.
-We totally have not made this mistake multiple times before.
 
-Look further down for the OS icons, pick the one you're using and download.
-Unzip and copy the download to a cozy place such as Program Files.
+> *DON'T* press the big green download button. That gives you an uncompiled version of FFmpeg. We totally have not made this mistake multiple times before.
+
+Look further down for the OS icons, pick the one you're using and download, and unzip and copy the download to a cozy place such as Program Files.
 
 Now we need to add the /bin folder to PATH.
-Go to start and just search "path".
-One of the results should be "Edit environment variables for your account".
-Click on it, then in the window that pops up double-click on the "Path" line.
-If you do the top one it applies to your account only, the bottom on applies to all accounts.
-Up to you.
-Click on "Browse" in the window that pops up and find the /bin folder inside the extracted FFmpeg build.
-Click "OK" or "Apply" or whatever until everything is all nice and packed up.
+
+- Go to start and just search "path".
+- One of the results should be "Edit environment variables for your account".
+- Click on it, then in the window that pops up double-click on the "Path" line.
+- If you do the top one it applies to your account only, the bottom on applies to all accounts (up to you).
+- Click on "Browse" in the window that pops up and find the /bin folder inside the extracted FFmpeg build.
+- Click "OK" or "Apply" or whatever until everything is all nice and packed up.
 
 Restart your computer so that Windows updates everything correctly, and continue with the next step.
 
@@ -70,9 +68,9 @@ If you're using Homebrew, just run `brew install ffmpeg` and `brew install opus`
 
 ## Modis package
 
-Now you have all the requirements for Modis installed, but you still need to download Modis.
-You can get the latest release on Modis' [release page](https://github.com/Infraxion/modis/releases).
-Extract it into a nice, cozy folder.
+Now you have all the requirements for Modis installed, but you still need to download Modis. You can get the latest release on Modis' [release page](https://github.com/Infraxion/modis/releases).
+
+Extract it into a nice, cozy folder that you can run it from.
 
 ## Running Modis
 
@@ -93,11 +91,13 @@ modis.gui(
 )
 ```
 
-If you don't know how to make your own Discord Bot, have a look at the [Making a Discord Bot](./api-keys.md#making-a-discord-bot) section for step-by-step instructions.
+> If you don't know how to make your own Discord Bot, have a look at the [Making a Discord Bot](./api-keys.md#making-a-discord-bot) section for step-by-step instructions on getting the Discord token and client id.
 
 To make this file, open up a text editor and paste the text. Save this file as `launcher.py` (and make sure that it's saving as a .py file rather than a .txt file). This file should go in the root directory for Modis (the same one with `requirements.txt`).
 
 To run Modis now, just run `launcher.py`.
+
+> If you are running Modis on a system without `tkinter` installed, you'll need to change `modis.gui` to `modis.console`.
 
 ## Troubleshooting
 
