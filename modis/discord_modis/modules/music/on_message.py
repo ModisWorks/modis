@@ -62,6 +62,10 @@ async def on_message(message):
             if command == 'playnow':
                 await _data.cache[server.id].play(author, channel, arg, now=True, stop_current=True)
 
+            if command == 'playshuffle':
+                await _data.cache[server.id].play(author, channel, arg)
+                await _data.cache[server.id].shuffle()
+
             elif command == 'pause':
                 await _data.cache[server.id].pause()
 
