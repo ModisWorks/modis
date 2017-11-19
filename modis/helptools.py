@@ -55,7 +55,7 @@ def get_help_datapacks(filepath, prefix="!"):
                 if "name" not in c:
                     continue
 
-                content += "`"
+                content += "- `"
                 command = prefix + c["name"]
                 content += "{}".format(command)
                 if "params" in c:

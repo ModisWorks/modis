@@ -74,7 +74,8 @@ for module_name in module_list:
 
 # Commands
 readme = add_md(readme, "Documentation", 2)
-readme = add_md(readme, "More detailed information about each module can be found in the [Documentation](https://infraxion.github.io/modis/documentation/#modules).")
+readme = add_md(readme,
+                "More detailed information about each module can be found in the [Documentation](https://infraxion.github.io/modis/documentation/#modules).")
 
 newreadme_path = "{}/README.md".format(filepath)
 with open(newreadme_path, 'w') as file:
