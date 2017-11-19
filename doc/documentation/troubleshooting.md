@@ -9,7 +9,7 @@ permalink: /documentation/troubleshooting/
 
 [Discord Permissions Calculator](https://discordapi.com/permissions.html) will generate an invite link for you, or you can make you own by pasting
 
-```http
+```https
 https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot&permissions=2146958455
 ```
 
