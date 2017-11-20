@@ -71,7 +71,7 @@ class MusicPlayer:
         if "topic_id" in data["discord"]["servers"][self.server_id][_data.modulename]:
             topic_id = data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"]
             if topic_id is not None and topic_id != "":
-                logger.debug("TOPIC ID: {}".format(topic_id))
+                logger.debug("Topic channel id: {}".format(topic_id))
                 self.topicchannel = client.get_channel(topic_id)
 
     async def setup(self, author, text_channel):
@@ -732,10 +732,17 @@ class MusicPlayer:
             while len(self.prev_queue) > self.prev_queue_max:
                 self.prev_queue.pop(0)
 
-            logger.debug("Prev: {}".format(self.prev_queue))
-
             try:
-                self.streamer = await self.vclient.create_ytdl_player(song, after=self.vafter_ts)
+                boptions = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 10"
+                ytoptions = {
+                    "socket_timeout": 10,
+                    "logger": logger
+                }
+
+                self.streamer = await self.vclient.create_ytdl_player(song,
+                                                                      ytdl_options=ytoptions,
+                                                                      before_options=boptions,
+                                                                      after=self.vafter_ts)
                 self.state = "ready"
 
                 self.current_duration = self.streamer.duration
@@ -817,6 +824,8 @@ class MusicPlayer:
         return time_bar
 
     def vafter_ts(self):
+        """Function that is called after a song finishes playing"""
+        logger.info("Song finishing")
         future = asyncio.run_coroutine_threadsafe(self.vafter(), client.loop)
         try:
             future.result()
