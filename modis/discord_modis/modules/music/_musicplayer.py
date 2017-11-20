@@ -746,7 +746,7 @@ class MusicPlayer:
                 self.prev_queue.pop(0)
 
             try:
-                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 10", "-reconnect_at_eof 10",
+                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 10", "-reconnect_at_eof 1",
                              "-timeout 10", "-multiple_requests 1"]
                 boptions = " {}".format(' '.join(bopt_list))
                 logger.debug("FFmpeg options: {}".format(boptions))
