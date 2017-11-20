@@ -1,3 +1,5 @@
+"""The music player for the music module"""
+
 import asyncio
 import logging
 import math
@@ -14,6 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 class MusicPlayer:
+    """The music player for the music module"""
+
     def __init__(self, server_id):
         """Locks onto a server for easy management of various UIs
 
@@ -31,6 +35,8 @@ class MusicPlayer:
         self.vclient = None
         self.streamer = None
         self.queue = []
+        self.prev_queue = []
+        self.prev_queue_max = 50
         self.volume = 20
         # Timebar
         self.current_duration = 0
@@ -38,6 +44,7 @@ class MusicPlayer:
         self.vclient_starttime = None
         self.vclient_task = None
         self.pause_time = None
+        self.prev_time = ""
 
         # Status variables
         self.mready = False
@@ -49,7 +56,6 @@ class MusicPlayer:
         self.embed = None
         self.queue_display = 9
         self.nowplayinglog = logging.getLogger("{}.{}.nowplaying".format(__name__, self.server_id))
-        self.prev_time = ""
         self.timelog = logging.getLogger("{}.{}.time".format(__name__, self.server_id))
         self.queuelog = logging.getLogger("{}.{}.queue".format(__name__, self.server_id))
         self.queuelenlog = logging.getLogger("{}.{}.queuelen".format(__name__, self.server_id))
@@ -104,10 +110,7 @@ class MusicPlayer:
 
         if self.state == 'ready':
             # Queue the song
-            self.enqueue(query, now)
-
-            if shuffle:
-                await self.shuffle()
+            self.enqueue(query, now, shuffle)
 
             if stop_current:
                 if self.streamer:
@@ -149,6 +152,7 @@ class MusicPlayer:
         self.vchannel = None
         self.streamer = None
         self.queue = []
+        self.prev_queue = []
 
         self.update_queue()
 
@@ -194,6 +198,7 @@ class MusicPlayer:
         self.vchannel = None
         self.streamer = None
         self.queue = []
+        self.prev_queue = []
 
         if self.embed:
             await self.embed.delete()
@@ -280,10 +285,8 @@ class MusicPlayer:
             self.statuslog.info("Skipping")
 
             for i in range(num - 1):
-                try:
+                if len(self.queue) > 0:
                     self.queue.pop(0)
-                except IndexError:
-                    pass
 
             try:
                 self.streamer.stop()
@@ -299,7 +302,7 @@ class MusicPlayer:
         """
 
         if not self.state == 'ready':
-            logger.debug("Trying to skip from wrong state '{}'".format(self.state))
+            logger.debug("Trying to remove from wrong state '{}'".format(self.state))
             return
 
         if index == "":
@@ -307,6 +310,7 @@ class MusicPlayer:
             return
         elif index == "all":
             self.queue = []
+            self.prev_queue = []
             self.update_queue()
             self.statuslog.info("Removed all songs")
             return
@@ -330,6 +334,46 @@ class MusicPlayer:
             self.statuslog.info("Removed {}".format(self.queue[num][1]))
             self.queue.pop(num)
             self.update_queue()
+
+    async def rewind(self, query="1"):
+        """
+        The rewind command
+
+        Args:
+            query (str): The number of items to skip
+        """
+
+        if not self.state == 'ready':
+            logger.debug("Trying to rewind from wrong state '{}'".format(self.state))
+            return
+
+        if query == "":
+            query = "1"
+
+        try:
+            num = int(query)
+        except TypeError:
+            self.statuslog.error("Rewind argument must be a number")
+        except ValueError:
+            self.statuslog.error("Rewind argument must be a number")
+        else:
+            if len(self.prev_queue) == 0:
+                self.statuslog.error("No songs to rewind")
+                return
+
+            if num > len(self.prev_queue):
+                self.statuslog.warning("Rewinding to start")
+            else:
+                self.statuslog.info("Rewinding")
+
+            for i in range(num + 1):
+                if len(self.prev_queue) > 0:
+                    self.queue.insert(0, self.prev_queue.pop())
+
+            try:
+                self.streamer.stop()
+            except Exception as e:
+                logger.exception(e)
 
     async def shuffle(self):
         """The shuffle command"""
@@ -480,7 +524,7 @@ class MusicPlayer:
                 logger.error("Error connecting to voice {}".format(e))
                 return
         else:
-            self.statuslog.warning("You're not connected to a voice channel.")
+            self.statuslog.error("You're not connected to a voice channel.")
             return
 
         self.vready = True
@@ -519,13 +563,13 @@ class MusicPlayer:
         # Initial queue display
         queue_display = []
         for i in range(self.queue_display):
-            queue_display.append("{}: ---\n".format(str(i + 1)))
+            queue_display.append("{}. ---\n".format(str(i + 1)))
 
         # Initial datapacks
         datapacks = [
             ("Now playing", "---", False),
-            ("Time", "```" + self.make_timebar() + "```", True),
-            ("Queue", "```\n{}\n```".format(''.join(queue_display)), False),
+            ("Time", "```http\n" + self.make_timebar() + "\n```", True),
+            ("Queue", "```md\n{}\n```".format(''.join(queue_display)), False),
             ("Songs left in queue", "---", True),
             ("Volume", "{}%".format(self.volume), True),
             ("Status", "```---```", False)
@@ -544,16 +588,17 @@ class MusicPlayer:
 
         # Add handlers to update gui
         noformatter = logging.Formatter("{message}", style="{")
-        codeformatter = logging.Formatter("```\n{message}\n```", style="{")
+        timeformatter = logging.Formatter("```http\n{message}\n```", style="{")
+        mdformatter = logging.Formatter("```md\n{message}\n```", style="{")
         statusformatter = logging.Formatter("```__{levelname}__\n{message}\n```", style="{")
         volumeformatter = logging.Formatter("{message}%", style="{")
 
         nowplayinghandler = EmbedLogHandler(self, self.embed, 0)
         nowplayinghandler.setFormatter(noformatter)
         timehandler = EmbedLogHandler(self, self.embed, 1)
-        timehandler.setFormatter(codeformatter)
+        timehandler.setFormatter(timeformatter)
         queuehandler = EmbedLogHandler(self, self.embed, 2)
-        queuehandler.setFormatter(codeformatter)
+        queuehandler.setFormatter(mdformatter)
         queuelenhandler = EmbedLogHandler(self, self.embed, 3)
         queuelenhandler.setFormatter(noformatter)
         volumehandler = EmbedLogHandler(self, self.embed, 4)
@@ -580,12 +625,13 @@ class MusicPlayer:
             except Exception as e:
                 logger.exception(e)
 
-    def enqueue(self, query, front=False):
+    def enqueue(self, query, front=False, shuffle=False):
         """Queues songs based on either a YouTube search or a link
 
         Args:
             query (str): Either a search term or a link
             front (bool): Whether to enqueue at the front or the end
+            shuffle (bool): Whether to shuffle the added songs
         """
 
         if self.state != 'ready':
@@ -597,6 +643,9 @@ class MusicPlayer:
         self.statuslog.info("Queueing {}".format(query))
 
         yt_videos = api_youtube.parse_query(query, self.statuslog)
+        if shuffle:
+            random.shuffle(yt_videos)
+
         if front:
             self.queue = yt_videos + self.queue
         else:
@@ -619,7 +668,7 @@ class MusicPlayer:
                     songname = self.queue[i][1]
             except IndexError:
                 songname = "---"
-            queue_display.append("{}: {}\n".format(str(i + 1), songname))
+            queue_display.append("{}. {}\n".format(str(i + 1), songname))
 
         self.queuelog.info(''.join(queue_display))
         self.queuelenlog.info(str(len(self.queue)))
@@ -671,7 +720,11 @@ class MusicPlayer:
             song = self.queue[0][0]
             songname = self.queue[0][1]
 
-            self.queue.pop(0)
+            self.prev_queue.append(self.queue.pop(0))
+            while len(self.prev_queue) > self.prev_queue_max:
+                self.prev_queue.pop(0)
+
+            logger.debug("Prev: {}".format(self.prev_queue))
 
             try:
                 self.streamer = await self.vclient.create_ytdl_player(song, after=self.vafter_ts)

@@ -43,8 +43,9 @@ async def on_message(message):
                 _data.cache[server.id] = _musicplayer.MusicPlayer(server.id)
 
             # Remove message
-            if command in ['play', 'playnext', 'playnow', 'playshuffle', 'pause', 'resume', 'skip', 'remove', 'shuffle',
-                           'volume', 'stop', 'destroy', 'front', 'movehere', 'settopic', 'cleartopic', 'notopic']:
+            if command in ['play', 'playnext', 'playnow', 'playshuffle', 'pause', 'resume', 'skip', 'remove', 'rewind',
+                           'shuffle', 'volume', 'stop', 'destroy', 'front', 'movehere', 'settopic', 'cleartopic',
+                           'notopic']:
                 try:
                     await client.delete_message(message)
                 except discord.errors.NotFound:
@@ -76,6 +77,9 @@ async def on_message(message):
 
             elif command == 'remove':
                 await _data.cache[server.id].remove(index=arg)
+
+            elif command == 'rewind':
+                await _data.cache[server.id].rewind(query=arg)
 
             elif command == 'shuffle':
                 await _data.cache[server.id].shuffle()

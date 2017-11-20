@@ -28,6 +28,11 @@
       "description": "Removes the song from the queue at [index]"
     },
     {
+      "name": "rewind",
+      "params": ["n"],
+      "description": "Rewinds the queue [n] songs"
+    },
+    {
       "name": "volume",
       "params": ["v"],
       "description": "Sets the volume to [v]% (must be between 0% and 200%)"
