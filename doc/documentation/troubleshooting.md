@@ -10,14 +10,14 @@ permalink: /documentation/troubleshooting/
 Make sure Modis is in your server. If it is, this can be caused by a few problems, but this is usually because one or more requirements for Modis are  not up to date. To fix this, run
 
 ```sh
-pip install <packagename> --upgrade
+pip3 install <packagename> --upgrade
 ```
 
 or
 
 ```sh
-pip uninstall <packagename>
-pip install <packagename>
+pip3 uninstall <packagename>
+pip3 install <packagename>
 ```
 
 for each package listed in the `requirements.txt`.
