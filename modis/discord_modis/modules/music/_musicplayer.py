@@ -73,6 +73,11 @@ class MusicPlayer:
             if topic_id is not None and topic_id != "":
                 logger.debug("Topic channel id: {}".format(topic_id))
                 self.topicchannel = client.get_channel(topic_id)
+        # Get volume
+        if "volume" in data["discord"]["servers"][self.server_id][_data.modulename]:
+            self.volume = data["discord"]["servers"][self.server_id][_data.modulename]["volume"]
+        else:
+            self.write_volume()
 
     async def setup(self, author, text_channel):
         """
@@ -445,6 +450,14 @@ class MusicPlayer:
                 else:
                     self.statuslog.error("Volume must be between 0 and 200")
 
+        self.write_volume()
+
+    def write_volume(self):
+        # Update the volume
+        data = datatools.get_data()
+        data["discord"]["servers"][self.server_id][_data.modulename]["volume"] = self.volume
+        datatools.write_data(data)
+
     async def movehere(self, channel):
         """Moves the embed message to a new channel; can also be used to move the musicplayer to the front
 
@@ -733,10 +746,14 @@ class MusicPlayer:
                 self.prev_queue.pop(0)
 
             try:
-                boptions = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 10"
+                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 30",
+                             "-timeout 30", "-multiple_requests 1", "-reconnect_at_eof 1"]
+                boptions = " {}".format(' '.join(bopt_list))
                 ytoptions = {
-                    "socket_timeout": 10,
-                    "logger": logger
+                    "socket_timeout": 30,
+                    "verbose": True,
+                    "noplaylist": True,
+                    "logger": self.logger
                 }
 
                 self.streamer = await self.vclient.create_ytdl_player(song,
