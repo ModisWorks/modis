@@ -1,6 +1,3 @@
-import tkinter as tk
-import tkinter.ttk as ttk
-
 from collections import OrderedDict
 import json as _json
 
@@ -82,6 +79,9 @@ def add_help_text(parent, filepath, prefix="!"):
         filepath (str): The file to load help text from
         prefix (str): The prefix to use for commands
     """
+
+    import tkinter as tk
+    import tkinter.ttk as ttk
 
     help_contents = get_help_data(filepath)
 
