@@ -9,13 +9,13 @@ permalink: /documentation/troubleshooting/
 
 Make sure Modis is in your server. If it is, this can be caused by a few problems, but this is usually because one or more requirements for Modis are  not up to date. To fix this, run
 
-```sh
+```command
 pip install [packagename] --upgrade
 ```
 
 or
 
-```sh
+```command
 pip uninstall [packagename]
 pip install [packagename]
 ```
