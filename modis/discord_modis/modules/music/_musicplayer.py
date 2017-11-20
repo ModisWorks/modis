@@ -799,9 +799,12 @@ class MusicPlayer:
         if progress > self.timebar_length:
             progress = self.timebar_length
 
-        time_bar = "|" + ("-" * progress) + (" " * (self.timebar_length - progress)) + "| {}".format(
-            self.duration_to_string(duration)
-        )
+        duration_string = self.duration_to_string(duration)
+        if duration > 0:
+            bar = "|" + ("-" * progress) + (" " * (self.timebar_length - progress)) + "|"
+            time_bar = "{} {}".format(bar, duration_string)
+        else:
+            time_bar = duration_string
 
         return time_bar
 
@@ -836,12 +839,11 @@ class MusicPlayer:
                 self.statuslog.error(self.streamer.error)
                 self.statuslog.error("Encountered an error")
         except Exception as e:
+            logger.exception(e)
             try:
                 await self.destroy()
-            except:
-                pass
-
-            logger.exception(e)
+            except Exception as e:
+                logger.exception(e)
 
 
 class EmbedLogHandler(logging.Handler):
