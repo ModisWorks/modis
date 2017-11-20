@@ -517,6 +517,11 @@ class MusicPlayer:
                 logger.exception(e)
                 self.statuslog.warning("I'm already connected to a voice channel.")
                 return
+            except discord.opus.OpusNotLoaded as e:
+                logger.exception(e)
+                logger.error("This is an error with your FFmpeg setup.")
+                self.statuslog.error("Could not load Opus.")
+                return
             except discord.DiscordException as e:
                 logger.exception(e)
                 self.statuslog.error("I couldn't connect to the voice channel. Check my permissions.")
@@ -755,8 +760,8 @@ class MusicPlayer:
 
                 try:
                     self.streamer.stop()
-                except:
-                    pass
+                except Exception as e:
+                    logger.exception(e)
 
                 self.streamer = None
                 self.state = "ready"
