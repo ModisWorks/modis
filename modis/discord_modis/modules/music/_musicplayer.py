@@ -132,10 +132,10 @@ class MusicPlayer:
         self.state = 'stopping'
 
         await self.set_topic("")
-        self.nowplayinglog.info("---")
-        self.timelog.info(self.make_timebar())
+        self.nowplayinglog.debug("---")
+        self.timelog.debug(self.make_timebar())
         self.prev_time = "---"
-        self.statuslog.info("Stopping")
+        self.statuslog.debug("Stopping")
 
         self.vready = False
         self.pause_time = None
@@ -161,8 +161,8 @@ class MusicPlayer:
 
         self.update_queue()
 
-        self.nowplayinglog.info("---")
-        self.timelog.info(self.make_timebar())
+        self.nowplayinglog.debug("---")
+        self.timelog.debug(self.make_timebar())
         self.prev_time = "---"
         self.statuslog.info("Stopped")
         self.state = 'off'
@@ -177,10 +177,10 @@ class MusicPlayer:
         self.state = 'destroyed'
 
         await self.set_topic("")
-        self.nowplayinglog.info("---")
-        self.timelog.info(self.make_timebar())
+        self.nowplayinglog.debug("---")
+        self.timelog.debug(self.make_timebar())
         self.prev_time = "---"
-        self.statuslog.info("Destroying")
+        self.statuslog.debug("Destroying")
 
         self.mready = False
         self.vready = False
@@ -691,8 +691,8 @@ class MusicPlayer:
                 songname = "---"
             queue_display.append("{}. {}\n".format(str(i + 1), songname))
 
-        self.queuelog.info(''.join(queue_display))
-        self.queuelenlog.info(str(len(self.queue)))
+        self.queuelog.debug(''.join(queue_display))
+        self.queuelenlog.debug(str(len(self.queue)))
 
     async def set_topic(self, topic):
         """Sets the topic for the topic channel"""
@@ -719,7 +719,7 @@ class MusicPlayer:
                     time_bar = self.make_timebar()
 
                 if time_bar != self.prev_time:
-                    self.timelog.info(time_bar)
+                    self.timelog.debug(time_bar)
                     self.prev_time = time_bar
 
             yield from asyncio.sleep(5)
@@ -746,8 +746,8 @@ class MusicPlayer:
                 self.prev_queue.pop(0)
 
             try:
-                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 10", "-reconnect_at_eof 1",
-                             "-timeout 10", "-multiple_requests 1"]
+                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 15", "-reconnect_at_eof 1",
+                             "-timeout 15", "-multiple_requests 1"]
                 boptions = " {}".format(' '.join(bopt_list))
                 logger.debug("FFmpeg options: {}".format(boptions))
 
@@ -776,13 +776,13 @@ class MusicPlayer:
                 self.streamer.start()
 
                 nowplaying = "Playing {}".format(self.streamer.title)
-                self.statuslog.info("Playing")
+                self.statuslog.debug("Playing")
                 await self.set_topic(nowplaying)
-                self.nowplayinglog.info(nowplaying)
+                self.nowplayinglog.debug(nowplaying)
             except Exception as e:
                 await self.set_topic("")
                 self.nowplayinglog.info("Error playing {}".format(songname))
-                self.timelog.info(self.make_timebar())
+                self.timelog.debug(self.make_timebar())
                 self.prev_time = "---"
                 self.statuslog.error("Had a problem playing {}".format(songname))
                 logger.exception(e)
@@ -847,7 +847,7 @@ class MusicPlayer:
 
     def vafter_ts(self):
         """Function that is called after a song finishes playing"""
-        logger.info("Song finishing")
+        logger.debug("Song finishing")
         future = asyncio.run_coroutine_threadsafe(self.vafter(), client.loop)
         try:
             future.result()
