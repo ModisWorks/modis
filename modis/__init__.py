@@ -34,8 +34,10 @@ def console(discord_token, discord_client_id):
         discord_client_id: The bot's client ID
     """
 
+    state, response = datatools.get_compare_version()
+
     logger.info("Starting Modis in console")
-    logger.info(datatools.get_compare_version())
+    logger.info(response)
 
     import threading
     import asyncio
