@@ -1,4 +1,5 @@
 modulename = "Music"
+modulecolor = 0xAAFF00
 
 creator = "Infraxion"
 

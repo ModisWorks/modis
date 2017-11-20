@@ -56,10 +56,15 @@ class MusicPlayer:
         self.embed = None
         self.queue_display = 9
         self.nowplayinglog = logging.getLogger("{}.{}.nowplaying".format(__name__, self.server_id))
+        self.nowplayinglog.setLevel("DEBUG")
         self.timelog = logging.getLogger("{}.{}.time".format(__name__, self.server_id))
+        self.timelog.setLevel("DEBUG")
         self.queuelog = logging.getLogger("{}.{}.queue".format(__name__, self.server_id))
+        self.queuelog.setLevel("DEBUG")
         self.queuelenlog = logging.getLogger("{}.{}.queuelen".format(__name__, self.server_id))
+        self.queuelenlog.setLevel("DEBUG")
         self.volumelog = logging.getLogger("{}.{}.volume".format(__name__, self.server_id))
+        self.volumelog.setLevel("DEBUG")
         self.statuslog = logging.getLogger("{}.{}.status".format(__name__, self.server_id))
         self.statuslog.setLevel("DEBUG")
         self.statustimer = None
@@ -602,7 +607,7 @@ class MusicPlayer:
             "Press the buttons!",
             modulename=_data.modulename,
             creator=_data.creator,
-            colour=0x88FF00,
+            colour=_data.modulecolor,
             datapacks=datapacks
         )
 
