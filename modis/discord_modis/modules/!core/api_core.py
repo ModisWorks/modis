@@ -18,10 +18,10 @@ async def update_server_data(server):
     data = datatools.get_data()
     # Add the server to server data if it doesn't yet exist
     send_welcome_message = False
-    if "mute_intro" not in data or not data["mute_intro"]:
-        if server.id not in data["discord"]["servers"]:
-            logger.debug("Adding new server to serverdata")
-            data["discord"]["servers"][server.id] = {"prefix": "!"}
+    if server.id not in data["discord"]["servers"]:
+        logger.debug("Adding new server to serverdata")
+        data["discord"]["servers"][server.id] = {"prefix": "!"}
+        if "mute_intro" not in data or not data["mute_intro"]:
             send_welcome_message = True
 
     # Make sure all modules are in the server
