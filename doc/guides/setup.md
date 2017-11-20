@@ -95,9 +95,15 @@ modis.gui(
 
 To make this file, open up a text editor and paste the text. Save this file as `launcher.py` (and make sure that it's saving as a .py file rather than a .txt file). This file should go in the root directory for Modis (the same one with `requirements.txt`).
 
-To run Modis now, just run `launcher.py`.
+To run Modis now, just run
 
-> If you are running Modis on a system without `tkinter` installed, you'll need to change `modis.gui` to `modis.console`.
+```command
+python launcher.py
+```
+
+from the directory that `launcher.py` is in.
+
+> If you are running Modis on a system without `tkinter` installed, you will need to change `modis.gui` to `modis.console`.
 
 ## Troubleshooting
 
