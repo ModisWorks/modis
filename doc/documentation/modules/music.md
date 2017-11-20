@@ -37,6 +37,10 @@ The music module allows you to play videos and playlists from YouTube, as well a
 - `!remove [index]`: Removes the song from the queue at [index]
 - `!remove all`: Removes all songs from the queue
 
+### rewind
+
+- `!rewind [n]`: Rewinds the queue [n] songs
+
 ### volume
 
 - `!volume [v]`: Sets the volume to [v]% (must be between 0% and 200%)
