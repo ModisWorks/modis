@@ -746,20 +746,23 @@ class MusicPlayer:
                 self.prev_queue.pop(0)
 
             try:
-                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 30",
-                             "-timeout 30", "-multiple_requests 1", "-reconnect_at_eof 1"]
+                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 30"]
                 boptions = " {}".format(' '.join(bopt_list))
+                logging.debug("FFmpeg options: {}".format(boptions))
+
                 ytoptions = {
-                    "socket_timeout": 30,
-                    "verbose": True,
+                    "format": "bestaudio/best",
+                    "extractaudio": True,
+                    "audioformat": "mp3",
                     "noplaylist": True,
-                    "logger": self.logger
+                    "socket_timeout": 15,
+                    "logger": logger
                 }
 
                 self.streamer = await self.vclient.create_ytdl_player(song,
                                                                       ytdl_options=ytoptions,
-                                                                      before_options=boptions,
-                                                                      after=self.vafter_ts)
+                                                                      after=self.vafter_ts,
+                                                                      before_options=boptions)
                 self.state = "ready"
 
                 self.current_duration = self.streamer.duration
