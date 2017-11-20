@@ -12,8 +12,7 @@ if datatools.has_data():
     if "log_level" in data:
         logger.setLevel(data["log_level"])
 
-formatter = logging.Formatter(
-    "{asctime} {levelname:8} {name} - {message}", style="{")
+formatter = logging.Formatter("{asctime} {levelname:8} {name} - {message}", style="{")
 printhandler = logging.StreamHandler(sys.stdout)
 printhandler.setFormatter(formatter)
 filehandler = logging.FileHandler("modis.log")
