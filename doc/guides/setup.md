@@ -30,7 +30,7 @@ To install the packages, open a command processor (CMD or Terminal for Windows a
 
 Below are a list of commands you'll need to run as of writing if you're too lazy to check requirements.txt:
 
-```command
+```sh
 pip install discord.py
 pip install youtube-dl
 pip install pynacl
@@ -97,7 +97,7 @@ To make this file, open up a text editor and paste the text. Save this file as `
 
 To run Modis now, just run
 
-```command
+```sh
 python launcher.py
 ```
 
