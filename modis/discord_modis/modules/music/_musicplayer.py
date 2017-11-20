@@ -748,7 +748,7 @@ class MusicPlayer:
             try:
                 bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 30"]
                 boptions = " {}".format(' '.join(bopt_list))
-                logging.debug("FFmpeg options: {}".format(boptions))
+                logger.debug("FFmpeg options: {}".format(boptions))
 
                 ytoptions = {
                     "format": "bestaudio/best",
@@ -756,6 +756,7 @@ class MusicPlayer:
                     "audioformat": "mp3",
                     "noplaylist": True,
                     "socket_timeout": 15,
+                    "nocheckcertificate": True,
                     "logger": logger
                 }
 
