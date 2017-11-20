@@ -13,7 +13,6 @@ logs_dir = "{}/../logs/".format(file_dir)
 if not os.path.isdir(logs_dir):
     os.mkdir(logs_dir)
 
-logging.basicConfig(filename="{}/{}.log".format(logs_dir, time.time()))
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 if datatools.has_data():
@@ -24,7 +23,7 @@ if datatools.has_data():
 formatter = logging.Formatter("{asctime} {levelname:8} {name} - {message}", style="{")
 printhandler = logging.StreamHandler(sys.stdout)
 printhandler.setFormatter(formatter)
-filehandler = logging.FileHandler("modis.log")
+filehandler = logging.FileHandler("{}/{}.log".format(logs_dir, time.time()))
 filehandler.setFormatter(formatter)
 
 logger.addHandler(printhandler)
