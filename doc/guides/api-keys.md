@@ -14,3 +14,11 @@ API keys and tokens are needed for a few different parts of Modis. This guide sh
 1. Scroll down and select 'Create a Bot User'. ![Create Bot User](https://github.com/Infraxion/modis/raw/gh-pages/doc/guides/img/createbotuser.png?raw=true "Create Bot User")
 
 You now have your very own Discord Bot! You can add it to a server by putting your bot's client id in the [Discord Permissions Calculator](https://discordapi.com/permissions.html), and start Modis with your client id and bot token to have Modis running in your own server. For more details on setting up Modis, see the [Setup](./setup.md#modis-package) guide.
+
+You can make you own bot invite link by pasting
+
+```https
+https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot&permissions=2146958455
+```
+
+into your web browser and replacing `CLIENT_ID` with your bot's client id. You don't need to give all the permissions, but some modules won't work without the required permissions.
