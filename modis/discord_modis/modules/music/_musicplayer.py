@@ -622,7 +622,8 @@ class MusicPlayer:
             try:
                 if self.embed is not None:
                     await client.add_reaction(self.embed.sent_embed, e)
-            except discord.DiscordException:
+            except discord.DiscordException as e:
+                logger.exception(e)
                 self.statuslog.error("I couldn't add the buttons. Check my permissions.")
             except Exception as e:
                 logger.exception(e)
