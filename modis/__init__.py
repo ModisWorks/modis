@@ -1,10 +1,19 @@
 """Initialises Modis."""
 
 import logging
+import os
 import sys
+import time
 
 from modis import datatools
 
+
+file_dir = os.path.dirname(os.path.realpath(__file__))
+logs_dir = "{}/../logs/".format(file_dir)
+if not os.path.isdir(logs_dir):
+    os.mkdir(logs_dir)
+
+logging.basicConfig(filename="{}/{}.log".format(logs_dir, time.time()))
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 if datatools.has_data():
@@ -92,6 +101,8 @@ def gui(discord_token, discord_client_id):
     root.minsize(width=800, height=400)
     root.geometry("800x600")
     root.title("Modis Control Panel")
+    # Icon
+    root.iconbitmap(r"{}/assets/modis.ico".format(file_dir))
 
     # Setup the notebook
     """notebook = ttk.Notebook(root)
