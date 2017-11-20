@@ -5,16 +5,6 @@ permalink: /documentation/troubleshooting/
 
 # Troubleshooting
 
-## How do I get Modis in my server?
-
-[Discord Permissions Calculator](https://discordapi.com/permissions.html) will generate an invite link for you, or you can make you own by pasting
-
-```https
-https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot&permissions=2146958455
-```
-
-into your web browser and replacing `CLIENT_ID` with your bot's client id. You don't need to give all the permissions, but some modules won't work without the required permissions.
-
 ## I get errors when starting Modis or sending any message
 
 Make sure Modis is in your server. If it is, this can be caused by a few problems, but this is usually because one or more requirements for Modis are  not up to date. To fix this, run
