@@ -513,10 +513,12 @@ class MusicPlayer:
             self.statuslog.info("Connecting to voice")
             try:
                 self.vclient = await client.join_voice_channel(self.vchannel)
-            except discord.ClientException:
+            except discord.ClientException as e:
+                logger.exception(e)
                 self.statuslog.warning("I'm already connected to a voice channel.")
                 return
-            except discord.DiscordException:
+            except discord.DiscordException as e:
+                logger.exception(e)
                 self.statuslog.error("I couldn't connect to the voice channel. Check my permissions.")
                 return
             except Exception as e:
