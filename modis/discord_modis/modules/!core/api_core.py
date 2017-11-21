@@ -28,6 +28,9 @@ async def update_server_data(server):
     _dir = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     _dir_modules = "{}/../".format(_dir)
     for module_name in os.listdir(_dir_modules):
+        if module_name.startswith("_") or module_name.startswith("!"):
+            continue
+
         if not os.path.isfile("{}/{}/_data.py".format(_dir_modules, module_name)):
             logger.warning("No _data.py file found for module {}".format(module_name))
             continue
