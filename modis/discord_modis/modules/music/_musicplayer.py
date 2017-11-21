@@ -795,8 +795,16 @@ class MusicPlayer:
                 boptions = " {}".format(' '.join(bopt_list))
                 logger.debug("FFmpeg options: {}".format(boptions))
 
+                ytdl_formats = [
+                    "bestaudio[protocol^=http][ext=mp4]",
+                    "bestaudio[protocol^=http][ext=mp3]",
+                    "bestaudio[protocol^=http]",
+                    "bestaudio",
+                    "best",
+                ]
+
                 ytoptions = {
-                    "format": "bestaudio/best",
+                    "format": '/'.join(ytdl_formats),
                     "extractaudio": True,
                     "audioformat": "mp3",
                     "noplaylist": True,
