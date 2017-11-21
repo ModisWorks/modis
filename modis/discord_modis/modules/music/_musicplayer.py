@@ -804,7 +804,7 @@ class MusicPlayer:
                     "socket_timeout": 30,
                     "retries": 40,
                     "nocheckcertificate": True,
-                    "logger": logger
+                    "logger": self.logger
                 }
 
                 self.streamer = await self.vclient.create_ytdl_player(song,
