@@ -516,6 +516,32 @@ class MusicPlayer:
         embed = ui_embed.topic_update(channel, self.topicchannel)
         await embed.send()
 
+    async def nowplaying_info(self, channel):
+        """
+        Print the info about the currently playing song
+
+        Args:
+            channel (discord.Channel): The channel to send info to
+        """
+
+        await client.send_typing(channel)
+
+        if self.streamer is None:
+            embed = ui_embed.nowplaying_none(channel)
+            await embed.send()
+            return
+
+        if self.streamer.is_live:
+            duration_info = "Livestream"
+        else:
+            duration_info = self.duration_to_string(self.streamer.duration)
+
+        embed = ui_embed.nowplaying_info(channel, title=self.streamer.title, duration=duration_info,
+                                         source=self.streamer.uploader, source_date=self.streamer.upload_date,
+                                         views=self.streamer.views, likes=self.streamer.likes,
+                                         description=self.streamer.description)
+        await embed.send()
+
     # Methods
     async def vsetup(self, author):
         """Creates the voice client
