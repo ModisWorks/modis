@@ -9,7 +9,7 @@ import requests
 _dir = _os.path.dirname(_os.path.realpath(__file__))
 _datafile = "{}/../data.json".format(_dir)
 
-version = "0.3.1"
+version = "0.3.0a"
 
 
 def has_data() -> bool:
