@@ -50,6 +50,10 @@
       "description": "Stops Modis from updating this channel's topic with the currently playing song"
     },
     {
+      "name": "nowplaying",
+      "description": "Gives information about the current song"
+    },
+    {
       "name": "destroy",
       "description": "Stops and removes the music player"
     },
