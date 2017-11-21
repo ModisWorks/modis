@@ -791,8 +791,8 @@ class MusicPlayer:
                 self.prev_queue.pop(0)
 
             try:
-                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 15", "-reconnect_at_eof 1",
-                             "-timeout 15", "-multiple_requests 1"]
+                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 30", "-reconnect_at_eof 1",
+                             "-timeout 30", "-multiple_requests 1"]
                 boptions = " {}".format(' '.join(bopt_list))
                 logger.debug("FFmpeg options: {}".format(boptions))
 
@@ -801,7 +801,7 @@ class MusicPlayer:
                     "extractaudio": True,
                     "audioformat": "mp3",
                     "noplaylist": True,
-                    "socket_timeout": 15,
+                    "socket_timeout": 30,
                     "retries": 40,
                     "nocheckcertificate": True,
                     "logger": logger
