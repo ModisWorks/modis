@@ -43,7 +43,11 @@ def parse_query(query, ilogger):
     # Try parsing this as a link
     p = urlparse(query)
     logger.debug("Query: {}".format(p))
-    if p and p.scheme and p.netloc and p.query:
+    if p and p.scheme and p.netloc:
+        if "youtube" not in p.netloc or not p.query:
+            logger.debug("Using url: {}".format(query))
+            return [[query, query]]
+
         query_parts = p.query.split('&')
         yturl_parts = {}
         for q in query_parts:
