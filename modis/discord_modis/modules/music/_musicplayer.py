@@ -371,7 +371,9 @@ class MusicPlayer:
                 self.statuslog.error("No songs to rewind")
                 return
 
-            if num > len(self.prev_queue):
+            if num < 0:
+                self.statuslog.error("Rewind must be postitive or 0")
+            elif num > len(self.prev_queue):
                 self.statuslog.warning("Rewinding to start")
             else:
                 self.statuslog.info("Rewinding")
@@ -641,7 +643,7 @@ class MusicPlayer:
     async def add_reactions(self):
         """Adds the reactions buttons to the current message"""
         self.statuslog.info("Loading buttons")
-        for e in ("⏯", "⏹", "⏭", "🔀", "🔉", "🔊"):
+        for e in ("⏯", "⏮", "⏹", "⏭", "🔀", "🔉", "🔊"):
             try:
                 if self.embed is not None:
                     await client.add_reaction(self.embed.sent_embed, e)
