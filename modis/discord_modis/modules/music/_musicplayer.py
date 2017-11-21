@@ -39,7 +39,6 @@ class MusicPlayer:
         self.prev_queue_max = 50
         self.volume = 20
         # Timebar
-        self.current_duration = 0
         self.timebar_length = 33
         self.vclient_starttime = None
         self.vclient_task = None
@@ -716,12 +715,14 @@ class MusicPlayer:
             if self.pause_time is None:
                 diff = self.vclient.loop.time() - self.vclient_starttime
 
-                if self.current_duration > 0:
-                    time_counts = int(math.ceil((diff / self.current_duration) * self.timebar_length))
+                if self.streamer.is_live:
+                    time_bar = "Livestream"
+                elif self.streamer.duration > 0:
+                    time_counts = int(math.ceil((diff / self.streamer.duration) * self.timebar_length))
                     if time_counts > self.timebar_length:
                         time_counts = self.timebar_length
 
-                    time_bar = self.make_timebar(time_counts, self.current_duration)
+                    time_bar = self.make_timebar(time_counts, self.streamer.duration)
                 else:
                     time_bar = self.make_timebar()
 
@@ -773,8 +774,6 @@ class MusicPlayer:
                                                                       after=self.vafter_ts,
                                                                       before_options=boptions)
                 self.state = "ready"
-
-                self.current_duration = self.streamer.duration
 
                 self.vclient_starttime = self.vclient.loop.time()
                 self.vclient_task = asyncio.Task(self.time_loop())
@@ -869,7 +868,6 @@ class MusicPlayer:
             self.logger.debug("Returning because player is in state {}".format(self.state))
             return
 
-        self.current_duration = 0
         self.pause_time = None
 
         if self.vclient_task:
