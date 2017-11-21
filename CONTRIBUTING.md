@@ -6,7 +6,7 @@ We always welcome people looking to help make Modis bigger and better! To get st
 
 ### New Features
 
-You have a new idea for something you want in Modis? Great! If you want it included in Modis, it's best to message the devs and check that it's ok. We'll probably say yes but we also don't want to have blocks of code thrown at us in case it isn't something we want in our core codebase.
+You have a new idea for something you want in Modis? Great! If you want it included in Modis, it's best to message the devs and check that it's ok. We'll probably say yes but we also don't want to have blocks of code thrown at us in case it isn't something we want in our core codebase. If your new feature isn't going to be something that everyone wants, then you should make the feature easy to opt in/out of. All modules should support the `activated` flag set by the `manager` module, while new features for modules should use the `_data.py` and `data.json` to store settings on a per-server basis.
 
 ### Making changes
 
