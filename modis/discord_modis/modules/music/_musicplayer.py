@@ -715,7 +715,9 @@ class MusicPlayer:
             if self.pause_time is None:
                 diff = self.vclient.loop.time() - self.vclient_starttime
 
-                if self.streamer.is_live:
+                if self.streamer is None:
+                    time_bar = "Error"
+                elif self.streamer.is_live:
                     time_bar = "Livestream"
                 elif self.streamer.duration > 0:
                     time_counts = int(math.ceil((diff / self.streamer.duration) * self.timebar_length))
@@ -781,7 +783,8 @@ class MusicPlayer:
                 self.streamer.volume = self.volume / 100
                 self.streamer.start()
 
-                nowplaying = "Playing {}".format(self.streamer.title)
+                nowplaying = "{} {}".format("Streaming" if self.streamer.is_live else "Playing",
+                                            self.streamer.title)
                 self.statuslog.debug("Playing")
                 await self.set_topic(nowplaying)
                 self.nowplayinglog.debug(nowplaying)
