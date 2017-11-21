@@ -767,6 +767,7 @@ class MusicPlayer:
                     "audioformat": "mp3",
                     "noplaylist": True,
                     "socket_timeout": 15,
+                    "retries": 40,
                     "nocheckcertificate": True,
                     "logger": logger
                 }
