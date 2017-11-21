@@ -372,6 +372,7 @@ class MusicPlayer:
 
             if num < 0:
                 self.statuslog.error("Rewind must be postitive or 0")
+                return
             elif num > len(self.prev_queue):
                 self.statuslog.warning("Rewinding to start")
             else:
