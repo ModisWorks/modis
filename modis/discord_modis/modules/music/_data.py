@@ -1,7 +1,7 @@
 modulename = "Music"
-modulecolor = 0xAAFF00
+modulecolor = 0x282b30
 
-creator = "Infraxion"
+creator = "Infraxion and YtnomSnrub"
 
 sd_structure = {
     "activated": True,

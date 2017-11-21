@@ -39,11 +39,17 @@ class UI:
             discord.Embed: Built GUI
         """
 
-        embed = discord.Embed(
-            title=self.title,
-            type='rich',
-            description=self.description,
-            colour=self.colour)
+        if self.colour:
+            embed = discord.Embed(
+                title=self.title,
+                type='rich',
+                description=self.description,
+                colour=self.colour)
+        else:
+            embed = discord.Embed(
+                title=self.title,
+                type='rich',
+                description=self.description)
 
         if self.thumbnail:
             embed.set_thumbnail(url=self.thumbnail)
@@ -63,10 +69,7 @@ class UI:
                 inline=pack[2]
             )
 
-        embed.set_footer(
-            text="{} module by {}".format(self.modulename, self.creator),
-            icon_url="http://musicbyango.com/modis/dp/{}64.jpg".format(self.creator)
-        )
+        embed.set_footer(text="{} module by {}".format(self.modulename, self.creator))
 
         return embed
 
