@@ -110,7 +110,7 @@ def parse_query(query, ilogger):
                             track_list.append(t)
 
                 logger.debug(track_list)
-                if track_list is not None:
+                if track_list is not None and len(track_list) > 0:
                     return track_list
                 else:
                     return [[query, query]]
@@ -210,13 +210,13 @@ def get_queue_from_playlist(playlistid):
 def get_sc_tracks(result):
     if result.kind == "track":
         logger.debug("SoundCloud Track {}".format(result.title))
-        return [[result.permalink_url, result.title]]
+        return [[result.stream_url, result.title]]
     elif result.kind == "user":
         track_list = []
         logger.debug("SoundCloud User {}".format(result.username))
         tracks = scclient.get("/users/{}/tracks".format(result.id))
         for t in tracks:
-            track_list.append([t.permalink_url, t.title])
+            track_list.append([t.stream_url, t.title])
 
         return track_list
     elif result.kind == "playlist":
@@ -224,7 +224,7 @@ def get_sc_tracks(result):
         logger.debug("SoundCloud Playlist {}".format(result.title))
         tracks = result.tracks
         for t in tracks:
-            track_list.append([t["permalink_url"], t["title"]])
+            track_list.append([t["stream_url"], t["title"]])
 
         return track_list
 
