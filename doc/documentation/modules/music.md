@@ -40,6 +40,7 @@ The music module allows you to play videos and playlists from YouTube, as well a
 ### rewind
 
 - `!rewind [n]`: Rewinds the queue [n] songs
+- `!restart`: Restarts the current song
 
 ### volume
 
