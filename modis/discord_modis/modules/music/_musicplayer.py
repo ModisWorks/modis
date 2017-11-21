@@ -2,7 +2,6 @@
 
 import asyncio
 import logging
-import math
 import random
 
 import discord
@@ -755,7 +754,7 @@ class MusicPlayer:
                 elif self.streamer.is_live:
                     time_bar = "Livestream"
                 elif self.streamer.duration > 0:
-                    time_counts = int(math.round((diff / self.streamer.duration) * self.timebar_length))
+                    time_counts = int(round((diff / self.streamer.duration) * self.timebar_length))
                     if time_counts > self.timebar_length:
                         time_counts = self.timebar_length
 
