@@ -100,4 +100,4 @@ async def on_message(message):
                 await _data.cache[server.id].set_topic_channel(channel)
 
             elif command == 'cleartopic' or command == 'notopic':
-                await _data.cache[server.id].clear_topic_channel()
+                await _data.cache[server.id].clear_topic_channel(channel)

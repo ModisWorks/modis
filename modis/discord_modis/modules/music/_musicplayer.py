@@ -8,8 +8,8 @@ import random
 import discord
 
 from modis import datatools
-from . import _data, api_youtube
-from .._tools import ui_embed
+from . import _data, api_youtube, ui_embed
+from .._tools import ui_embed as ui_embed_tools
 from ..._client import client
 
 logger = logging.getLogger(__name__)
@@ -493,7 +493,11 @@ class MusicPlayer:
         self.topicchannel = channel
         await self.set_topic(self.topic)
 
-    async def clear_topic_channel(self):
+        await client.send_typing(channel)
+        embed = ui_embed.topic_update(channel, self.topicchannel)
+        await embed.send()
+
+    async def clear_topic_channel(self, channel):
         """Set the topic channel for this server"""
         try:
             if self.topicchannel:
@@ -507,6 +511,10 @@ class MusicPlayer:
         data = datatools.get_data()
         data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"] = ""
         datatools.write_data(data)
+
+        await client.send_typing(channel)
+        embed = ui_embed.topic_update(channel, self.topicchannel)
+        await embed.send()
 
     # Methods
     async def vsetup(self, author):
@@ -602,7 +610,7 @@ class MusicPlayer:
         ]
 
         # Create embed UI object
-        self.embed = ui_embed.UI(
+        self.embed = ui_embed_tools.UI(
             self.mchannel,
             "Music Player",
             "Press the buttons!",
@@ -788,6 +796,7 @@ class MusicPlayer:
                                             self.streamer.title)
                 self.statuslog.debug("Playing")
                 await self.set_topic(nowplaying)
+                self.logger.debug(self.streamer.description)
                 self.nowplayinglog.debug(self.streamer.title)
             except Exception as e:
                 await self.set_topic("")
