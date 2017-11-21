@@ -822,7 +822,6 @@ class MusicPlayer:
                                             self.streamer.title)
                 self.statuslog.debug("Playing")
                 await self.set_topic(nowplaying)
-                self.logger.debug(self.streamer.description)
                 self.nowplayinglog.debug(self.streamer.title)
             except Exception as e:
                 await self.set_topic("")
