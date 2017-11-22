@@ -35,7 +35,7 @@ class MusicPlayer:
         self.streamer = None
         self.queue = []
         self.prev_queue = []
-        self.prev_queue_max = 50
+        self.prev_queue_max = 500
         self.volume = 20
         # Timebar
         self.timebar_length = 33
@@ -43,6 +43,8 @@ class MusicPlayer:
         self.vclient_task = None
         self.pause_time = None
         self.prev_time = ""
+        # Loop
+        self.loop_type = 'off'
 
         # Status variables
         self.mready = False
@@ -117,6 +119,7 @@ class MusicPlayer:
         await self.setup(author, text_channel)
 
         if self.state == 'ready':
+            self.prev_queue = []
             # Queue the song
             self.enqueue(query, now, shuffle)
 
@@ -142,6 +145,7 @@ class MusicPlayer:
 
         self.vready = False
         self.pause_time = None
+        self.loop_type = 'off'
 
         if self.vclient:
             try:
@@ -188,6 +192,7 @@ class MusicPlayer:
         self.mready = False
         self.vready = False
         self.pause_time = None
+        self.loop = 'off'
 
         if self.vclient:
             try:
@@ -294,7 +299,7 @@ class MusicPlayer:
 
             for i in range(num - 1):
                 if len(self.queue) > 0:
-                    self.queue.pop(0)
+                    self.prev_queue.append(self.queue.pop(0))
 
             try:
                 self.streamer.stop()
@@ -318,7 +323,6 @@ class MusicPlayer:
             return
         elif index == "all":
             self.queue = []
-            self.prev_queue = []
             self.update_queue()
             self.statuslog.info("Removed all songs")
             return
@@ -401,6 +405,20 @@ class MusicPlayer:
         self.update_queue()
         self.statuslog.debug("Shuffled")
 
+    async def set_loop(self, loop_value):
+        """Updates the loop value, can be 'off', 'on', or 'shuffle'"""
+        if loop_value not in ['on', 'off', 'shuffle']:
+            self.statuslog.error("Loop value must be `off`, `on`, or `shuffle`")
+            return
+
+        self.loop_type = loop_value
+        if self.loop_type == 'on':
+            self.statuslog.info("Looping on")
+        elif self.loop_type == 'off':
+            self.statuslog.info("Looping off")
+        elif self.loop_type == 'shuffle':
+            self.statuslog.info("Looping on and shuffling")
+
     async def setvolume(self, value):
         """The volume command
 
@@ -459,13 +477,15 @@ class MusicPlayer:
         self.write_volume()
 
     def write_volume(self):
+        """Writes the current volume to the data.json"""
         # Update the volume
         data = datatools.get_data()
         data["discord"]["servers"][self.server_id][_data.modulename]["volume"] = self.volume
         datatools.write_data(data)
 
     async def movehere(self, channel):
-        """Moves the embed message to a new channel; can also be used to move the musicplayer to the front
+        """
+        Moves the embed message to a new channel; can also be used to move the musicplayer to the front
 
         Args:
             channel (discord.Channel): The channel to move to
@@ -860,12 +880,24 @@ class MusicPlayer:
 
         # Queue exhausted
         else:
-            self.statuslog.info("Finished Queue")
             self.state = "ready"
 
-            self.update_queue()
+            if self.loop_type == 'on':
+                self.statuslog.info("Finished queue: looping")
+                self.queue = self.prev_queue
+            elif self.loop_type == 'shuffle':
+                self.statuslog.info("Finished queue: looping and shuffling")
+                self.queue = self.prev_queue
+                random.shuffle(self.queue)
+            else:
+                self.statuslog.info("Finished queue")
 
-            await self.stop()
+            self.prev_queue = []
+            self.update_queue()
+            if self.queue:
+                await self.vplay()
+            else:
+                await self.stop()
 
     def duration_to_string(self, duration):
         """
