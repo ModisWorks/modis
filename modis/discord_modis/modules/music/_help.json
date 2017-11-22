@@ -58,6 +58,38 @@
       "description": "Plays the first result of the query or link in a random order"
     }
   ],
+  "SoundCloud Commands": [
+    {
+      "name": "play sc",
+      "params": ["query"],
+      "description": "Searches SoundCloud using the query and plays the first song."
+    },
+    {
+      "name": "play sc song",
+      "params": ["query"],
+      "description": "Searches SoundCloud using the query and plays the first song."
+    },
+    {
+      "name": "play sc songs",
+      "params": ["query"],
+      "description": "Searches SoundCloud using the query, and plays the top songs that match the query."
+    },
+    {
+      "name": "play sc user",
+      "params": ["query"],
+      "description": "Searches SoundCloud for a user, and plays their most recent songs."
+    },
+    {
+      "name": "play sc tagged",
+      "params": ["query"],
+      "description": "Searches SoundCloud for songs with a given tag, and plays the top songs with that tag."
+    },
+    {
+      "name": "play sc genre",
+      "params": ["query"],
+      "description": "Searches SoundCloud for songs with a given genre, and plays the top songs with that genre."
+    },
+  ],
   "Extra Commands": [
     {
       "name": "loop",
@@ -86,6 +118,6 @@
       "description": "Moves the music player to the front of the channel the command was sent from"
     }
   ],
-  "Documentation": "To see all commands, go to the [Music Module Documentation](https://infraxion.github.io/modis/documentation/modules/music/)",
+  "Documentation": "To see all commands, go to the Music Module Documentation at https://infraxion.github.io/modis/documentation/modules/music/",
   "About": "music plays videos and playlists from YouTube, and music files stored on the internet."
 }
