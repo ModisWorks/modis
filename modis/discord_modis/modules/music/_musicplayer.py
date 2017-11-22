@@ -113,13 +113,9 @@ class MusicPlayer:
             self.state = 'ready' if self.mready and self.vready else 'off'
         else:
             # Queue the song
-            await self.enqueue(query, now, shuffle)
+            await self.enqueue(query, now, stop_current, shuffle)
 
         if self.state == 'ready':
-            if stop_current:
-                if self.streamer:
-                    self.streamer.stop()
-
             if self.streamer is None:
                 await self.vplay()
 
@@ -184,7 +180,7 @@ class MusicPlayer:
         self.mready = False
         self.vready = False
         self.pause_time = None
-        self.loop = 'off'
+        self.loop_type = 'off'
 
         if self.vclient:
             try:
@@ -698,7 +694,7 @@ class MusicPlayer:
             except Exception as e:
                 logger.exception(e)
 
-    def parse_query(self, query, front, shuffle):
+    def parse_query(self, query, front, stop_current, shuffle):
         yt_videos, response = api_music.parse_query(query, self.statuslog)
         if shuffle:
             random.shuffle(yt_videos)
@@ -718,24 +714,32 @@ class MusicPlayer:
         else:
             self.statuslog.error(response[1])
 
-    async def enqueue(self, query, front=False, shuffle=False):
+        if stop_current:
+            if self.streamer:
+                self.streamer.stop()
+
+    async def enqueue(self, query, front=False, stop_current=False, shuffle=False):
         """Queues songs based on either a YouTube search or a link
 
         Args:
             query (str): Either a search term or a link
             front (bool): Whether to enqueue at the front or the end
+            stop_current (bool): Whether to stop the current song after the songs are queued
             shuffle (bool): Whether to shuffle the added songs
         """
+
+        if query is None or query == "":
+            return
 
         self.statuslog.info("Parsing {}".format(query))
         self.logger.debug("Enqueueing from query")
 
         if not self.vready:
-            self.parse_query(query, front, shuffle)
+            self.parse_query(query, front, stop_current, shuffle)
         else:
             parse_thread = threading.Thread(
                 target=self.parse_query,
-                args=[query, front, shuffle])
+                args=[query, front, stop_current, shuffle])
             # Run threads
             parse_thread.start()
 
