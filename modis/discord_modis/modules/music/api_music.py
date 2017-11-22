@@ -120,7 +120,7 @@ def parse_query(query, ilogger):
             if "list" in yturl_parts:
                 return get_queue_from_playlist(yturl_parts["list"]), (0, "Queued YouTube playlist from link")
             elif "v" in yturl_parts:
-                return [["https://www.youtube.com/watch?v={}".format(yturl_parts["v"]), query]],\
+                return [["https://www.youtube.com/watch?v={}".format(yturl_parts["v"]), query]], \
                        (0, "Queued YouTube video from link")
         elif "soundcloud" in p.netloc:
             if scclient is None:
@@ -362,6 +362,12 @@ def search_sp_tracks(query_type, query_search):
             if "items" in results["albums"] and len(results["albums"]["items"]) > 0:
                 album_tracks = spclient.album_tracks(results["albums"]["items"][0]["uri"])
                 return get_sp_tracks(album_tracks)
+    elif query_type == 'playlist':
+        if "playlists" in results:
+            if "items" in results["playlists"] and len(results["playlists"]["items"]) > 0:
+                playlist_tracks = spclient.user_playlist_tracks(results["playlists"]["items"][0]["owner"]["id"],
+                                                                results["playlists"]["items"][0]["id"], limit=50)
+                return get_sp_tracks(playlist_tracks)
 
     return []
 
@@ -381,7 +387,10 @@ def get_sp_tracks(results):
     if "items" in results and len(results["items"]) > 0:
         tracks = []
         for t in results["items"]:
-            tracks.append(get_sp_track(t))
+            if "track" in t:
+                tracks.append(get_sp_track(t["track"]))
+            else:
+                tracks.append(get_sp_track(t))
         return tracks
 
     return []
@@ -410,6 +419,7 @@ def get_sp_track(track):
         if len(yt_videos) > 0:
             return yt_videos[0]
 
+    logger.debug("No results found for Spotify track:\n{}".format(track))
     return []
 
 

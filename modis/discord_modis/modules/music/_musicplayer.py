@@ -3,6 +3,7 @@
 import asyncio
 import logging
 import random
+import threading
 
 import discord
 
@@ -84,26 +85,6 @@ class MusicPlayer:
         else:
             self.write_volume()
 
-    async def setup(self, author, text_channel):
-        """
-        The setup command
-
-        Args:
-            author (discord.Member): The member that called the command
-            text_channel (discord.Channel): The channel where the command was called
-        """
-
-        if self.state == 'off':
-            self.state = 'starting'
-            await self.set_topic("")
-            # Init the music player
-            await self.msetup(text_channel)
-            # Connect to voice
-            await self.vsetup(author)
-
-            # Mark as 'ready' if everything is ok
-            self.state = 'ready' if self.mready and self.vready else 'off'
-
     async def play(self, author, text_channel, query, now=False, stop_current=False, shuffle=False):
         """
         The play command
@@ -116,18 +97,29 @@ class MusicPlayer:
             stop_current (bool): Whether to stop the currently playing song
             shuffle (bool): Whether to shuffle the queue after starting
         """
-        await self.setup(author, text_channel)
+
+        if self.state == 'off':
+            self.state = 'starting'
+            self.prev_queue = []
+            await self.set_topic("")
+            # Init the music player
+            await self.msetup(text_channel)
+            # Queue the song
+            await self.enqueue(query, now, shuffle)
+            # Connect to voice
+            await self.vsetup(author)
+
+            # Mark as 'ready' if everything is ok
+            self.state = 'ready' if self.mready and self.vready else 'off'
+        else:
+            # Queue the song
+            await self.enqueue(query, now, shuffle)
 
         if self.state == 'ready':
-            self.prev_queue = []
-            # Queue the song
-            self.enqueue(query, now, shuffle)
-
             if stop_current:
                 if self.streamer:
                     self.streamer.stop()
 
-            # Start playing if not yet playing
             if self.streamer is None:
                 await self.vplay()
 
@@ -706,23 +698,7 @@ class MusicPlayer:
             except Exception as e:
                 logger.exception(e)
 
-    def enqueue(self, query, front=False, shuffle=False):
-        """Queues songs based on either a YouTube search or a link
-
-        Args:
-            query (str): Either a search term or a link
-            front (bool): Whether to enqueue at the front or the end
-            shuffle (bool): Whether to shuffle the added songs
-        """
-
-        if self.state != 'ready':
-            logger.error("Attempt to queue song from wrong state ('{}'), must be 'ready'.".format(self.state))
-            return
-
-        self.logger.debug("Enqueueing from query")
-
-        self.statuslog.info("Queueing {}".format(query))
-
+    def parse_query(self, query, front, shuffle):
         yt_videos, response = api_music.parse_query(query, self.statuslog)
         if shuffle:
             random.shuffle(yt_videos)
@@ -742,8 +718,30 @@ class MusicPlayer:
         else:
             self.statuslog.error(response[1])
 
+    async def enqueue(self, query, front=False, shuffle=False):
+        """Queues songs based on either a YouTube search or a link
+
+        Args:
+            query (str): Either a search term or a link
+            front (bool): Whether to enqueue at the front or the end
+            shuffle (bool): Whether to shuffle the added songs
+        """
+
+        self.statuslog.info("Parsing {}".format(query))
+        self.logger.debug("Enqueueing from query")
+
+        if not self.vready:
+            self.parse_query(query, front, shuffle)
+        else:
+            parse_thread = threading.Thread(
+                target=self.parse_query,
+                args=[query, front, shuffle])
+            # Run threads
+            parse_thread.start()
+
+
     def update_queue(self):
-        """ Updates the queue in the music player """
+        """Updates the queue in the music player """
 
         self.logger.debug("Updating queue display")
 
@@ -806,7 +804,7 @@ class MusicPlayer:
         self.pause_time = None
 
         # Queue has items
-        if self.queue:
+        if self.queue is not None and len(self.queue) > 0:
             self.statuslog.info("Loading next song")
 
             song = self.queue[0][0]
@@ -948,7 +946,6 @@ class MusicPlayer:
 
     async def vafter(self):
         """Function that is called after a song finishes playing"""
-
         self.logger.debug("Finished playing a song")
         if self.state != 'ready':
             self.logger.debug("Returning because player is in state {}".format(self.state))
