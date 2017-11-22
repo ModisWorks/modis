@@ -19,7 +19,8 @@ The music module allows you to play videos and playlists from YouTube, as well a
 
 To search SoundCloud, use `soundcloud` or `sc` before your query.
 
-- `!play sc song [query]`: Searches SoundCloud using the query and plays the first song. Doing `!play sc [query]` will also do the same thing.
+- `!play sc [query]`: Searches SoundCloud using the query and plays the first song.
+- `!play sc song [query]`: Searches SoundCloud using the query and plays the first song.
 - `!play sc songs [query]`: Searches SoundCloud using the query, and plays the top songs that match the query.
 - `!play sc user [query]`: Searches SoundCloud for a user, and plays their most recent songs.
 - `!play sc tagged [query]`: Searches SoundCloud for songs with a given tag, and plays the top songs with that tag.
