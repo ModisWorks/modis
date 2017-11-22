@@ -42,7 +42,7 @@ def build_sc_api():
     """Build the SoundCloud API for future use"""
     data = datatools.get_data()
     if "soundcloud_client_id" not in data["discord"]["keys"]:
-        logger.warning("No API key found with name 'google_api_key'")
+        logger.warning("No API key found with name 'soundcloud_client_id'")
         logger.info(
             "Please add your SoundCloud client id with name 'soundcloud_client_id' " +
             "in data.json to use Soundcloud features of the music module")
