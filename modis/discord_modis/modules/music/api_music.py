@@ -182,7 +182,7 @@ def parse_query(query, ilogger):
             return [], (1, "Host does not support SoundCloud")
 
         try:
-            if len(args) > 2 and args[1] in ['song', 'songs', 'track', 'tracks', 'user', 'tagged', 'genre']:
+            if len(args) > 2 and args[1] in ['song', 'songs', 'track', 'tracks', 'user', 'playlist', 'tagged', 'genre']:
                 query_type = args[1].lower()
                 query_search = ' '.join(args[2:])
             else:
@@ -304,6 +304,8 @@ def search_sc_tracks(query_type, query_search):
         results = scclient.get("/tracks", q=query_search, filter="public", limit=50)
     elif query_type == 'user':
         results = scclient.get("/users", q=query_search, limit=1)
+    elif query_type == 'playlist':
+        results = scclient.get("/playlists", q=query_search, limit=1)
     elif query_type == 'tagged':
         while ", " in query_search:
             query_search = query_search.replace(", ", ",").strip()
@@ -338,7 +340,8 @@ def get_sc_tracks(result):
     elif result.kind == "playlist":
         track_list = []
         logger.debug("SoundCloud Playlist {}".format(result.title))
-        tracks = result.tracks
+        playlist = scclient.get("/playlists/{}".format(result.id), limit=50)
+        tracks = playlist.tracks
         for t in tracks:
             track_list.append([t["stream_url"], t["title"]])
 
