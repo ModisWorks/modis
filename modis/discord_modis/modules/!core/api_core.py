@@ -4,6 +4,7 @@ import os
 import discord
 
 from modis import datatools, logger
+from . import _data
 from ..._client import client
 
 
@@ -104,3 +105,24 @@ def check_all_servers():
 
         if not is_in_client:
             remove_server_data(server_id)
+
+
+def update_cmd_db():
+    """Updates the command database"""
+
+    cmd_event_handlers = []
+
+    database_dir = "{}/../".format(os.path.dirname(os.path.realpath(__file__)))
+    for module_name in os.listdir(database_dir):
+        if module_name.startswith("_"):
+            return
+        module_dir = "{}/{}".format(database_dir, module_name)
+
+        module_event_handlers = os.listdir(module_dir)
+
+        if "on_command.py" in module_event_handlers:
+            import_name = ".discord_modis.modules.{}.on_command".format(module_name)
+            cmd_event_handlers.append(importlib.import_module(import_name, "modis"))
+
+    _data.cmd_db = cmd_event_handlers
+    print(_data.cmd_db)
