@@ -15,6 +15,18 @@ The music module allows you to play videos and playlists from YouTube, as well a
 - `!playnow [query/link]`: Stops playing the current song and starts playing the query or link
 - `!playshuffle [query/link]`: Adds the first result of the query or link to the queue, and shuffles the queue
 
+#### SoundCloud
+
+To search SoundCloud, use `soundcloud` or `sc` before your query.
+
+- `!play sc song [query]`: Searches SoundCloud using the query and plays the first song. Doing `!play sc [query]` will also do the same thing.
+- `!play sc songs [query]`: Searches SoundCloud using the query, and plays the top songs that match the query.
+- `!play sc user [query]`: Searches SoundCloud for a user, and plays their most recent songs.
+- `!play sc tagged [query]`: Searches SoundCloud for songs with a given tag, and plays the top songs with that tag. To search for multiple tags, separate tags using commas (i.e. `!play sc tagged orchestral, classical`).
+- `!play sc genre [query]`: Searches SoundCloud for songs with a given genre, and plays the top songs with that genre. To search for multiple genres, separate genres using commas (i.e. `!play sc genre orchestral, classical`).
+
+All these commands will work for any commands in the `!play` family, for example: `!playshuffle sc genre house` will play the top songs on SoundCloud in the 'house' genre in a random order.
+
 ### pause
 
 - `!pause`: Pauses the currently playing song
