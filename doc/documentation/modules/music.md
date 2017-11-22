@@ -44,6 +44,12 @@ All these commands will work for any commands in the `!play` family, for example
 - `!skip`: Skips the current song
 - `!skip [n]`: Skips [n] songs
 
+### loop
+
+- `!loop on`: Tells the music module to loop all songs from this session after the queue is empty
+- `!loop shuffle`: Tells the music module to loop all songs from this session in a random order after the queue is empty
+- `!loop off`: Tells the music module not to loop any songs once the queue is empty
+
 ### remove
 
 - `!remove [index]`: Removes the song from the queue at [index]
