@@ -38,7 +38,7 @@ class ModuleUIFrame(ttk.Frame):
         ttk.Entry(api_frame, textvariable=self.reddit_api_client_secret).grid(
             column=0, row=5, padx=0, pady=4, sticky="W E N S")
         # Update keys button
-        ttk.Button(api_frame, command=lambda: self.update_google_key(), text="Update API Data").grid(
+        ttk.Button(api_frame, command=lambda: self.update_keys(), text="Update API Data").grid(
             column=0, row=6, padx=0, pady=4, sticky="W E N S")
 
         # Set default values
@@ -52,7 +52,7 @@ class ModuleUIFrame(ttk.Frame):
         if "reddit_api_client_secret" in data["discord"]["keys"]:
             self.reddit_api_client_secret.set(data["discord"]["keys"]["reddit_api_client_secret"])
 
-    def update_google_key(self):
+    def update_keys(self):
         """Updates the Google API key with the text value"""
         from ...main import add_api_key
         add_api_key("reddit_api_user_agent", self.reddit_api_user_agent.get())

@@ -2,13 +2,12 @@
 
 import asyncio
 import logging
-import math
 import random
 
 import discord
 
 from modis import datatools
-from . import _data, api_youtube, ui_embed
+from . import _data, api_music, ui_embed
 from .._tools import ui_embed as ui_embed_tools
 from ..._client import client
 
@@ -36,7 +35,7 @@ class MusicPlayer:
         self.streamer = None
         self.queue = []
         self.prev_queue = []
-        self.prev_queue_max = 50
+        self.prev_queue_max = 500
         self.volume = 20
         # Timebar
         self.timebar_length = 33
@@ -44,6 +43,8 @@ class MusicPlayer:
         self.vclient_task = None
         self.pause_time = None
         self.prev_time = ""
+        # Loop
+        self.loop_type = 'off'
 
         # Status variables
         self.mready = False
@@ -118,6 +119,7 @@ class MusicPlayer:
         await self.setup(author, text_channel)
 
         if self.state == 'ready':
+            self.prev_queue = []
             # Queue the song
             self.enqueue(query, now, shuffle)
 
@@ -143,6 +145,7 @@ class MusicPlayer:
 
         self.vready = False
         self.pause_time = None
+        self.loop_type = 'off'
 
         if self.vclient:
             try:
@@ -189,6 +192,7 @@ class MusicPlayer:
         self.mready = False
         self.vready = False
         self.pause_time = None
+        self.loop = 'off'
 
         if self.vclient:
             try:
@@ -295,7 +299,7 @@ class MusicPlayer:
 
             for i in range(num - 1):
                 if len(self.queue) > 0:
-                    self.queue.pop(0)
+                    self.prev_queue.append(self.queue.pop(0))
 
             try:
                 self.streamer.stop()
@@ -319,7 +323,6 @@ class MusicPlayer:
             return
         elif index == "all":
             self.queue = []
-            self.prev_queue = []
             self.update_queue()
             self.statuslog.info("Removed all songs")
             return
@@ -402,6 +405,20 @@ class MusicPlayer:
         self.update_queue()
         self.statuslog.debug("Shuffled")
 
+    async def set_loop(self, loop_value):
+        """Updates the loop value, can be 'off', 'on', or 'shuffle'"""
+        if loop_value not in ['on', 'off', 'shuffle']:
+            self.statuslog.error("Loop value must be `off`, `on`, or `shuffle`")
+            return
+
+        self.loop_type = loop_value
+        if self.loop_type == 'on':
+            self.statuslog.info("Looping on")
+        elif self.loop_type == 'off':
+            self.statuslog.info("Looping off")
+        elif self.loop_type == 'shuffle':
+            self.statuslog.info("Looping on and shuffling")
+
     async def setvolume(self, value):
         """The volume command
 
@@ -460,13 +477,15 @@ class MusicPlayer:
         self.write_volume()
 
     def write_volume(self):
+        """Writes the current volume to the data.json"""
         # Update the volume
         data = datatools.get_data()
         data["discord"]["servers"][self.server_id][_data.modulename]["volume"] = self.volume
         datatools.write_data(data)
 
     async def movehere(self, channel):
-        """Moves the embed message to a new channel; can also be used to move the musicplayer to the front
+        """
+        Moves the embed message to a new channel; can also be used to move the musicplayer to the front
 
         Args:
             channel (discord.Channel): The channel to move to
@@ -704,9 +723,13 @@ class MusicPlayer:
 
         self.statuslog.info("Queueing {}".format(query))
 
-        yt_videos = api_youtube.parse_query(query, self.statuslog)
+        yt_videos, response = api_music.parse_query(query, self.statuslog)
         if shuffle:
             random.shuffle(yt_videos)
+
+        if len(yt_videos) == 0:
+            self.statuslog.warning("No results found for {}".format(query))
+            return
 
         if front:
             self.queue = yt_videos + self.queue
@@ -714,7 +737,10 @@ class MusicPlayer:
             self.queue = self.queue + yt_videos
 
         self.update_queue()
-        self.statuslog.info("Queued {}".format(query))
+        if response[0] == 0:
+            self.statuslog.info(response[1])
+        else:
+            self.statuslog.error(response[1])
 
     def update_queue(self):
         """ Updates the queue in the music player """
@@ -755,7 +781,7 @@ class MusicPlayer:
                 elif self.streamer.is_live:
                     time_bar = "Livestream"
                 elif self.streamer.duration > 0:
-                    time_counts = int(math.ceil((diff / self.streamer.duration) * self.timebar_length))
+                    time_counts = int(round((diff / self.streamer.duration) * self.timebar_length))
                     if time_counts > self.timebar_length:
                         time_counts = self.timebar_length
 
@@ -796,15 +822,24 @@ class MusicPlayer:
                 boptions = " {}".format(' '.join(bopt_list))
                 logger.debug("FFmpeg options: {}".format(boptions))
 
+                ytdl_formats = [
+                    "worstaudio[protocol^=http][ext=mp4]",
+                    "worstaudio[protocol^=http][ext=mp3]",
+                    "worstaudio[protocol^=http]",
+                    "worstaudio",
+                    "worstaudio",
+                ]
+
                 ytoptions = {
-                    "format": "bestaudio/best",
+                    "format": '/'.join(ytdl_formats),
                     "extractaudio": True,
                     "audioformat": "mp3",
                     "noplaylist": True,
                     "socket_timeout": 30,
-                    "retries": 40,
+                    "retries": 10,
+                    "sleep_interval": 1,
                     "nocheckcertificate": True,
-                    "logger": logger
+                    "logger": self.logger
                 }
 
                 self.streamer = await self.vclient.create_ytdl_player(song,
@@ -845,12 +880,24 @@ class MusicPlayer:
 
         # Queue exhausted
         else:
-            self.statuslog.info("Finished Queue")
             self.state = "ready"
 
-            self.update_queue()
+            if self.loop_type == 'on':
+                self.statuslog.info("Finished queue: looping")
+                self.queue = self.prev_queue
+            elif self.loop_type == 'shuffle':
+                self.statuslog.info("Finished queue: looping and shuffling")
+                self.queue = self.prev_queue
+                random.shuffle(self.queue)
+            else:
+                self.statuslog.info("Finished queue")
 
-            await self.stop()
+            self.prev_queue = []
+            self.update_queue()
+            if self.queue:
+                await self.vplay()
+            else:
+                await self.stop()
 
     def duration_to_string(self, duration):
         """
