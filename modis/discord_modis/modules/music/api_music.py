@@ -184,7 +184,7 @@ def parse_query(query, ilogger):
                 query_search = ' '.join(args[1:])
             query_type = query_type.replace('song', 'track')
             ilogger.info("Queueing SoundCloud {}: {}".format(query_type, query_search))
-            soundcloud_tracks = search_sc_tracks(query_type, query_search, ilogger)
+            soundcloud_tracks = search_sc_tracks(query_type, query_search)
             return soundcloud_tracks, (0, "Queued SoundCloud {}: {}".format(query_type, query_search))
         except Exception as e:
             logger.exception(e)
@@ -284,11 +284,11 @@ def get_queue_from_playlist(playlistid):
     return queue
 
 
-def search_sc_tracks(query_type, query_search, ilogger):
+def search_sc_tracks(query_type, query_search):
     results = []
-    if query_type == 'song':
+    if query_type == 'track':
         results = scclient.get("/tracks", q=query_search, limit=1)
-    elif query_type == 'songs':
+    elif query_type == 'tracks':
         results = scclient.get("/tracks", q=query_search, limit=50)
     elif query_type == 'genre':
         while ", " in query_search:
