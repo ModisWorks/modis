@@ -67,32 +67,37 @@
     {
       "name": "play sc",
       "params": ["query"],
-      "description": "Searches SoundCloud using the query and plays the first song."
+      "description": "Searches SoundCloud using the query and plays the first song"
     },
     {
       "name": "play sc song",
       "params": ["query"],
-      "description": "Searches SoundCloud using the query and plays the first song."
+      "description": "Searches SoundCloud using the query and plays the first song"
     },
     {
       "name": "play sc songs",
       "params": ["query"],
-      "description": "Searches SoundCloud using the query, and plays the top songs that match the query."
+      "description": "Searches SoundCloud using the query and plays the top songs that match the query"
     },
     {
       "name": "play sc user",
       "params": ["query"],
-      "description": "Searches SoundCloud for a user, and plays their most recent songs."
+      "description": "Searches SoundCloud for a user and plays their most recent songs"
+    },
+    {
+      "name": "play sc playlist",
+      "params": ["query"],
+      "description": "Searches SoundCloud for a playlist and queues songs from the first result"
     },
     {
       "name": "play sc tagged",
       "params": ["query"],
-      "description": "Searches SoundCloud for songs with a given tag, and plays the top songs with that tag."
+      "description": "Searches SoundCloud for songs with a given tag and plays the top songs with that tag"
     },
     {
       "name": "play sc genre",
       "params": ["query"],
-      "description": "Searches SoundCloud for songs with a given genre, and plays the top songs with that genre."
+      "description": "Searches SoundCloud for songs with a given genre and plays the top songs with that genre"
     }
   ],
   "Utility Commands": [
