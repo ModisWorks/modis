@@ -47,7 +47,7 @@ def get_help_datapacks(filepath, prefix="!"):
         heading = d
         content = ""
 
-        if d == "Commands":
+        if "commands" in d.lower():
             for c in help_contents[d]:
                 if "name" not in c:
                     continue

@@ -1,5 +1,5 @@
 {
-  "Commands": [
+  "Basic Commands": [
     {
       "name": "play",
       "params": ["query/link"],
@@ -28,11 +28,6 @@
       "description": "Removes the song from the queue at [index]"
     },
     {
-      "name": "rewind",
-      "params": ["n"],
-      "description": "Rewinds the queue [n] songs"
-    },
-    {
       "name": "volume",
       "params": ["v"],
       "description": "Sets the volume to [v]% (must be between 0% and 200%)"
@@ -40,6 +35,39 @@
     {
       "name": "stop",
       "description": "Stops the currently playing song, clears the queue, and disconnects from voice"
+    },
+    {
+      "name": "destroy",
+      "description": "Stops and removes the music player"
+    }
+  ],
+  "Play Commands": [
+    {
+      "name": "playnow",
+      "params": ["query/link"],
+      "description": "Stops playing the current song and starts playing the first result of the query or link"
+    },
+    {
+      "name": "playnext",
+      "params": ["query/link"],
+      "description": "Starts playing the first result of the query or link after the current song has finished"
+    },
+    {
+      "name": "playshuffle",
+      "params": ["query/link"],
+      "description": "Plays the first result of the query or link in a random order"
+    }
+  ],
+  "Extra Commands": [
+    {
+      "name": "loop",
+      "params": ["off/on/shuffle"],
+      "description": "Sets the loop state for this session: 'off' will stop looping, 'on' will loop everything played this session when the queue finishes, 'shuffle' will shuffle before looping"
+    },
+    {
+      "name": "rewind",
+      "params": ["n"],
+      "description": "Rewinds the queue [n] songs"
     },
     {
       "name": "settopic",
@@ -52,10 +80,6 @@
     {
       "name": "nowplaying",
       "description": "Gives information about the current song"
-    },
-    {
-      "name": "destroy",
-      "description": "Stops and removes the music player"
     },
     {
       "name": "front",
