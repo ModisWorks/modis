@@ -88,7 +88,7 @@
       "name": "play sc genre",
       "params": ["query"],
       "description": "Searches SoundCloud for songs with a given genre, and plays the top songs with that genre."
-    },
+    }
   ],
   "Extra Commands": [
     {
