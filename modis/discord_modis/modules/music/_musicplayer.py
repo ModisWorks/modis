@@ -7,7 +7,7 @@ import random
 import discord
 
 from modis import datatools
-from . import _data, api_youtube, ui_embed
+from . import _data, api_music, ui_embed
 from .._tools import ui_embed as ui_embed_tools
 from ..._client import client
 
@@ -703,9 +703,12 @@ class MusicPlayer:
 
         self.statuslog.info("Queueing {}".format(query))
 
-        yt_videos = api_youtube.parse_query(query, self.statuslog)
+        yt_videos, response = api_music.parse_query(query, self.statuslog)
         if shuffle:
             random.shuffle(yt_videos)
+
+        if len(yt_videos) == 0:
+            self.statuslog.warning("No results found for {}".format(query))
 
         if front:
             self.queue = yt_videos + self.queue
@@ -713,7 +716,10 @@ class MusicPlayer:
             self.queue = self.queue + yt_videos
 
         self.update_queue()
-        self.statuslog.info("Queued {}".format(query))
+        if response[0] == 0:
+            self.statuslog.info(response[1])
+        else:
+            self.statuslog.error(response[1])
 
     def update_queue(self):
         """ Updates the queue in the music player """
@@ -809,7 +815,8 @@ class MusicPlayer:
                     "audioformat": "mp3",
                     "noplaylist": True,
                     "socket_timeout": 30,
-                    "retries": 40,
+                    "retries": 10,
+                    "sleep_interval": 1,
                     "nocheckcertificate": True,
                     "logger": self.logger
                 }

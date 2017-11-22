@@ -19,6 +19,7 @@
 # music module:
     youtube-dl
     soundcloud
+    spotipy
     pynacl
     google-api-python-client
 
