@@ -176,7 +176,7 @@ def parse_query(query, ilogger):
             return [], (1, "Error queueing from Spotify")
     elif args[0].lower() in ["sc", "soundcloud"] and ytdiscoveryapi is not None:
         try:
-            if len(args) > 2 and args[1] in ['song', 'songs', 'track', 'tracks', 'genre']:
+            if len(args) > 2 and args[1] in ['song', 'songs', 'track', 'tracks', 'user', 'tagged', 'genre']:
                 query_type = args[1].lower()
                 query_search = ' '.join(args[2:])
             else:
@@ -290,6 +290,12 @@ def search_sc_tracks(query_type, query_search):
         results = scclient.get("/tracks", q=query_search, limit=1)
     elif query_type == 'tracks':
         results = scclient.get("/tracks", q=query_search, limit=50)
+    elif query_type == 'user':
+        results = scclient.get("/users", q=query_search, limit=1)
+    elif query_type == 'tagged':
+        while ", " in query_search:
+            query_search = query_search.replace(", ", ",").strip()
+        results = scclient.get("/tracks", tags=query_search, limit=50)
     elif query_type == 'genre':
         while ", " in query_search:
             query_search = query_search.replace(", ", ",").strip()
