@@ -19,13 +19,13 @@ The music module allows you to play videos and playlists from YouTube, as well a
 
 To search SoundCloud, use `soundcloud` or `sc` before your query.
 
-- `!play sc [query]`: Searches SoundCloud using the query and plays the first song.
-- `!play sc song [query]`: Searches SoundCloud using the query and plays the first song.
-- `!play sc songs [query]`: Searches SoundCloud using the query, and plays the top songs that match the query.
-- `!play sc user [query]`: Searches SoundCloud for a user, and plays their most recent songs.
-- `!play sc playlist [query]`: Searches SoundCloud for a playlist and queues songs from the first result.
-- `!play sc tagged [query]`: Searches SoundCloud for songs with a given tag, and plays the top songs with that tag.
-- `!play sc genre [query]`: Searches SoundCloud for songs with a given genre, and plays the top songs with that genre.
+- `!play sc [query]`: Searches SoundCloud using the query and plays the first song
+- `!play sc song [query]`: Searches SoundCloud using the query and plays the first song
+- `!play sc songs [query]`: Searches SoundCloud using the query and plays the top songs that match the query
+- `!play sc user [query]`: Searches SoundCloud for a user and plays their most recent songs
+- `!play sc playlist [query]`: Searches SoundCloud for a playlist and queues songs from the first result
+- `!play sc tagged [query]`: Searches SoundCloud for songs with a given tag and plays the top songs with that tag
+- `!play sc genre [query]`: Searches SoundCloud for songs with a given genre and plays the top songs with that genre
 
 All these commands will work for any commands in the `!play` family, for example: `!playshuffle sc genre house` will play the top songs on SoundCloud in the 'house' genre in a random order.
 
