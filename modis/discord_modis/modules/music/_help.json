@@ -1,10 +1,27 @@
 {
-  "Basic Commands": [
+  "Play Commands": [
     {
       "name": "play",
       "params": ["query/link"],
       "description": "Starts playing the first result of the query or link"
     },
+    {
+      "name": "playnow",
+      "params": ["query/link"],
+      "description": "Stops playing the current song and starts playing the first result of the query or link"
+    },
+    {
+      "name": "playnext",
+      "params": ["query/link"],
+      "description": "Starts playing the first result of the query or link after the current song has finished"
+    },
+    {
+      "name": "playshuffle",
+      "params": ["query/link"],
+      "description": "Plays the first result of the query or link in a random order"
+    }
+  ],
+  "Music Player Commands": [
     {
       "name": "pause",
       "description": "Pauses the currently playing song"
@@ -23,6 +40,11 @@
       "description": "Skips [n] songs"
     },
     {
+      "name": "rewind",
+      "params": ["n"],
+      "description": "Rewinds the queue [n] songs"
+    },
+    {
       "name": "remove",
       "params": ["index"],
       "description": "Removes the song from the queue at [index]"
@@ -39,23 +61,6 @@
     {
       "name": "destroy",
       "description": "Stops and removes the music player"
-    }
-  ],
-  "Play Commands": [
-    {
-      "name": "playnow",
-      "params": ["query/link"],
-      "description": "Stops playing the current song and starts playing the first result of the query or link"
-    },
-    {
-      "name": "playnext",
-      "params": ["query/link"],
-      "description": "Starts playing the first result of the query or link after the current song has finished"
-    },
-    {
-      "name": "playshuffle",
-      "params": ["query/link"],
-      "description": "Plays the first result of the query or link in a random order"
     }
   ],
   "SoundCloud Commands": [
@@ -90,16 +95,11 @@
       "description": "Searches SoundCloud for songs with a given genre, and plays the top songs with that genre."
     }
   ],
-  "Extra Commands": [
+  "Utility Commands": [
     {
       "name": "loop",
       "params": ["off/on/shuffle"],
       "description": "Sets the loop state for this session: 'off' will stop looping, 'on' will loop everything played this session when the queue finishes, 'shuffle' will shuffle before looping"
-    },
-    {
-      "name": "rewind",
-      "params": ["n"],
-      "description": "Rewinds the queue [n] songs"
     },
     {
       "name": "settopic",
