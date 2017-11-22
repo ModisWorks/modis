@@ -287,19 +287,19 @@ def get_queue_from_playlist(playlistid):
 def search_sc_tracks(query_type, query_search):
     results = []
     if query_type == 'track':
-        results = scclient.get("/tracks", q=query_search, limit=1)
+        results = scclient.get("/tracks", q=query_search, filter="public", limit=1)
     elif query_type == 'tracks':
-        results = scclient.get("/tracks", q=query_search, limit=50)
+        results = scclient.get("/tracks", q=query_search, filter="public", limit=50)
     elif query_type == 'user':
         results = scclient.get("/users", q=query_search, limit=1)
     elif query_type == 'tagged':
         while ", " in query_search:
             query_search = query_search.replace(", ", ",").strip()
-        results = scclient.get("/tracks", tags=query_search, limit=50)
+        results = scclient.get("/tracks", tags=query_search, filter="public", limit=50)
     elif query_type == 'genre':
         while ", " in query_search:
             query_search = query_search.replace(", ", ",").strip()
-        results = scclient.get("/tracks", genres=query_search, limit=50)
+        results = scclient.get("/tracks", genres=query_search, filter="public", limit=50)
 
     sc_tracks = []
     for r in results:
@@ -318,7 +318,7 @@ def get_sc_tracks(result):
     elif result.kind == "user":
         track_list = []
         logger.debug("SoundCloud User {}".format(result.username))
-        tracks = scclient.get("/users/{}/tracks".format(result.id))
+        tracks = scclient.get("/users/{}/tracks".format(result.id), limit=50)
         for t in tracks:
             track_list.append([t.stream_url, t.title])
 
