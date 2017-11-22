@@ -709,6 +709,7 @@ class MusicPlayer:
 
         if len(yt_videos) == 0:
             self.statuslog.warning("No results found for {}".format(query))
+            return
 
         if front:
             self.queue = yt_videos + self.queue
@@ -802,11 +803,11 @@ class MusicPlayer:
                 logger.debug("FFmpeg options: {}".format(boptions))
 
                 ytdl_formats = [
-                    "bestaudio[protocol^=http][ext=mp4]",
-                    "bestaudio[protocol^=http][ext=mp3]",
-                    "bestaudio[protocol^=http]",
-                    "bestaudio",
-                    "best",
+                    "worstaudio[protocol^=http][ext=mp4]",
+                    "worstaudio[protocol^=http][ext=mp3]",
+                    "worstaudio[protocol^=http]",
+                    "worstaudio",
+                    "worstaudio",
                 ]
 
                 ytoptions = {
