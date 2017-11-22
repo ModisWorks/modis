@@ -158,6 +158,9 @@ def parse_query(query, ilogger):
         return [], (1, "No query given")
 
     if args[0].lower() in ["sp", "spotify"] and spclient is not None:
+        if spclient is None:
+            return [], (1, "Host does not support Spotify")
+
         try:
             if len(args) > 2 and args[1] in ['album', 'artist', 'song', 'track', 'playlist']:
                 query_type = args[1].lower()
@@ -174,7 +177,10 @@ def parse_query(query, ilogger):
         except Exception as e:
             logger.exception(e)
             return [], (1, "Error queueing from Spotify")
-    elif args[0].lower() in ["sc", "soundcloud"] and ytdiscoveryapi is not None:
+    elif args[0].lower() in ["sc", "soundcloud"]:
+        if scclient is None:
+            return [], (1, "Host does not support SoundCloud")
+
         try:
             if len(args) > 2 and args[1] in ['song', 'songs', 'track', 'tracks', 'user', 'tagged', 'genre']:
                 query_type = args[1].lower()
@@ -190,6 +196,9 @@ def parse_query(query, ilogger):
             logger.exception(e)
             return [], (1, "Could not queue from SoundCloud")
     elif args[0].lower() in ["yt", "youtube"] and ytdiscoveryapi is not None:
+        if ytdiscoveryapi is None:
+            return [], (1, "Host does not support YouTube")
+
         try:
             query_search = ' '.join(args[1:])
             ilogger.info("Queueing Youtube search: {}".format(query_search))
@@ -198,7 +207,10 @@ def parse_query(query, ilogger):
             logger.exception(e)
             return [], (1, "Could not queue YouTube search")
 
-    return get_ytvideos(query, ilogger), (0, "Queued YouTube search: {}".format(query))
+    if ytdiscoveryapi is not None:
+        return get_ytvideos(query, ilogger), (0, "Queued YouTube search: {}".format(query))
+    else:
+        return [], (1, "Host does not support YouTube")
 
 
 def get_ytvideos(query, ilogger):
