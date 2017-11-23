@@ -14,7 +14,7 @@ if not os.path.isdir(logs_dir):
     os.mkdir(logs_dir)
 
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+logger.setLevel("DEBUG")
 if datatools.has_data():
     data = datatools.get_data()
     if "log_level" in data:

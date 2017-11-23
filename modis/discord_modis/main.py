@@ -32,7 +32,7 @@ def start(token, client_id, loop, on_ready_handler=None):
 
     # Save logger info to data
     if "log_level" not in data:
-        data["log_level"] = "INFO"
+        data["log_level"] = "DEBUG"
 
     data["discord"]["token"] = token
     data["discord"]["client_id"] = client_id
