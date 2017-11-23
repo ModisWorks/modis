@@ -8,12 +8,18 @@ logger = logging.getLogger(__name__)
 _dir = os.getcwd()
 datafile = "{}/data.json".format(_dir)
 
-template = {
+ROOT_TEMPLATE = {
     "log_level": "INFO",
     "keys": {
         "discord_token": ""
     },
     "servers": {}
+}
+
+SERVER_TEMPLATE = {
+    "prefix": "!",
+    "activation": {},
+    "commands": {}
 }
 
 
@@ -31,8 +37,8 @@ def get():
         with open(datafile, 'r') as file:
             return json.load(file)
     else:
-        write(template)
-        return template
+        write(ROOT_TEMPLATE)
+        return ROOT_TEMPLATE
 
 
 def write(data):
