@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def start(token, client_id, loop, module_found_handler=None, on_ready_handler=None):
+def start(token, client_id, loop, on_ready_handler=None):
     """Start the Discord client and log Modis into Discord."""
     import discord
     import asyncio
@@ -40,7 +40,7 @@ def start(token, client_id, loop, module_found_handler=None, on_ready_handler=No
 
     # Import event handlers
     logger.debug("Importing event handlers")
-    event_handlers = _get_event_handlers(module_found_handler)
+    event_handlers = _get_event_handlers()
 
     # Create event handler combiner
     logger.debug("Compiling event handlers")
@@ -90,9 +90,10 @@ def start(token, client_id, loop, module_found_handler=None, on_ready_handler=No
                 # we want to retrieve any exceptions to make sure that
                 # they don't nag us about it being un-retrieved.
                 gathered.exception()
-            except:
-                pass
+            except Exception as e:
+                logger.exception(e)
         except Exception as e:
+            logger.exception(e)
             pending = asyncio.Task.all_tasks(loop=client.loop)
             gathered = asyncio.gather(*pending, loop=client.loop)
             gathered.exception()
@@ -106,7 +107,7 @@ def start(token, client_id, loop, module_found_handler=None, on_ready_handler=No
             client.loop.close()
 
 
-def _get_event_handlers(module_found_handler):
+def _get_event_handlers():
     """
     Gets dictionary of event handlers and the modules that define them
 
@@ -160,6 +161,7 @@ def _get_event_handlers(module_found_handler):
             return
         module_dir = "{}/{}".format(database_dir, module_name)
 
+<<<<<<< HEAD
         # Add all defined event handlers in module files
         module_event_handlers = os.listdir(module_dir)
 
@@ -182,6 +184,21 @@ def _get_event_handlers(module_found_handler):
 
                 event_handlers[event_handler].append(
                     importlib.import_module(import_name, "modis"))
+=======
+        # Iterate through files in module
+        if os.path.isdir(module_dir) and not module_name.startswith("_"):
+            # Add all defined event handlers in module files
+            module_event_handlers = os.listdir(module_dir)
+
+            for event_handler in event_handlers.keys():
+                if "{}.py".format(event_handler) in module_event_handlers:
+                    import_name = ".discord_modis.modules.{}.{}".format(
+                        module_name, event_handler)
+                    logger.debug("Found event handler {}".format(import_name[23:]))
+
+                    event_handlers[event_handler].append(
+                        importlib.import_module(import_name, "modis"))
+>>>>>>> unstable
 
     return event_handlers
 
