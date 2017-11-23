@@ -55,8 +55,9 @@ Now that you have the basics done, you want to install Modis. First, you'll want
 
 ## Running Modis
 
-Modis is now fully installed, but you still need to make a launch.
-We'll be streamlining this in the future so you don't have to do it, but for now, you're going to have to put in some work.
+Modis is now fully installed, but you still need to make a way to run it. You'll need to make a Python file to run it. First: import the `modis` packages, then call `modis.gui` with your Discord Bot Token and Discord Bot Client ID.
+
+> If you don't know how to make your own Discord Bot, have a look at the [Making a Discord Bot](./api-keys.md#making-a-discord-bot) section for step-by-step instructions on getting the Discord token and client id.
 
 The `launcher.py` file should look like this:
 
@@ -71,8 +72,6 @@ modis.gui(
     discord_client_id=CLIENT_ID
 )
 ```
-
-> If you don't know how to make your own Discord Bot, have a look at the [Making a Discord Bot](./api-keys.md#making-a-discord-bot) section for step-by-step instructions on getting the Discord token and client id.
 
 To run Modis now, just run `python launcher.py` from the directory that `launcher.py` is in.
 
