@@ -22,3 +22,11 @@ https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot&permission
 ```
 
 into your web browser and replacing `CLIENT_ID` with your bot's client id. You don't need to give all the permissions, but some modules won't work without the required permissions.
+
+## Getting a Google API key
+
+(Guide coming soon, feel free to ask for help in our Discord server for help)
+
+## Making a SoundCloud application
+
+Right now, SoundCloud have disabled making new applications. To use SoundCloud in Modis, you'll need to get a client id from an existing application, or wait until SoundCloud allow new applications again. We'll update this section with the new process for registering once SoundCloud have updated the process.
