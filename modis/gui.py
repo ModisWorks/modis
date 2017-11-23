@@ -1,5 +1,3 @@
-"""Base GUI for Modis."""
-
 import asyncio
 import importlib
 import logging
@@ -8,7 +6,7 @@ import threading
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from modis import datatools, helptools
+from modis.tools import datatools, helptools
 
 logger = logging.getLogger(__name__)
 
@@ -60,9 +58,9 @@ class Frame(ttk.Frame):
         self.rowconfigure(0, weight=1)
 
         # Welcome!
-        logger.info("Welcome to Modis v{}".format(datatools.version))
+        logger.info("Welcome to Modis v{}".format(data.version))
         # Update with version data
-        state, response = datatools.get_compare_version()
+        state, response = data.get_compare_version()
         logger.info("{}\n".format(response))
 
 

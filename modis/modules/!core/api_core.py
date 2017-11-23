@@ -20,7 +20,7 @@ async def server_update(server):
         server: The Discord server to update info for
     """
 
-    data = datatools.get_data()
+    data = data.get_data()
 
     # Add the server to server data if it doesn't yet exist
     if server.id not in data["servers"]:
@@ -44,12 +44,12 @@ async def server_update(server):
 
             if _data.modulename not in data["discord"]["servers"][server.id]:
                 data["discord"]["servers"][server.id][_data.modulename] = _data.sd_structure
-                datatools.write_data(data)
+                data.write_data(data)
         except Exception as e:
             logger.error("Could not initialise module {}".format(module_name))
             logger.exception(e)
 
-    datatools.write_data(data)
+    data.write_data(data)
 
 
 def server_remove(server_id):
@@ -62,15 +62,15 @@ def server_remove(server_id):
 
     logger.debug("Removing server from serverdata")
     # Remove the server from data
-    data = datatools.get_data()
+    data = data.get_data()
     if server_id in data["discord"]["servers"]:
         data["discord"]["servers"].pop(server_id)
-        datatools.write_data(data)
+        data.write_data(data)
 
 
 def server_check():
     """Checks all servers, removing any that Modis isn't part of any more"""
-    data = datatools.get_data()
+    data = data.get_data()
     for server_id in data["discord"]["servers"]:
         is_in_client = False
         for client_server in client.servers:

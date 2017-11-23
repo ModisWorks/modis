@@ -1,6 +1,6 @@
 import logging
 
-from modis import datatools
+from modis import data
 from . import _data, api_mitsuku
 from ..._client import client
 
@@ -20,7 +20,7 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    data = datatools.get_data()
+    data = data.get_data()
 
     if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
         return
@@ -38,7 +38,7 @@ async def on_message(message):
                 new_serverdata = data
                 new_serverdata["discord"]["servers"][server.id][_data.modulename]["channels"][channel.id] = \
                     api_mitsuku.get_botcust2()
-                datatools.write_data(new_serverdata)
+                data.write_data(new_serverdata)
 
             # Get botcust2 from serverdata
             botcust2 = data["discord"]["servers"][server.id][_data.modulename]["channels"][channel.id]

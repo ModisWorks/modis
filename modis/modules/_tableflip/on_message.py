@@ -1,4 +1,4 @@
-from modis import datatools
+from modis import data
 from . import _data, api_flipcheck
 from ..._client import client
 
@@ -16,7 +16,7 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    data = datatools.get_data()
+    data = data.get_data()
 
     if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
         return

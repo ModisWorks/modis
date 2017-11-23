@@ -1,6 +1,6 @@
 import logging
 
-from modis import datatools
+from modis import data
 from . import _data
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ async def on_message(message):
         return
 
     # Check prefix
-    data = datatools.get_data()
+    data = data.get_data()
     prefix = data["discord"]["servers"][message.server.id]["prefix"]
     if not message.content.startswith(prefix):
         return

@@ -7,7 +7,7 @@ import spotipy
 from soundcloud.resource import Resource, ResourceList
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from modis import datatools
+from modis import data
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ spclient = None
 
 def build_yt_api():
     """Build the YouTube API for future use"""
-    data = datatools.get_data()
+    data = data.get_data()
     if "google_api_key" not in data["discord"]["keys"]:
         logger.warning("No API key found with name 'google_api_key'")
         logger.info("Please add your Google API key with name 'google_api_key' " +
@@ -40,7 +40,7 @@ def build_yt_api():
 
 def build_sc_api():
     """Build the SoundCloud API for future use"""
-    data = datatools.get_data()
+    data = data.get_data()
     if "soundcloud_client_id" not in data["discord"]["keys"]:
         logger.warning("No API key found with name 'soundcloud_client_id'")
         logger.info(
@@ -60,7 +60,7 @@ def build_sc_api():
 
 def build_spotify_api():
     """Build the Spotify API for future use"""
-    data = datatools.get_data()
+    data = data.get_data()
     if "spotify_client_id" not in data["discord"]["keys"]:
         logger.warning("No API key found with name 'spotify_client_id'")
         logger.info(

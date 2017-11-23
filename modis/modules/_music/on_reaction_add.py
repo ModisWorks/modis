@@ -1,4 +1,4 @@
-from modis import datatools
+from modis import data
 from ..._client import client
 
 from . import _data
@@ -19,7 +19,7 @@ async def on_reaction_add(reaction, user):
     channel = reaction.message.channel
     emoji = reaction.emoji
 
-    data = datatools.get_data()
+    data = data.get_data()
 
     if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
         return

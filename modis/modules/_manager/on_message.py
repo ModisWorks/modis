@@ -4,7 +4,7 @@ import os
 
 import discord
 
-from modis import datatools
+from modis import data
 from . import _data, ui_embed
 from ..._client import client
 
@@ -24,7 +24,7 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    data = datatools.get_data()
+    data = data.get_data()
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
@@ -66,7 +66,7 @@ async def on_message(message):
                 new_prefix = arg.replace(" ", "").strip()
                 data["discord"]["servers"][server.id]["prefix"] = new_prefix
                 # Write the data
-                datatools.write_data(data)
+                data.write_data(data)
 
                 await client.send_typing(channel)
                 embed = ui_embed.modify_prefix(channel, new_prefix)
@@ -105,7 +105,7 @@ async def on_message(message):
                         is_activate = command == "activate"
                         data["discord"]["servers"][server.id][module_data.modulename]["activated"] = is_activate
                         # Write the data
-                        datatools.write_data(data)
+                        data.write_data(data)
 
                         await client.send_typing(channel)
                         embed = ui_embed.modify_module(channel, module_data.modulename, is_activate)

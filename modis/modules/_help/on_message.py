@@ -1,6 +1,6 @@
 import discord
 
-from modis import datatools
+from modis import data
 from . import api_help, ui_embed
 from ..._client import client
 
@@ -18,7 +18,7 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    data = datatools.get_data()
+    data = data.get_data()
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:

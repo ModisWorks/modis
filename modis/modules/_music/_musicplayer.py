@@ -7,7 +7,7 @@ import threading
 
 import discord
 
-from modis import datatools
+from modis import data
 from . import _data, _timebar, api_music, ui_embed
 from .._tools import ui_embed as ui_embed_tools
 from ..._client import client
@@ -25,7 +25,7 @@ class MusicPlayer:
             server_id (str): The Discord ID of the server to lock on to
         """
 
-        data = datatools.get_data()
+        data = data.get_data()
         # Player variables
         self.server_id = server_id
         self.logger = logging.getLogger("{}.{}".format(__name__, self.server_id))
@@ -497,9 +497,9 @@ class MusicPlayer:
     def write_volume(self):
         """Writes the current volume to the data.json"""
         # Update the volume
-        data = datatools.get_data()
+        data = data.get_data()
         data["discord"]["servers"][self.server_id][_data.modulename]["volume"] = self.volume
-        datatools.write_data(data)
+        data.write_data(data)
 
     async def movehere(self, channel):
         """
@@ -524,9 +524,9 @@ class MusicPlayer:
 
     async def set_topic_channel(self, channel):
         """Set the topic channel for this server"""
-        data = datatools.get_data()
+        data = data.get_data()
         data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"] = channel.id
-        datatools.write_data(data)
+        data.write_data(data)
 
         self.topicchannel = channel
         await self.set_topic(self.topic)
@@ -546,9 +546,9 @@ class MusicPlayer:
         self.topicchannel = None
         logger.debug("Clearing topic channel")
 
-        data = datatools.get_data()
+        data = data.get_data()
         data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"] = ""
-        datatools.write_data(data)
+        data.write_data(data)
 
         await client.send_typing(channel)
         embed = ui_embed.topic_update(channel, self.topicchannel)

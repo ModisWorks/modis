@@ -3,7 +3,7 @@ import logging
 import tkinter as tk
 from tkinter import ttk
 
-from modis import datatools
+from modis import data
 from ._data import *
 from ..._client import client
 
@@ -85,7 +85,7 @@ def send_message(channel_id, message):
         return
 
     # Check that it's enabled in the server
-    data = datatools.get_data()
+    data = data.get_data()
     if not data["discord"]["servers"][channel.server.id][modulename]["activated"]:
         logger.info("This module has been disabled in {} ({})".format(channel.server.name, channel.server.id))
 

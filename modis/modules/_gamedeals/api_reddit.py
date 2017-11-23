@@ -2,7 +2,7 @@ import logging
 
 import praw
 
-from modis import datatools
+from modis import data
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ redditapi = None
 
 
 def build_api():
-    data = datatools.get_data()
+    data = data.get_data()
     if "reddit_api_user_agent" not in data["discord"]["keys"] or \
             "reddit_api_client_id" not in data["discord"]["keys"] or \
             "reddit_api_client_secret" not in data["discord"]["keys"]:

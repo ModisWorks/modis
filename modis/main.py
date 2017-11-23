@@ -44,8 +44,8 @@ def start(loop):
     # Run the client loop
     logger.info("Connecting to Discord")
     try:
-        from modis import datatools
-        data = datatools.get_data()
+        from modis import data
+        data = data.get_data()
         token = data["keys"]["discord_token"]
         client.loop.run_until_complete(client.login(token))
     except Exception as e:
