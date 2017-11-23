@@ -60,7 +60,7 @@ class Frame(ttk.Frame):
         self.rowconfigure(0, weight=1)
 
         # Welcome!
-        logger.info("Welcome to Modis v{}".format(datatools.version))
+        logger.info("Welcome to Modis v{} ({})".format(datatools.version, datatools.version_nickname))
         # Update with version data
         state, response = datatools.get_compare_version()
         logger.info("{}\n".format(response))

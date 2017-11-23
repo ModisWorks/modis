@@ -13,6 +13,7 @@ _dir = _os.getcwd()
 _datafile = "{}/data.json".format(_dir)
 
 version = "0.3.1"
+version_nickname = "Beetoven"
 
 
 def log_data():
