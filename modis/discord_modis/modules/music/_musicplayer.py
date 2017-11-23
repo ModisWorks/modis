@@ -8,7 +8,7 @@ import threading
 import discord
 
 from modis import datatools
-from . import _data, api_music, ui_embed
+from . import _data, _timebar, api_music, ui_embed
 from .._tools import ui_embed as ui_embed_tools
 from ..._client import client
 
@@ -39,7 +39,6 @@ class MusicPlayer:
         self.prev_queue_max = 500
         self.volume = 20
         # Timebar
-        self.timebar_length = 33
         self.vclient_starttime = None
         self.vclient_task = None
         self.pause_time = None
@@ -60,10 +59,13 @@ class MusicPlayer:
         self.nowplayinglog.setLevel("DEBUG")
         self.timelog = logging.getLogger("{}.{}.time".format(__name__, self.server_id))
         self.timelog.setLevel("DEBUG")
+        self.timelog.propagate = False
         self.queuelog = logging.getLogger("{}.{}.queue".format(__name__, self.server_id))
         self.queuelog.setLevel("DEBUG")
+        self.queuelog.propagate = False
         self.queuelenlog = logging.getLogger("{}.{}.queuelen".format(__name__, self.server_id))
         self.queuelenlog.setLevel("DEBUG")
+        self.queuelenlog.propagate = False
         self.volumelog = logging.getLogger("{}.{}.volume".format(__name__, self.server_id))
         self.volumelog.setLevel("DEBUG")
         self.statuslog = logging.getLogger("{}.{}.status".format(__name__, self.server_id))
@@ -105,7 +107,7 @@ class MusicPlayer:
             # Init the music player
             await self.msetup(text_channel)
             # Queue the song
-            await self.enqueue(query, now, shuffle)
+            await self.enqueue(query, now, stop_current, shuffle)
             # Connect to voice
             await self.vsetup(author)
 
@@ -127,7 +129,7 @@ class MusicPlayer:
 
         await self.set_topic("")
         self.nowplayinglog.debug("---")
-        self.timelog.debug(self.make_timebar())
+        self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
         self.statuslog.debug("Stopping")
 
@@ -157,7 +159,7 @@ class MusicPlayer:
         self.update_queue()
 
         self.nowplayinglog.debug("---")
-        self.timelog.debug(self.make_timebar())
+        self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
         self.statuslog.info("Stopped")
         self.state = 'off'
@@ -173,7 +175,7 @@ class MusicPlayer:
 
         await self.set_topic("")
         self.nowplayinglog.debug("---")
-        self.timelog.debug(self.make_timebar())
+        self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
         self.statuslog.debug("Destroying")
 
@@ -542,7 +544,7 @@ class MusicPlayer:
         if self.streamer.is_live:
             duration_info = "Livestream"
         else:
-            duration_info = self.duration_to_string(self.streamer.duration)
+            duration_info = api_music.duration_to_string(self.streamer.duration)
 
         embed = ui_embed.nowplaying_info(channel, title=self.streamer.title, duration=duration_info,
                                          source=self.streamer.uploader, source_date=self.streamer.upload_date,
@@ -580,7 +582,7 @@ class MusicPlayer:
                 return
             except discord.opus.OpusNotLoaded as e:
                 logger.exception(e)
-                logger.error("This is an error with your FFmpeg setup.")
+                logger.error("Could not load Opus. This is an error with your FFmpeg setup.")
                 self.statuslog.error("Could not load Opus.")
                 return
             except discord.DiscordException as e:
@@ -636,7 +638,7 @@ class MusicPlayer:
         # Initial datapacks
         datapacks = [
             ("Now playing", "---", False),
-            ("Time", "```http\n" + self.make_timebar() + "\n```", True),
+            ("Time", "```http\n" + _timebar.make_timebar() + "\n```", True),
             ("Queue", "```md\n{}\n```".format(''.join(queue_display)), False),
             ("Songs left in queue", "---", True),
             ("Volume", "{}%".format(self.volume), True),
@@ -743,7 +745,6 @@ class MusicPlayer:
             # Run threads
             parse_thread.start()
 
-
     def update_queue(self):
         """Updates the queue in the music player """
 
@@ -782,14 +783,8 @@ class MusicPlayer:
                     time_bar = "Error"
                 elif self.streamer.is_live:
                     time_bar = "Livestream"
-                elif self.streamer.duration > 0:
-                    time_counts = int(round((diff / self.streamer.duration) * self.timebar_length))
-                    if time_counts > self.timebar_length:
-                        time_counts = self.timebar_length
-
-                    time_bar = self.make_timebar(time_counts, self.streamer.duration)
                 else:
-                    time_bar = self.make_timebar()
+                    time_bar = _timebar.make_timebar(diff, self.streamer.duration)
 
                 if time_bar != self.prev_time:
                     self.timelog.debug(time_bar)
@@ -822,7 +817,6 @@ class MusicPlayer:
                 bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 30", "-reconnect_at_eof 1",
                              "-timeout 30", "-multiple_requests 1"]
                 boptions = " {}".format(' '.join(bopt_list))
-                logger.debug("FFmpeg options: {}".format(boptions))
 
                 ytdl_formats = [
                     "worstaudio[protocol^=http][ext=mp4]",
@@ -864,7 +858,7 @@ class MusicPlayer:
             except Exception as e:
                 await self.set_topic("")
                 self.nowplayinglog.info("Error playing {}".format(songname))
-                self.timelog.debug(self.make_timebar())
+                self.timelog.debug(_timebar.make_timebar())
                 self.prev_time = "---"
                 self.statuslog.error("Had a problem playing {}".format(songname))
                 logger.exception(e)
@@ -900,44 +894,6 @@ class MusicPlayer:
                 await self.vplay()
             else:
                 await self.stop()
-
-    def duration_to_string(self, duration):
-        """
-        Converts a duration to a string
-
-        Args:
-            duration (int): The duration in seconds to convert
-
-        Returns s (str): The duration as a string
-        """
-
-        m, s = divmod(duration, 60)
-        h, m = divmod(m, 60)
-        return "%d:%02d:%02d" % (h, m, s)
-
-    def make_timebar(self, progress=0, duration=0):
-        """
-        Makes a new time bar string
-
-        Args:
-            progress: The number of 'dots' in the time bar
-            duration: The duration of the current song
-
-        Returns:
-            timebar (str): The time bar string
-        """
-
-        if progress > self.timebar_length:
-            progress = self.timebar_length
-
-        duration_string = self.duration_to_string(duration)
-        if duration > 0:
-            bar = "|" + ("-" * progress) + (" " * (self.timebar_length - progress)) + "|"
-            time_bar = "{} {}".format(bar, duration_string)
-        else:
-            time_bar = duration_string
-
-        return time_bar
 
     def vafter_ts(self):
         """Function that is called after a song finishes playing"""

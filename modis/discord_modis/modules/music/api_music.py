@@ -426,6 +426,21 @@ def get_sp_track(track):
     return []
 
 
+def duration_to_string(duration):
+    """
+    Converts a duration to a string
+
+    Args:
+        duration (int): The duration in seconds to convert
+
+    Returns s (str): The duration as a string
+    """
+
+    m, s = divmod(duration, 60)
+    h, m = divmod(m, 60)
+    return "%d:%02d:%02d" % (h, m, s)
+
+
 build_yt_api()
 build_sc_api()
 build_spotify_api()

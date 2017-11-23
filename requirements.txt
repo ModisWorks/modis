@@ -1,6 +1,6 @@
 # Quick install list:
     # pip install:
-        discord.py
+        discord.py[voice]
         youtube-dl
         soundcloud
         pynacl
@@ -12,7 +12,7 @@
 
 
 # core:
-    discord.py
+    discord.py[voice]
     youtube-dl
     # ffmpeg/bin/ in system PATH variables
 

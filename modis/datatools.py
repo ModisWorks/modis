@@ -1,15 +1,24 @@
 """Read and write json data."""
 
 import json as _json
+import logging
 import os as _os
 from collections import OrderedDict
 
 import requests
 
-_dir = _os.path.dirname(_os.path.realpath(__file__))
-_datafile = "{}/../data.json".format(_dir)
+logger = logging.getLogger(__name__)
 
-version = "0.3.1"
+_dir = _os.getcwd()
+_datafile = "{}/data.json".format(_dir)
+
+version = "0.3.0b"
+
+
+def log_data():
+    """Log the data dir info"""
+    logger.debug("Working dir: {}".format(_dir))
+    logger.debug("Data file location: {}".format(_datafile))
 
 
 def has_data():
