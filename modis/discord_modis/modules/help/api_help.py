@@ -45,7 +45,7 @@ def get_help_commands(server_prefix):
     _dir = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__)))
     for module_name in os.listdir("{}/../".format(_dir)):
-        if not module_name.startswith("_"):
+        if not module_name.startswith("_") and not module_name.startswith("!"):
             help_command = "`{}help {}`".format(server_prefix, module_name)
             datapacks.append((module_name, help_command, True))
 

@@ -1,6 +1,3 @@
-import tkinter as tk
-import tkinter.ttk as ttk
-
 from collections import OrderedDict
 import json as _json
 
@@ -50,12 +47,12 @@ def get_help_datapacks(filepath, prefix="!"):
         heading = d
         content = ""
 
-        if d == "Commands":
+        if "commands" in d.lower():
             for c in help_contents[d]:
                 if "name" not in c:
                     continue
 
-                content += "`"
+                content += "- `"
                 command = prefix + c["name"]
                 content += "{}".format(command)
                 if "params" in c:
@@ -82,6 +79,9 @@ def add_help_text(parent, filepath, prefix="!"):
         filepath (str): The file to load help text from
         prefix (str): The prefix to use for commands
     """
+
+    import tkinter as tk
+    import tkinter.ttk as ttk
 
     help_contents = get_help_data(filepath)
 

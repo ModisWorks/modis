@@ -1,22 +1,29 @@
 """Initialises Modis."""
 
 import logging
+import os
 import sys
+import time
 
 from modis import datatools
 
+
+file_dir = os.path.dirname(os.path.realpath(__file__))
+logs_dir = "{}/../logs/".format(file_dir)
+if not os.path.isdir(logs_dir):
+    os.mkdir(logs_dir)
+
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+logger.setLevel("DEBUG")
 if datatools.has_data():
     data = datatools.get_data()
     if "log_level" in data:
         logger.setLevel(data["log_level"])
 
-formatter = logging.Formatter(
-    "{asctime} {levelname:8} {name} - {message}", style="{")
+formatter = logging.Formatter("{asctime} {levelname:8} {name} - {message}", style="{")
 printhandler = logging.StreamHandler(sys.stdout)
 printhandler.setFormatter(formatter)
-filehandler = logging.FileHandler("modis.log")
+filehandler = logging.FileHandler("{}/{}.log".format(logs_dir, time.time()))
 filehandler.setFormatter(formatter)
 
 logger.addHandler(printhandler)
@@ -37,8 +44,10 @@ def console(discord_token, discord_client_id):
         discord_client_id: The bot's client ID
     """
 
+    state, response = datatools.get_compare_version()
+
     logger.info("Starting Modis in console")
-    logger.info(datatools.get_compare_version())
+    logger.info(response)
 
     import threading
     import asyncio
@@ -93,6 +102,8 @@ def gui(discord_token, discord_client_id):
     root.minsize(width=800, height=400)
     root.geometry("800x600")
     root.title("Modis Control Panel")
+    # Icon
+    root.iconbitmap(r"{}/assets/modis.ico".format(file_dir))
 
     # Setup the notebook
     """notebook = ttk.Notebook(root)

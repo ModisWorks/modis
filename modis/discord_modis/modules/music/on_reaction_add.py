@@ -50,6 +50,8 @@ async def on_reaction_add(reaction, user):
                     await _data.cache[server.id].stop()
                 if emoji == "⏭":
                     await _data.cache[server.id].skip("1")
+                if emoji == "⏮":
+                    await _data.cache[server.id].rewind("1")
                 if emoji == "🔀":
                     await _data.cache[server.id].shuffle()
                 if emoji == "🔉":

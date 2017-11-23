@@ -2,6 +2,7 @@
     # pip install:
         discord.py[voice]
         youtube-dl
+        soundcloud
         pynacl
         google-api-python-client
         requests
@@ -17,6 +18,8 @@
 
 # music module:
     youtube-dl
+    soundcloud
+    spotipy
     pynacl
     google-api-python-client
 

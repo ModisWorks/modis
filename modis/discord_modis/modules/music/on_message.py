@@ -43,8 +43,9 @@ async def on_message(message):
                 _data.cache[server.id] = _musicplayer.MusicPlayer(server.id)
 
             # Remove message
-            if command in ['play', 'playnext', 'playnow', 'pause', 'resume', 'skip', 'shuffle', 'volume', 'stop',
-                           'destroy', 'front', 'movehere']:
+            if command in ['play', 'playnext', 'playnow', 'playshuffle', 'pause', 'resume', 'skip', 'remove', 'rewind',
+                           'restart', 'shuffle', 'volume', 'stop', 'destroy', 'front', 'movehere', 'settopic',
+                           'cleartopic', 'notopic', 'loop']:
                 try:
                     await client.delete_message(message)
                 except discord.errors.NotFound:
@@ -62,6 +63,9 @@ async def on_message(message):
             if command == 'playnow':
                 await _data.cache[server.id].play(author, channel, arg, now=True, stop_current=True)
 
+            if command == 'playshuffle':
+                await _data.cache[server.id].play(author, channel, arg, shuffle=True)
+
             elif command == 'pause':
                 await _data.cache[server.id].pause()
 
@@ -71,17 +75,38 @@ async def on_message(message):
             elif command == 'skip':
                 await _data.cache[server.id].skip(query=arg)
 
+            elif command == 'remove':
+                await _data.cache[server.id].remove(index=arg)
+
+            elif command == 'rewind':
+                await _data.cache[server.id].rewind(query=arg)
+
+            elif command == 'restart':
+                await _data.cache[server.id].rewind(query="0")
+
             elif command == 'shuffle':
                 await _data.cache[server.id].shuffle()
+
+            elif command == 'loop':
+                await _data.cache[server.id].set_loop(arg)
 
             elif command == 'stop':
                 await _data.cache[server.id].stop()
 
-            elif command == 'destroy':
-                await _data.cache[server.id].destroy()
-
             elif command == 'volume':
                 await _data.cache[server.id].setvolume(arg)
+
+            elif command == 'settopic':
+                await _data.cache[server.id].set_topic_channel(channel)
+
+            elif command == 'cleartopic' or command == 'notopic':
+                await _data.cache[server.id].clear_topic_channel(channel)
+
+            elif command == 'nowplaying':
+                await _data.cache[server.id].nowplaying_info(channel)
+
+            elif command == 'destroy':
+                await _data.cache[server.id].destroy()
 
             elif command == 'front' or command == 'movehere':
                 await _data.cache[server.id].movehere(channel)

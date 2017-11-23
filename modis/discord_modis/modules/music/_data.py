@@ -1,9 +1,11 @@
 modulename = "Music"
+modulecolor = 0x282b30
 
-creator = "Infraxion"
+creator = "Infraxion and YtnomSnrub"
 
 sd_structure = {
-    "activated": True
+    "activated": True,
+    "topic_id": ""
 }
 
 cache = {}

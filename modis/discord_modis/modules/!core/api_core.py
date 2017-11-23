@@ -21,12 +21,16 @@ async def update_server_data(server):
     if server.id not in data["discord"]["servers"]:
         logger.debug("Adding new server to serverdata")
         data["discord"]["servers"][server.id] = {"prefix": "!"}
-        send_welcome_message = True
+        if "mute_intro" not in data or not data["mute_intro"]:
+            send_welcome_message = True
 
     # Make sure all modules are in the server
     _dir = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     _dir_modules = "{}/../".format(_dir)
     for module_name in os.listdir(_dir_modules):
+        if module_name.startswith("_") or module_name.startswith("!"):
+            continue
+
         if not os.path.isfile("{}/{}/_data.py".format(_dir_modules, module_name)):
             logger.warning("No _data.py file found for module {}".format(module_name))
             continue

@@ -1,6 +1,7 @@
 """Base GUI for Modis."""
 
 import asyncio
+import importlib
 import logging
 import os
 import threading
@@ -317,9 +318,30 @@ class BotControl(ttk.Labelframe):
         asyncio.set_event_loop(loop)
         self.discord_thread = threading.Thread(
             target=main.start,
-            args=[discord_token, discord_client_id, loop, self.module_frame.add_module, self.on_ready])
+            args=[discord_token, discord_client_id, loop, self.on_ready])
         logger.debug("Starting event loop")
         self.discord_thread.start()
+
+        # Find module UIs
+        database_dir = "{}/modules".format(
+            os.path.dirname(os.path.realpath(__file__)))
+        for module_name in os.listdir(database_dir):
+            module_dir = "{}/{}".format(database_dir, module_name)
+
+            # Iterate through files in module
+            if os.path.isdir(module_dir) and not module_name.startswith("_"):
+                # Add all defined event handlers in module files
+                module_event_handlers = os.listdir(module_dir)
+
+                if "_ui.py" in module_event_handlers:
+                    import_name = ".discord_modis.modules.{}.{}".format(
+                        module_name, "_ui")
+                    logger.debug(
+                        "Found module UI file {}".format(import_name[23:]))
+
+                    self.module_frame.add_module(module_name, importlib.import_module(import_name, "modis"))
+                else:
+                    self.module_frame.add_module(module_name, None)
 
     async def on_ready(self):
         """Called when the client is ready"""

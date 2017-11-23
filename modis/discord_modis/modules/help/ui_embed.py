@@ -26,3 +26,27 @@ def success(channel, title, datapacks):
     )
 
     return gui
+
+
+def http_exception(channel, title):
+    """
+    Creates an embed UI containing the 'too long' error message
+
+    Args:
+        channel (discord.Channel): The Discord channel to bind the embed to
+        title (str): The title of the embed
+
+    Returns:
+        ui (ui_embed.UI): The embed UI object
+    """
+
+    # Create embed UI object
+    gui = ui_embed.UI(
+        channel,
+        "Too much help",
+        "{} is too helpful! Try trimming some of the help messages.".format(title),
+        modulename=modulename,
+        creator=creator
+    )
+
+    return gui

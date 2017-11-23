@@ -1,6 +1,8 @@
-from . import api_help, ui_embed, _data
-from ..._client import client
+import discord
+
 from modis import datatools
+from . import api_help, ui_embed
+from ..._client import client
 
 
 async def on_message(message):
@@ -38,7 +40,11 @@ async def on_message(message):
                     if datapacks:
                         await client.send_typing(channel)
                         embed = ui_embed.success(channel, arg, datapacks)
-                        await embed.send()
+                        try:
+                            await embed.send()
+                        except discord.errors.HTTPException:
+                            embed = ui_embed.http_exception(channel, arg)
+                            await embed.send()
                 else:
                     # Parse message
                     datapacks = api_help.get_help_commands(prefix)
@@ -46,4 +52,8 @@ async def on_message(message):
                     if datapacks:
                         await client.send_typing(channel)
                         embed = ui_embed.success(channel, arg, datapacks)
-                        await embed.send()
+                        try:
+                            await embed.send()
+                        except discord.errors.HTTPException:
+                            embed = ui_embed.http_exception(channel, arg)
+                            await embed.send()
