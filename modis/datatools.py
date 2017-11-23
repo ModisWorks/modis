@@ -1,18 +1,27 @@
 """Read and write json data."""
 
 import json as _json
+import logging
 import os as _os
 from collections import OrderedDict
 
 import requests
 
+logger = logging.getLogger(__name__)
+
 _dir = _os.getcwd()
 _datafile = "{}/data.json".format(_dir)
 
-version = "0.3.0a"
+version = "0.3.0b"
 
 
-def has_data() -> bool:
+def log_data():
+    """Log the data dir info"""
+    logger.debug("Working dir: {}".format(_dir))
+    logger.debug("Data file location: {}".format(_datafile))
+
+
+def has_data():
     """
     Checks whether or not a data.json file has been created
 
@@ -23,7 +32,7 @@ def has_data() -> bool:
     return _os.path.exists(_datafile)
 
 
-def get_data() -> dict:
+def get_data():
     """
     Get the current data dict of Discord from the data.json file
 
@@ -38,7 +47,7 @@ def get_data() -> dict:
         return {}
 
 
-def write_data(data: dict):
+def write_data(data):
     """
     Write the data to the data.json file
 
@@ -52,7 +61,7 @@ def write_data(data: dict):
         _json.dump(sorted_dict, file, indent=2)
 
 
-def sort_recursive(data: dict):
+def sort_recursive(data):
     """
     Recursively sorts all elements in a dictionary
 

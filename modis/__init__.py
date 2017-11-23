@@ -25,6 +25,8 @@ logger.addHandler(filehandler)
 logger.info("----------------NEW INSTANCE----------------")
 logger.info("Loading Modis")
 
+datatools.log_data()
+
 
 def console(discord_token, discord_client_id):
     """
