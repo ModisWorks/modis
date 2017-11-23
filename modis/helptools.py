@@ -102,7 +102,7 @@ def add_help_text(parent, filepath, prefix="!"):
         text.insert('end', d, "heading")
         text.insert('end', '\n')
 
-        if d == "Commands":
+        if "commands" in d.lower():
             for c in help_contents[d]:
                 if "name" not in c:
                     continue
