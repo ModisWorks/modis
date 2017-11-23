@@ -25,7 +25,7 @@ into your web browser and replacing `CLIENT_ID` with your bot's client id. You d
 
 ## Getting a Google API key
 
-(Guide coming soon, feel free to ask for help in our Discord server for help)
+(Guide coming soon, feel free to ask for help in our Discord server)
 
 ## Making a SoundCloud application
 
