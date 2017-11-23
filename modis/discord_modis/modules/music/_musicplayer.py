@@ -39,7 +39,7 @@ class MusicPlayer:
         self.prev_queue_max = 500
         self.volume = 20
         # Timebar
-        self.timebar_length = 33
+        self.timebar_length = 23
         self.vclient_starttime = None
         self.vclient_task = None
         self.pause_time = None
@@ -932,7 +932,7 @@ class MusicPlayer:
 
         duration_string = self.duration_to_string(duration)
         if duration > 0:
-            bar = "|" + ("-" * progress) + (" " * (self.timebar_length - progress)) + "|"
+            bar = "│" + ("◆" * progress) + ("◇" * (self.timebar_length - progress)) + "│"
             time_bar = "{} {}".format(bar, duration_string)
         else:
             time_bar = duration_string
