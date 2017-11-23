@@ -47,7 +47,7 @@
     {
       "name": "remove",
       "params": ["index"],
-      "description": "Removes the song from the queue at [index]"
+      "description": "Removes the song from the queue at [index], you can remove a range of songs by giving the index in the form #-#"
     },
     {
       "name": "volume",

@@ -301,7 +301,7 @@ class MusicPlayer:
         The remove command
 
         Args:
-            index (str): The index to remove
+            index (str): The index to remove, can be either a number, or a range in the for '##-##'
         """
 
         if not self.state == 'ready':
@@ -317,25 +317,53 @@ class MusicPlayer:
             self.statuslog.info("Removed all songs")
             return
 
+        indexes = index.split("-")
+        self.logger.debug("Removing {}".format(indexes))
+
         try:
-            num = int(index) - 1
+            if len(indexes) == 0:
+                self.statuslog.error("Remove must specify an index or range")
+                return
+            elif len(indexes) == 1:
+                num_lower = int(indexes[0]) - 1
+                num_upper = num_lower + 1
+            elif len(indexes) == 2:
+                num_lower = int(indexes[0]) - 1
+                num_upper = int(indexes[1])
+            else:
+                self.statuslog.error("Cannot have more than 2 indexes for remove range")
+                return
         except TypeError:
             self.statuslog.error("Remove index must be a number")
+            return
         except ValueError:
             self.statuslog.error("Remove index must be a number")
-        else:
-            if num < 0 or num >= len(self.queue):
-                if len(self.queue) == 0:
-                    self.statuslog.warning("No songs in queue")
-                elif len(self.queue) == 1:
-                    self.statuslog.error("Index must be 1 (only 1 song in queue)")
-                else:
-                    self.statuslog.error("Index must be between 1 and {}".format(len(self.queue)))
-                return
+            return
 
-            self.statuslog.info("Removed {}".format(self.queue[num][1]))
-            self.queue.pop(num)
-            self.update_queue()
+        if num_lower < 0 or num_lower >= len(self.queue) or num_upper > len(self.queue):
+            if len(self.queue) == 0:
+                self.statuslog.warning("No songs in queue")
+            elif len(self.queue) == 1:
+                self.statuslog.error("Remove index must be 1 (only 1 song in queue)")
+            else:
+                self.statuslog.error("Remove index must be between 1 and {}".format(len(self.queue)))
+            return
+
+        if num_upper <= num_lower:
+            self.statuslog.error("Second index in range must be greater than first")
+            return
+
+        lower_songname = self.queue[num_lower][1]
+        for num in range(0, num_upper - num_lower):
+            self.logger.debug("Removed {}".format(self.queue[num_lower][1]))
+            self.queue.pop(num_lower)
+
+        if len(indexes) == 1:
+            self.statuslog.info("Removed {}".format(lower_songname))
+        else:
+            self.statuslog.info("Removed songs {}-{}".format(num_lower + 1, num_upper))
+
+        self.update_queue()
 
     async def rewind(self, query="1"):
         """
