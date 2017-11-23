@@ -11,17 +11,17 @@ from modis.tools import helptools
 logger = logging.getLogger(__name__)
 
 
-class Frame(ttk.Frame):
+class RootFrame(ttk.Frame):
     """The main window frame for Modis."""
 
-    def __init__(self, parent, discord_token, discord_client_id):
+    def __init__(self, parent):
         """
         Create a new main window frame.
 
         Args:
             parent: A tk or ttk object
         """
-        super(Frame, self).__init__(parent)
+        super(RootFrame, self).__init__(parent)
 
         logger.debug("Initialising frame")
 
@@ -32,7 +32,7 @@ class Frame(ttk.Frame):
         # Create the main control panel
         nav = ttk.Notebook(self)
         module_frame = ModuleFrame(nav)
-        nav.add(GlobalFrame(nav, discord_token, discord_client_id, module_frame, statusbar), text="Global")
+        nav.add(GlobalFrame(nav, module_frame, statusbar), text="Global")
         nav.add(module_frame, text="Modules")
         nav.grid(column=0, row=0, sticky="W E N S")
 
@@ -67,7 +67,7 @@ class Frame(ttk.Frame):
 class GlobalFrame(tk.Frame):
     """The frame that has all global elements for the bot"""
 
-    def __init__(self, parent, discord_token, discord_client_id, module_frame, status_bar):
+    def __init__(self, parent, module_frame, status_bar):
         super(GlobalFrame, self).__init__(parent)
 
         # Log
@@ -75,7 +75,7 @@ class GlobalFrame(tk.Frame):
         log.grid(column=0, row=0, padx=8, pady=8, sticky="W E N S")
 
         # Bot control panel
-        botcontrol = BotControl(self, discord_token, discord_client_id, module_frame, status_bar)
+        botcontrol = BotControl(self, module_frame, status_bar)
         botcontrol.grid(
             column=0, row=1, padx=8, pady=8, sticky="W E S")
 
@@ -241,7 +241,7 @@ class ModuleUIBaseFrame(ttk.Frame):
 class BotControl(ttk.Labelframe):
     """The control panel for the Modis bot."""
 
-    def __init__(self, parent, discord_token, discord_client_id, module_frame, status_bar):
+    def __init__(self, parent, module_frame, status_bar):
         """
         Create a new control panel and add it to the parent.
 
@@ -283,21 +283,21 @@ class BotControl(ttk.Labelframe):
         self.state = "off"
         self.button_toggle_text = tk.StringVar(value="Start Modis")
         self.button_toggle = ttk.Button(
-            self, command=lambda: self.toggle(discord_token, discord_client_id), textvariable=self.button_toggle_text)
+            self, command=lambda: self.toggle(), textvariable=self.button_toggle_text)
         self.button_toggle.grid(column=3, row=1, padx=4, pady=4, sticky="W E N S")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=2)
 
-    def toggle(self, discord_token, discord_client_id):
+    def toggle(self):
         """Toggles Modis on or off"""
         if self.state == 'off':
-            self.start(discord_token, discord_client_id)
+            self.start()
         elif self.state == 'on':
             self.stop()
 
-    def start(self, discord_token, discord_client_id):
+    def start(self):
         """Start Modis and log it into Discord."""
         self.button_toggle_text.set("Stop Modis")
         self.state = "on"
@@ -316,7 +316,7 @@ class BotControl(ttk.Labelframe):
         asyncio.set_event_loop(loop)
         self.discord_thread = threading.Thread(
             target=main.start,
-            args=[discord_token, discord_client_id, loop, self.on_ready])
+            args=[loop, self.on_ready])
         logger.debug("Starting event loop")
         self.discord_thread.start()
 

@@ -36,7 +36,7 @@ def gui():
     logger.debug("Importing packages")
     import os
     import tkinter as tk
-    from modis import gui
+    from modis import window
 
     logger.debug("Initialising GUI")
 
@@ -46,10 +46,10 @@ def gui():
     root.geometry("800x600")
     root.title("Modis Control Panel")
     file_dir = os.path.dirname(os.path.realpath(__file__))
-    root.iconbitmap(r"assets/modis.ico".format(file_dir))
+    root.iconbitmap(r"{}/assets/modis.ico".format(file_dir))
 
     # Setup the notebook
-    discord = gui.Frame(root)
+    discord = window.RootFrame(root)
     discord.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
     # Configure stretch ratios
     root.columnconfigure(0, weight=1)
