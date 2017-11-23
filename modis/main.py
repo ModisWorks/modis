@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def start(token, client_id, loop, on_ready_handler=None):
+def start(loop):
     """Start the Discord client and log Modis into Discord."""
     import discord
     import asyncio
@@ -12,31 +12,8 @@ def start(token, client_id, loop, on_ready_handler=None):
     logger.debug("Creating Discord client")
     asyncio.set_event_loop(loop)
     client = discord.Client()
-    from . import _client
-    _client.client = client
-
-    from .. import datatools
-    if datatools.has_data():
-        data = datatools.get_data()
-    else:
-        # Create a blank data file
-        data = {"discord": {}}
-
-    # Save default server info to data
-    if "servers" not in data["discord"]:
-        data["discord"]["servers"] = {}
-
-    # Save default key info to data
-    if "keys" not in data["discord"]:
-        data["discord"]["keys"] = {}
-
-    # Save logger info to data
-    if "log_level" not in data:
-        data["log_level"] = "DEBUG"
-
-    data["discord"]["token"] = token
-    data["discord"]["client_id"] = client_id
-    datatools.write_data(data)
+    from . import cache
+    cache.client = client
 
     # Import event handlers
     logger.debug("Importing event handlers")
@@ -50,15 +27,11 @@ def start(token, client_id, loop, on_ready_handler=None):
             for module_event_handler in event_handlers[event_handler_type]:
                 # Check for errors in the module event
                 try:
-                    module_event_handler_func = getattr(module_event_handler,
-                                                        event_handler_type)
+                    module_event_handler_func = getattr(module_event_handler, event_handler_type)
                     await module_event_handler_func(*args, **kwargs)
                 except Exception as e:
                     logger.error("An error occured in '{}'".format(module_event_handler))
                     logger.exception(e)
-
-            if on_ready_handler is not None and event_handler_type == "on_ready":
-                await on_ready_handler()
 
         func.__name__ = event_handler_type
         return func
@@ -71,6 +44,9 @@ def start(token, client_id, loop, on_ready_handler=None):
     # Run the client loop
     logger.info("Connecting to Discord")
     try:
+        from modis import datatools
+        data = datatools.get_data()
+        token = data["keys"]["discord_token"]
         client.loop.run_until_complete(client.login(token))
     except Exception as e:
         logger.exception(e)

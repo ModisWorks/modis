@@ -6,5 +6,6 @@ logger = logging.getLogger(__name__)
 
 
 async def on_ready():
-    api_core.check_all_servers()
+    api_core.server_check()
+    api_core.cmd_db_update()
     logger.info("Modis for Discord is ready")

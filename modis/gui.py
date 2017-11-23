@@ -41,7 +41,7 @@ class Frame(ttk.Frame):
         def on_closing():
             """Called when the window closes"""
             try:
-                from ._client import client
+                from .cache import client
                 if client.loop:
                     asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
             except RuntimeError:
@@ -354,7 +354,7 @@ class BotControl(ttk.Labelframe):
 
         logger.info("Stopping Discord Modis")
 
-        from ._client import client
+        from .cache import client
         asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
         self.status_bar.set_status(0)
 
