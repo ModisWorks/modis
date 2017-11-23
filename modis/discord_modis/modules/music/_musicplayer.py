@@ -60,10 +60,13 @@ class MusicPlayer:
         self.nowplayinglog.setLevel("DEBUG")
         self.timelog = logging.getLogger("{}.{}.time".format(__name__, self.server_id))
         self.timelog.setLevel("DEBUG")
+        self.timelog.propagate = False
         self.queuelog = logging.getLogger("{}.{}.queue".format(__name__, self.server_id))
         self.queuelog.setLevel("DEBUG")
+        self.queuelog.propagate = False
         self.queuelenlog = logging.getLogger("{}.{}.queuelen".format(__name__, self.server_id))
         self.queuelenlog.setLevel("DEBUG")
+        self.queuelenlog.propagate = False
         self.volumelog = logging.getLogger("{}.{}.volume".format(__name__, self.server_id))
         self.volumelog.setLevel("DEBUG")
         self.statuslog = logging.getLogger("{}.{}.status".format(__name__, self.server_id))
