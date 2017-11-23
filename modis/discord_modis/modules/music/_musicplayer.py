@@ -583,7 +583,7 @@ class MusicPlayer:
                 return
             except discord.opus.OpusNotLoaded as e:
                 logger.exception(e)
-                logger.error("This is an error with your FFmpeg setup.")
+                logger.error("Could not load Opus. This is an error with your FFmpeg setup.")
                 self.statuslog.error("Could not load Opus.")
                 return
             except discord.DiscordException as e:
@@ -825,7 +825,6 @@ class MusicPlayer:
                 bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 30", "-reconnect_at_eof 1",
                              "-timeout 30", "-multiple_requests 1"]
                 boptions = " {}".format(' '.join(bopt_list))
-                logger.debug("FFmpeg options: {}".format(boptions))
 
                 ytdl_formats = [
                     "worstaudio[protocol^=http][ext=mp4]",
