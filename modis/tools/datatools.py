@@ -1,3 +1,11 @@
+"""
+This tool handles reading and saving data. Modis uses the JSON protocol to store
+data to ensure easy accessibility.
+
+This tool also contains the templates for the data structure of both the root
+structure and the structure for each server.
+"""
+
 import logging
 import os
 import json

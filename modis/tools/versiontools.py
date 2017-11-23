@@ -1,3 +1,9 @@
+"""
+This tool checks GitHub for the latest version of Modis and can produce the name
+of the current official version and the difference between that version and the
+version currently being used.
+"""
+
 import requests
 
 VERSION = "0.4.0"
