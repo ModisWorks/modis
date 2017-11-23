@@ -57,6 +57,8 @@ class MusicPlayer:
         self.queue_display = 9
         self.nowplayinglog = logging.getLogger("{}.{}.nowplaying".format(__name__, self.server_id))
         self.nowplayinglog.setLevel("DEBUG")
+        self.nowplayingauthorlog = logging.getLogger("{}.{}.nowplayingauthor".format(__name__, self.server_id))
+        self.nowplayingauthorlog.setLevel("DEBUG")
         self.timelog = logging.getLogger("{}.{}.time".format(__name__, self.server_id))
         self.timelog.setLevel("DEBUG")
         self.timelog.propagate = False
@@ -129,6 +131,7 @@ class MusicPlayer:
 
         await self.set_topic("")
         self.nowplayinglog.debug("---")
+        self.nowplayingauthorlog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
         self.statuslog.debug("Stopping")
@@ -159,6 +162,7 @@ class MusicPlayer:
         self.update_queue()
 
         self.nowplayinglog.debug("---")
+        self.nowplayingauthorlog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
         self.statuslog.info("Stopped")
@@ -175,6 +179,7 @@ class MusicPlayer:
 
         await self.set_topic("")
         self.nowplayinglog.debug("---")
+        self.nowplayingauthorlog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
         self.statuslog.debug("Destroying")
@@ -665,8 +670,9 @@ class MusicPlayer:
 
         # Initial datapacks
         datapacks = [
-            ("Now playing", "---", False),
-            ("Time", "```http\n" + _timebar.make_timebar() + "\n```", True),
+            ("Now playing", "---", True),
+            ("Author", "---", True),
+            ("Time", "```http\n" + _timebar.make_timebar() + "\n```", False),
             ("Queue", "```md\n{}\n```".format(''.join(queue_display)), False),
             ("Songs left in queue", "---", True),
             ("Volume", "{}%".format(self.volume), True),
@@ -693,18 +699,21 @@ class MusicPlayer:
 
         nowplayinghandler = EmbedLogHandler(self, self.embed, 0)
         nowplayinghandler.setFormatter(noformatter)
-        timehandler = EmbedLogHandler(self, self.embed, 1)
+        nowplayingauthorhandler = EmbedLogHandler(self, self.embed, 1)
+        nowplayingauthorhandler.setFormatter(noformatter)
+        timehandler = EmbedLogHandler(self, self.embed, 2)
         timehandler.setFormatter(timeformatter)
-        queuehandler = EmbedLogHandler(self, self.embed, 2)
+        queuehandler = EmbedLogHandler(self, self.embed, 3)
         queuehandler.setFormatter(mdformatter)
-        queuelenhandler = EmbedLogHandler(self, self.embed, 3)
+        queuelenhandler = EmbedLogHandler(self, self.embed, 4)
         queuelenhandler.setFormatter(noformatter)
-        volumehandler = EmbedLogHandler(self, self.embed, 4)
+        volumehandler = EmbedLogHandler(self, self.embed, 5)
         volumehandler.setFormatter(volumeformatter)
-        statushandler = EmbedLogHandler(self, self.embed, 5)
+        statushandler = EmbedLogHandler(self, self.embed, 6)
         statushandler.setFormatter(statusformatter)
 
         self.nowplayinglog.addHandler(nowplayinghandler)
+        self.nowplayingauthorlog.addHandler(nowplayingauthorhandler)
         self.timelog.addHandler(timehandler)
         self.queuelog.addHandler(queuehandler)
         self.queuelenlog.addHandler(queuelenhandler)
@@ -883,9 +892,11 @@ class MusicPlayer:
                 self.statuslog.debug("Playing")
                 await self.set_topic(nowplaying)
                 self.nowplayinglog.debug(self.streamer.title)
+                self.nowplayingauthorlog.debug(self.streamer.uploader)
             except Exception as e:
                 await self.set_topic("")
                 self.nowplayinglog.info("Error playing {}".format(songname))
+                self.nowplayingauthorlog.info("---")
                 self.timelog.debug(_timebar.make_timebar())
                 self.prev_time = "---"
                 self.statuslog.error("Had a problem playing {}".format(songname))
