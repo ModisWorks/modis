@@ -47,7 +47,7 @@ Restart your computer so that Windows updates everything correctly, and continue
 
 ### FFmpeg on OS X
 
-If you're using Homebrew, just run `brew install ffmpeg` and `brew install opus` in Terminal. This will install the required libraries for voice and audio that Modis needs. Restart your computer after both packages have downloaded and continue with the next step.
+If you're using Homebrew, just run `brew install ffmpeg --with-opus` in Terminal. This will install the required libraries for voice and audio that Modis needs. Restart your computer after both packages have downloaded and continue with the next step.
 
 ## Getting Modis
 
