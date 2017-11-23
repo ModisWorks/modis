@@ -39,7 +39,7 @@ class MusicPlayer:
         self.prev_queue_max = 500
         self.volume = 20
         # Timebar
-        self.timebar_length = 23
+        self.timebar_length = 21
         self.vclient_starttime = None
         self.vclient_task = None
         self.pause_time = None
@@ -105,7 +105,7 @@ class MusicPlayer:
             # Init the music player
             await self.msetup(text_channel)
             # Queue the song
-            await self.enqueue(query, now, shuffle)
+            await self.enqueue(query, now, stop_current, shuffle)
             # Connect to voice
             await self.vsetup(author)
 
