@@ -25,20 +25,10 @@ When you're installing Python on Windows, make sure you check the option that ad
 
 ## Python packages
 
-You can find all the package requirements in the requirements.txt file.
+You can find all the package requirements in the `requirements.txt` file.
 To install the packages, open a command processor (CMD or Terminal for Windows and OS X) and type `pip3 install [packagename]`.
 
-Below are a list of commands you'll need to run as of writing if you're too lazy to check requirements.txt:
-
-```sh
-pip3 install discord.py
-pip3 install youtube-dl
-pip3 install pynacl
-pip3 install google-api-python-client
-pip3 install requests
-pip3 install lxml
-pip3 install praw
-```
+You can also install all packages from the `requirements.txt` file by running opening a command window in the same direcory as `requirements.txt` and running `pip3 install -r requirements.txt`.
 
 ## FFmpeg
 
