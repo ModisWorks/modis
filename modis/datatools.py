@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 _dir = _os.getcwd()
 _datafile = "{}/data.json".format(_dir)
 
-version = "0.3.0b"
+version = "0.3.0c"
 
 
 def log_data():

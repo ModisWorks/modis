@@ -72,7 +72,8 @@ def start(token, client_id, loop, module_found_handler=None, on_ready_handler=No
     logger.info("Connecting to Discord")
     try:
         client.loop.run_until_complete(client.login(token))
-    except:
+    except Exception as e:
+        logger.exception(e)
         logger.critical("Could not connect to Discord")
     else:
         logger.debug("Running the bot")
