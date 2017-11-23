@@ -157,34 +157,8 @@ def _get_event_handlers():
     database_dir = "{}/modules".format(
         os.path.dirname(os.path.realpath(__file__)))
     for module_name in os.listdir(database_dir):
-        if module_name.startswith("_"):
-            return
         module_dir = "{}/{}".format(database_dir, module_name)
 
-<<<<<<< HEAD
-        # Add all defined event handlers in module files
-        module_event_handlers = os.listdir(module_dir)
-
-        if module_found_handler:
-            if "_ui.py" in module_event_handlers:
-                import_name = ".discord_modis.modules.{}.{}".format(
-                    module_name, "_ui")
-                logger.debug(
-                    "Found module UI file {}".format(import_name[23:]))
-
-                module_found_handler(module_name, importlib.import_module(import_name, "modis"))
-            else:
-                module_found_handler(module_name, None)
-
-        for event_handler in event_handlers.keys():
-            if "{}.py".format(event_handler) in module_event_handlers:
-                import_name = ".discord_modis.modules.{}.{}".format(
-                    module_name, event_handler)
-                logger.debug("Found event handler {}".format(import_name[23:]))
-
-                event_handlers[event_handler].append(
-                    importlib.import_module(import_name, "modis"))
-=======
         # Iterate through files in module
         if os.path.isdir(module_dir) and not module_name.startswith("_"):
             # Add all defined event handlers in module files
@@ -198,7 +172,6 @@ def _get_event_handlers():
 
                     event_handlers[event_handler].append(
                         importlib.import_module(import_name, "modis"))
->>>>>>> unstable
 
     return event_handlers
 
