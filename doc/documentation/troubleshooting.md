@@ -7,20 +7,17 @@ permalink: /documentation/troubleshooting/
 
 ## I get errors when starting Modis or sending any message
 
-Make sure Modis is in your server. If it is, this can be caused by a few problems, but this is usually because one or more requirements for Modis are  not up to date. To fix this, run
+Make sure Modis is in your server. If it is, this can be caused by a few problems, but this is usually because one or more requirements for Modis are not up to date. You can update Modis and its requirements using `pip3 install modis --upgrade`. If you don't want to install modis with pip, you can run `pip3 install --upgrade -r requirements.txt` from a command window in the directory of Modis' `requirements.txt`, or you can manually run:
 
 ```sh
 pip3 install <packagename> --upgrade
 ```
 
-or
-
-```sh
-pip3 uninstall <packagename>
-pip3 install <packagename>
-```
-
 for each package listed in the `requirements.txt`.
+
+## On Mac, Modis won't connect to Discord
+
+Go to `Applications/Python 3.6/` and run the `Install Certificates.command` file by double-clicking it.
 
 ## I get syntax errors when running Modis
 
