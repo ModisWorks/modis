@@ -1,9 +1,6 @@
 import logging
-
-import importlib
 import os
-
-import discord
+import importlib
 
 from modis.tools import datatools
 from . import _data

@@ -1,6 +1,6 @@
 import logging
 
-from modis import data
+from modis.tools import datatools
 from . import _data
 
 logger = logging.getLogger(__name__)
@@ -18,10 +18,12 @@ async def on_message(message):
         return
 
     # Check prefix
-    data = data.get_data()
+    data = datatools.get()
     prefix = data["discord"]["servers"][message.server.id]["prefix"]
     if not message.content.startswith(prefix):
         return
+
+    logger.debug("Cmd call on s{} c{}".format(message.server, message.channel))
 
     # Parse message
     package = message.content.split(" ")

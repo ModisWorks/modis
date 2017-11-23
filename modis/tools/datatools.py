@@ -1,8 +1,6 @@
 import logging
-
-import json
-
 import os
+import json
 from collections import OrderedDict
 
 logger = logging.getLogger(__name__)

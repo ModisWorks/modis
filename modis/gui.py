@@ -1,12 +1,12 @@
-import asyncio
-import importlib
 import logging
 import os
+import asyncio
+import importlib
 import threading
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from modis.tools import datatools, helptools
+from modis.tools import helptools
 
 logger = logging.getLogger(__name__)
 

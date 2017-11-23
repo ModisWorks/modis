@@ -22,7 +22,7 @@ def cmd():
     import asyncio
     from modis import main
 
-    logger.debug("Starting Modis")
+    logger.info("Starting Modis")
     loop = asyncio.get_event_loop()
     main.start(loop)
 
@@ -58,15 +58,15 @@ def gui():
     discord.rowconfigure(0, weight=1)
 
     # Run the window UI
-    logger.debug("Starting GUI")
+    logger.info("Starting GUI")
     root.mainloop()
 
 
 def log_init():
-    """Initialises the root logger
+    """Initialises the root logger.
 
     Returns:
-        logging.logger: The root logger
+        logger (logging.logger): The root logger.
     """
 
     import os
