@@ -14,8 +14,6 @@ _datafile = "{}/data.json".format(_dir)
 
 version = "0.3.0b"
 
-<<<<<<< HEAD
-=======
 
 def log_data():
     """Log the data dir info"""
@@ -23,7 +21,6 @@ def log_data():
     logger.debug("Data file location: {}".format(_datafile))
 
 
->>>>>>> master
 def has_data():
     """
     Checks whether or not a data.json file has been created
