@@ -8,8 +8,9 @@ import time
 from modis import datatools
 
 
+working_dir = os.getcwd()
 file_dir = os.path.dirname(os.path.realpath(__file__))
-logs_dir = "{}/../logs/".format(file_dir)
+logs_dir = "{}/logs/".format(working_dir)
 if not os.path.isdir(logs_dir):
     os.mkdir(logs_dir)
 
