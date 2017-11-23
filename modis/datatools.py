@@ -6,8 +6,8 @@ from collections import OrderedDict
 
 import requests
 
-_dir = _os.path.dirname(_os.path.realpath(__file__))
-_datafile = "{}/../data.json".format(_dir)
+_dir = _os.getcwd()
+_datafile = "{}/data.json".format(_dir)
 
 version = "0.3.0a"
 

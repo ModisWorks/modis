@@ -4,11 +4,12 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
 
-# Always prefer setuptools over distutils
-from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
 from os import path
+
+# Always prefer setuptools over distutils
+from setuptools import find_packages, setup
 
 here = path.abspath(path.dirname(__file__))
 
@@ -22,7 +23,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.3.0a',
+    version='0.3.0.2',
 
     description='A modular Discord bot',
     long_description=long_description,
@@ -32,7 +33,7 @@ setup(
 
     # Author details
     author='Infraxion and YtnomSnrub',
-    author_email='',
+    author_email='jalaunder@gmail.com',
 
     # Choose your license
     license='Apache',
@@ -62,7 +63,8 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(),
+    include_package_data=True,
+    packages=find_packages(exclude=["__pycache__"]),
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
@@ -74,12 +76,12 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         'discord.py[voice]>=0.16.12,<1',
-        'youtube-dl',
-        'pynacl',
-        'google-api-python-client',
-        'requests',
-        'lxml',
-        'praw'
+        'youtube-dl>=2017.11.15',
+        'pynacl>=1.0.1',
+        'google-api-python-client>=1.6.4',
+        'requests>=2.18.4',
+        'lxml>=4.1.1',
+        'praw>=5.2.0'
     ],
 
     python_requires=">=3.6, <4",
