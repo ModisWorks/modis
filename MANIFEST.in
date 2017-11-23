@@ -1,0 +1,2 @@
+recursive-include modis *
+prune modis/**/__pycache__
