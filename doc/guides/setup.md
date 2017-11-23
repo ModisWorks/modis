@@ -23,13 +23,6 @@ When you're installing Python on Windows, make sure you check the option that ad
 
 [Homebrew](https://brew.sh/) is a package manager for OS X. It will make setting up Modis easier and you should install it if you haven't already. To install Python, open Terminal and run `brew install python`.
 
-## Python packages
-
-You can find all the package requirements in the `requirements.txt` file.
-To install the packages, open a command processor (CMD or Terminal for Windows and OS X) and type `pip3 install [packagename]`.
-
-You can also install all packages from the `requirements.txt` file by running opening a command window in the same direcory as `requirements.txt` and running `pip3 install -r requirements.txt`.
-
 ## FFmpeg
 
 ### FFmpeg on Windows
@@ -56,11 +49,9 @@ Restart your computer so that Windows updates everything correctly, and continue
 
 If you're using Homebrew, just run `brew install ffmpeg` and `brew install opus` in Terminal. This will install the required libraries for voice and audio that Modis needs. Restart your computer after both packages have downloaded and continue with the next step.
 
-## Modis package
+## Getting Modis
 
-Now you have all the requirements for Modis installed, but you still need to download Modis. You can get the latest release on Modis' [release page](https://github.com/Infraxion/modis/releases).
-
-Extract it into a nice, cozy folder that you can run it from.
+Now that you have the basics done, you want to install Modis. First, you'll want to use pip to install Modis to install all the packages and requirements that Modis needs. In a command window, run `pip3 install modis --upgrade` to install the latest version of Modis. If everything goes well and there are no errors, then you can start making a file to launch Modis from.
 
 ## Running Modis
 
@@ -83,17 +74,15 @@ modis.gui(
 
 > If you don't know how to make your own Discord Bot, have a look at the [Making a Discord Bot](./api-keys.md#making-a-discord-bot) section for step-by-step instructions on getting the Discord token and client id.
 
-To make this file, open up a text editor and paste the text. Save this file as `launcher.py` (and make sure that it's saving as a .py file rather than a .txt file). This file should go in the root directory for Modis (the same one with `requirements.txt`).
+To run Modis now, just run `python launcher.py` from the directory that `launcher.py` is in.
 
-To run Modis now, just run
+> If you are running Modis on a system without `tkinter` installed, or you just really like command windows, you will need to change `modis.gui` to `modis.console`.
 
-```sh
-python launcher.py
-```
+### Installing the whole thing
 
-from the directory that `launcher.py` is in.
+The best bit about Modis is that it's really easy to make it your own! Once you have it working with the `pip` install and a `launcher.py` file, you should download the latest release on Modis' [release page](https://github.com/Infraxion/modis/releases). Extract it into a nice, cozy folder that you can run it from.
 
-> If you are running Modis on a system without `tkinter` installed, you will need to change `modis.gui` to `modis.console`.
+To run this version of Modis, you'll need to use your `launcher.py` file from above and put it in the root directory (the one with `requirements.txt`). You can run Modis the same way, but it'll use your code now instead of the code from `pip`. You can edit this to do what you want: tweak our modules, or look at our other guides and make your own!
 
 ## Troubleshooting
 
