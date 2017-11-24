@@ -46,7 +46,6 @@ ydl_opts = {
     "noplaylist": True,
     "socket_timeout": 30,
     "max_downloads": 1,
-    "logger": logger,
     "match_filter": _match_func
 }
 
