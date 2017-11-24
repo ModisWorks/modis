@@ -19,6 +19,41 @@ logger = logging.getLogger(__name__)
 
 _dir = os.getcwd()
 songcache_dir = "{}/.songcache".format(_dir)
+songcache_next_dir = "{}/.songcache/next".format(_dir)
+
+
+def _match_func(info_dict):
+    if "is_live" not in info_dict or not info_dict["is_live"]:
+        if "duration" in info_dict and info_dict["duration"] > 0:
+            return None
+    raise DownloadStreamException("Cannot download stream")
+
+
+file_format = "%(title)s"
+output_format = "{}/{}".format(songcache_dir, file_format)
+output_format_next = "{}/{}".format(songcache_next_dir, file_format)
+
+ytdl_formats = [
+    "worstaudio",
+    "worst",
+]
+
+ydl_opts = {
+    "format": '/'.join(ytdl_formats),
+    "audio_format": "mp3",
+    "extract_audio": True,
+    "restrict_filenames": True,
+    "writeinfojson": True,
+    "nooverwrites": True,
+    "noplaylist": True,
+    "socket_timeout": 30,
+    "max_downloads": 1,
+    "match_filter": _match_func
+}
+
+
+class DownloadStreamException(BaseException):
+    """Called when trying to download a stream"""
 
 
 class MusicPlayer:
@@ -183,6 +218,8 @@ class MusicPlayer:
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
 
+        self.clear_cache()
+
         if log_stop:
             self.statuslog.info("Stopped")
 
@@ -235,6 +272,8 @@ class MusicPlayer:
             await self.embed.delete()
             self.embed = None
 
+        self.clear_cache()
+
     async def toggle(self):
         """Toggles between paused and not paused command"""
 
@@ -262,10 +301,9 @@ class MusicPlayer:
 
         try:
             if self.streamer.is_playing():
-                self.statuslog.info("Paused")
                 self.streamer.pause()
-
                 self.pause_time = self.vclient.loop.time()
+                self.statuslog.info("Paused")
         except Exception as e:
             logger.error(e)
             pass
@@ -842,6 +880,20 @@ class MusicPlayer:
                     logger.exception(e)
         self.logger.debug("Cache cleared")
 
+    def move_next_cache(self):
+        """Moves files in the 'next' cache dir to the root"""
+        if not os.path.isdir(songcache_next_dir):
+            return
+
+        logger.debug("Moving next cache")
+        files = os.listdir(songcache_next_dir)
+        for f in files:
+            try:
+                os.rename("{}/{}".format(songcache_next_dir, f), "{}/{}".format(songcache_dir, f))
+            except Exception as e:
+                logger.exception(e)
+        logger.debug("Next cache moved")
+
     def ytdl_progress_hook(self, d):
         """Called when youtube-dl updates progress"""
         if d['status'] == 'downloading':
@@ -895,43 +947,21 @@ class MusicPlayer:
     def download_next_song(self, song):
         """Downloads the next song and starts playing it"""
 
-        class DownloadStreamException(BaseException):
-            """Called when trying to download a stream"""
+        dl_ydl_opts = dict(ydl_opts)
+        dl_ydl_opts["progress_hooks"] = [self.ytdl_progress_hook]
+        dl_ydl_opts["outtmpl"] = output_format
 
-        def _match_func(info_dict):
-            if "is_live" not in info_dict or not info_dict["is_live"]:
-                if "duration" in info_dict and info_dict["duration"] > 0:
-                    return None
-            raise DownloadStreamException("Cannot download stream")
-
-        output_format = "{}/%(title)s".format(songcache_dir)
-
-        ytdl_formats = [
-            "worstaudio",
-            "worst",
-        ]
-
-        ydl_opts = {
-            "format": '/'.join(ytdl_formats),
-            "audio_format": "mp3",
-            "extract_audio": True,
-            "outtmpl": output_format,
-            "restrict_filenames": True,
-            "writeinfojson": True,
-            "nooverwrites": False,
-            "noplaylist": True,
-            "socket_timeout": 30,
-            "max_downloads": 1,
-            "match_filter": _match_func,
-            'progress_hooks': [self.ytdl_progress_hook],
-        }
+        # Move the songs from the next cache to the current cache
+        self.move_next_cache()
 
         self.play_empty()
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        # Download the file and create the stream
+        with youtube_dl.YoutubeDL(dl_ydl_opts) as ydl:
             try:
                 ydl.download([song])
             except DownloadStreamException:
-                future = asyncio.run_coroutine_threadsafe(self.create_stream_player(song, ydl_opts), client.loop)
+                # This is a livestream, use the appropriate player
+                future = asyncio.run_coroutine_threadsafe(self.create_stream_player(song, dl_ydl_opts), client.loop)
                 try:
                     future.result()
                 except Exception as e:
@@ -944,17 +974,27 @@ class MusicPlayer:
                 self.state = 'ready'
                 self.vafter_ts()
 
+    def download_next_song_cache(self):
+        """Downloads the next song in the queue to the cache"""
+        if len(self.queue) == 0:
+            return
+
+        cache_ydl_opts = dict(ydl_opts)
+        cache_ydl_opts["outtmpl"] = output_format_next
+
+        with youtube_dl.YoutubeDL(cache_ydl_opts) as ydl:
+            try:
+                ydl.download([self.queue[0][0]])
+            except:
+                # Silently fail, everything will be handled fully when the current song is done
+                pass
+
     def create_ffmpeg_player(self, filepath):
         self.current_download_elapsed = 0
 
         self.streamer = self.vclient.create_ffmpeg_player(filepath, after=self.vafter_ts)
         self.state = "ready"
-
-        self.vclient_task = asyncio.Task(self.time_loop(), loop=self.vclient.loop)
-        self.vclient_starttime = self.vclient.loop.time()
-
-        self.streamer.volume = self.volume / 100
-        self.streamer.start()
+        self.setup_streamer()
 
         # Read from the info json
         info_filename = "{}.info.json".format(filepath)
@@ -970,15 +1010,9 @@ class MusicPlayer:
     async def create_stream_player(self, url, ydl_opts):
         self.current_download_elapsed = 0
 
-        self.streamer = await self.vclient.create_ytdl_player(url, ytdl_options=ydl_opts,
-                                                              after=self.vafter_ts)
+        self.streamer = await self.vclient.create_ytdl_player(url, ytdl_options=ydl_opts, after=self.vafter_ts)
         self.state = "ready"
-
-        self.streamer.volume = self.volume / 100
-        self.streamer.start()
-
-        self.vclient_task = asyncio.Task(self.time_loop(), loop=self.vclient.loop)
-        self.vclient_starttime = self.vclient.loop.time()
+        self.setup_streamer()
 
         # Read from the info json
         self.statuslog.debug("Playing")
@@ -986,6 +1020,18 @@ class MusicPlayer:
         self.nowplayingauthorlog.debug(self.streamer.uploader)
         self.current_duration = self.streamer.duration
         self.is_live = True
+
+    def setup_streamer(self):
+        self.vclient_task = asyncio.Task(self.time_loop(), loop=self.vclient.loop)
+        self.vclient_starttime = self.vclient.loop.time()
+
+        self.streamer.volume = self.volume / 100
+        self.streamer.start()
+
+        # Cache next song
+        self.logger.debug("Caching next song")
+        dl_thread = threading.Thread(target=self.download_next_song_cache)
+        dl_thread.start()
 
     async def vplay(self):
         if self.state != 'ready':
@@ -996,6 +1042,7 @@ class MusicPlayer:
         self.logger.debug("Playing next in queue")
 
         self.pause_time = None
+        self.clear_cache()
 
         # Queue has items
         if self.queue is not None and len(self.queue) > 0:
@@ -1010,6 +1057,7 @@ class MusicPlayer:
 
             try:
                 self.statuslog.debug("Downloading next song")
+                self.timelog.debug("Loading song")
                 dl_thread = threading.Thread(target=self.download_next_song, args=[song])
                 dl_thread.start()
 
@@ -1036,7 +1084,6 @@ class MusicPlayer:
                 await self.vplay()
 
             self.update_queue()
-
 
         # Queue exhausted
         else:
@@ -1077,13 +1124,13 @@ class MusicPlayer:
 
         self.pause_time = None
 
-        # Clear the cache
-        self.clear_cache()
-
         if self.vclient_task:
             loop = asyncio.get_event_loop()
             loop.call_soon(self.vclient_task.cancel)
             self.vclient_task = None
+
+        # Log a full time bar
+        self.timelog.debug(_timebar.make_timebar(self.current_duration, self.current_duration))
 
         try:
             if self.streamer is None:
