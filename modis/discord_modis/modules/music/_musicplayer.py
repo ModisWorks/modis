@@ -1,7 +1,6 @@
 """The music player for the music module"""
 
 import asyncio
-import json
 import logging
 import os
 import random
@@ -43,11 +42,11 @@ ydl_opts = {
     "audio_format": "mp3",
     "extract_audio": True,
     "restrict_filenames": True,
-    "writeinfojson": True,
     "nooverwrites": True,
     "noplaylist": True,
     "socket_timeout": 30,
     "max_downloads": 1,
+    "logger": logger,
     "match_filter": _match_func
 }
 
@@ -103,6 +102,8 @@ class MusicPlayer:
         self.nowplayinglog.setLevel("DEBUG")
         self.nowplayingauthorlog = logging.getLogger("{}.{}.nowplayingauthor".format(__name__, self.server_id))
         self.nowplayingauthorlog.setLevel("DEBUG")
+        self.nowplayingsourcelog = logging.getLogger("{}.{}.nowplayingsource".format(__name__, self.server_id))
+        self.nowplayingsourcelog.setLevel("DEBUG")
         self.timelog = logging.getLogger("{}.{}.time".format(__name__, self.server_id))
         self.timelog.setLevel("DEBUG")
         self.timelog.propagate = False
@@ -179,6 +180,7 @@ class MusicPlayer:
         await self.set_topic("")
         self.nowplayinglog.debug("---")
         self.nowplayingauthorlog.debug("---")
+        self.nowplayingsourcelog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
 
@@ -215,6 +217,7 @@ class MusicPlayer:
 
         self.nowplayinglog.debug("---")
         self.nowplayingauthorlog.debug("---")
+        self.nowplayingsourcelog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
 
@@ -237,6 +240,7 @@ class MusicPlayer:
         await self.set_topic("")
         self.nowplayinglog.debug("---")
         self.nowplayingauthorlog.debug("---")
+        self.nowplayingsourcelog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
         self.statuslog.debug("Destroying")
@@ -275,11 +279,14 @@ class MusicPlayer:
         self.clear_cache()
 
     async def toggle(self):
-        """Toggles between paused and not paused command"""
+        """Toggles between pause and resume command"""
 
         self.logger.debug("toggle command")
 
         if not self.state == 'ready':
+            return
+
+        if self.streamer is None:
             return
 
         try:
@@ -299,6 +306,9 @@ class MusicPlayer:
         if not self.state == 'ready':
             return
 
+        if self.streamer is None:
+            return
+
         try:
             if self.streamer.is_playing():
                 self.streamer.pause()
@@ -311,9 +321,12 @@ class MusicPlayer:
     async def resume(self):
         """Resumes playback if paused"""
 
-        self.logger.debug("toggle command")
+        self.logger.debug("resume command")
 
         if not self.state == 'ready':
+            return
+
+        if self.streamer is None:
             return
 
         try:
@@ -705,8 +718,9 @@ class MusicPlayer:
 
         # Initial datapacks
         datapacks = [
-            ("Now playing", "---", True),
+            ("Now playing", "---", False),
             ("Author", "---", True),
+            ("Source", "---", True),
             ("Time", "```http\n" + _timebar.make_timebar() + "\n```", False),
             ("Queue", "```md\n{}\n```".format(''.join(queue_display)), False),
             ("Songs left in queue", "---", True),
@@ -736,19 +750,22 @@ class MusicPlayer:
         nowplayinghandler.setFormatter(noformatter)
         nowplayingauthorhandler = EmbedLogHandler(self, self.embed, 1)
         nowplayingauthorhandler.setFormatter(noformatter)
-        timehandler = EmbedLogHandler(self, self.embed, 2)
+        nowplayingsourcehandler = EmbedLogHandler(self, self.embed, 2)
+        nowplayingsourcehandler.setFormatter(noformatter)
+        timehandler = EmbedLogHandler(self, self.embed, 3)
         timehandler.setFormatter(timeformatter)
-        queuehandler = EmbedLogHandler(self, self.embed, 3)
+        queuehandler = EmbedLogHandler(self, self.embed, 4)
         queuehandler.setFormatter(mdformatter)
-        queuelenhandler = EmbedLogHandler(self, self.embed, 4)
+        queuelenhandler = EmbedLogHandler(self, self.embed, 5)
         queuelenhandler.setFormatter(noformatter)
-        volumehandler = EmbedLogHandler(self, self.embed, 5)
+        volumehandler = EmbedLogHandler(self, self.embed, 6)
         volumehandler.setFormatter(volumeformatter)
-        statushandler = EmbedLogHandler(self, self.embed, 6)
+        statushandler = EmbedLogHandler(self, self.embed, 7)
         statushandler.setFormatter(statusformatter)
 
         self.nowplayinglog.addHandler(nowplayinghandler)
         self.nowplayingauthorlog.addHandler(nowplayingauthorhandler)
+        self.nowplayingsourcelog.addHandler(nowplayingsourcehandler)
         self.timelog.addHandler(timehandler)
         self.queuelog.addHandler(queuehandler)
         self.queuelenlog.addHandler(queuelenhandler)
@@ -849,21 +866,24 @@ class MusicPlayer:
     def time_loop(self):
         while True:
             if self.pause_time is None:
-                diff = self.vclient.loop.time() - self.vclient_starttime
+                if self.vclient is not None and self.vclient_starttime is not None and self.streamer is not None:
+                    diff = self.vclient.loop.time() - self.vclient_starttime
 
-                if self.streamer is None:
-                    time_bar = "Error"
-                elif self.is_live:
-                    time_bar = "Livestream"
-                else:
-                    time_bar = _timebar.make_timebar(diff, self.current_duration)
+                    if self.is_live:
+                        time_bar = "Livestream"
+                    else:
+                        time_bar = _timebar.make_timebar(diff, self.current_duration)
 
-                if time_bar != self.prev_time:
-                    self.timelog.debug(time_bar)
-                    self.prev_time = time_bar
-                    yield from asyncio.sleep(5)
+                    if time_bar != self.prev_time:
+                        self.timelog.debug(time_bar)
+                        self.prev_time = time_bar
+                        yield from asyncio.sleep(5)
+                    else:
+                        yield from asyncio.sleep(1)
                 else:
                     yield from asyncio.sleep(1)
+            else:
+                yield from asyncio.sleep(2)
 
     def clear_cache(self):
         """Removes all files from the songcache dir"""
@@ -890,6 +910,8 @@ class MusicPlayer:
         for f in files:
             try:
                 os.rename("{}/{}".format(songcache_next_dir, f), "{}/{}".format(songcache_dir, f))
+            except PermissionError:
+                pass
             except Exception as e:
                 logger.exception(e)
         logger.debug("Next cache moved")
@@ -929,6 +951,7 @@ class MusicPlayer:
             self.statuslog.info("Error downloading song")
         elif d['status'] == 'finished':
             self.statuslog.info("Downloaded song")
+            self.timelog.debug("Downloading song: 100%")
             if "elapsed" in d:
                 download_time = "{} {}".format(d["elapsed"] if d["elapsed"] > 0 else "<1",
                                                "seconds" if d["elapsed"] != 1 else "second")
@@ -959,6 +982,7 @@ class MusicPlayer:
         with youtube_dl.YoutubeDL(dl_ydl_opts) as ydl:
             try:
                 ydl.download([song])
+                self.is_live = False
             except DownloadStreamException:
                 # This is a livestream, use the appropriate player
                 future = asyncio.run_coroutine_threadsafe(self.create_stream_player(song, dl_ydl_opts), client.loop)
@@ -966,13 +990,45 @@ class MusicPlayer:
                     future.result()
                 except Exception as e:
                     logger.exception(e)
+                    return
+
+                self.current_duration = 0
+                self.is_live = True
             except PermissionError:
                 # File is still in use, it'll get cleared next time
                 pass
-            except youtube_dl.utils.DownloadError:
-                self.statuslog.error("Unsupported URL: {}".format(song))
+            except youtube_dl.utils.DownloadError as e:
+                self.logger.exception(e)
+                self.statuslog.error(e)
                 self.state = 'ready'
                 self.vafter_ts()
+                return
+            except Exception as e:
+                self.logger.exception(e)
+                self.state = 'ready'
+                self.vafter_ts()
+                return
+
+            try:
+                url_info = ydl.extract_info(song, download=False)
+                self.nowplayinglog.debug(url_info["title"])
+
+                if "duration" in url_info:
+                    self.current_duration = url_info["duration"]
+                else:
+                    self.current_duration = 0
+
+                if "uploader" in url_info:
+                    self.nowplayingauthorlog.info(url_info["uploader"])
+                else:
+                    self.nowplayingauthorlog.info("Unknown")
+
+                if "extractor_key" in url_info:
+                    self.nowplayingsourcelog.info(url_info["extractor_key"])
+                else:
+                    self.nowplayingsourcelog.info("Unknown")
+            except Exception as e:
+                logger.exception(e)
 
     def download_next_song_cache(self):
         """Downloads the next song in the queue to the cache"""
@@ -984,9 +1040,9 @@ class MusicPlayer:
 
         with youtube_dl.YoutubeDL(cache_ydl_opts) as ydl:
             try:
-                ydl.download([self.queue[0][0]])
+                url = self.queue[0][0]
+                ydl.download([url])
             except:
-                # Silently fail, everything will be handled fully when the current song is done
                 pass
 
     def create_ffmpeg_player(self, filepath):
@@ -996,37 +1052,22 @@ class MusicPlayer:
         self.state = "ready"
         self.setup_streamer()
 
-        # Read from the info json
-        info_filename = "{}.info.json".format(filepath)
-        with open(info_filename, 'r') as file:
-            info = json.load(file)
+        self.statuslog.debug("Playing")
 
-            self.statuslog.debug("Playing")
-            self.nowplayinglog.debug(info["title"])
-            self.nowplayingauthorlog.debug(info["uploader"])
-            self.current_duration = info["duration"]
-            self.is_live = False
-
-    async def create_stream_player(self, url, ydl_opts):
+    async def create_stream_player(self, url, opts=ydl_opts):
         self.current_download_elapsed = 0
 
-        self.streamer = await self.vclient.create_ytdl_player(url, ytdl_options=ydl_opts, after=self.vafter_ts)
+        self.streamer = await self.vclient.create_ytdl_player(url, ytdl_options=opts, after=self.vafter_ts)
         self.state = "ready"
         self.setup_streamer()
 
-        # Read from the info json
-        self.statuslog.debug("Playing")
-        self.nowplayinglog.debug(self.streamer.title)
-        self.nowplayingauthorlog.debug(self.streamer.uploader)
-        self.current_duration = self.streamer.duration
-        self.is_live = True
+        self.statuslog.debug("Streaming")
 
     def setup_streamer(self):
-        self.vclient_task = asyncio.Task(self.time_loop(), loop=self.vclient.loop)
-        self.vclient_starttime = self.vclient.loop.time()
-
         self.streamer.volume = self.volume / 100
         self.streamer.start()
+
+        self.vclient_starttime = self.vclient.loop.time()
 
         # Cache next song
         self.logger.debug("Caching next song")
@@ -1058,6 +1099,7 @@ class MusicPlayer:
             try:
                 self.statuslog.debug("Downloading next song")
                 self.timelog.debug("Loading song")
+
                 dl_thread = threading.Thread(target=self.download_next_song, args=[song])
                 dl_thread.start()
 
@@ -1066,6 +1108,7 @@ class MusicPlayer:
                 await self.set_topic("")
                 self.nowplayinglog.info("Error playing {}".format(songname))
                 self.nowplayingauthorlog.info("---")
+                self.nowplayingsourcelog.info("---")
                 self.timelog.debug(_timebar.make_timebar())
                 self.prev_time = "---"
                 self.statuslog.error("Had a problem playing {}".format(songname))
@@ -1084,6 +1127,7 @@ class MusicPlayer:
                 await self.vplay()
 
             self.update_queue()
+            self.vclient_task = asyncio.Task(self.time_loop(), loop=client.loop)
 
         # Queue exhausted
         else:
