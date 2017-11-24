@@ -41,6 +41,7 @@ class MusicPlayer:
         self.vclient = None
         self.streamer = None
         self.current_duration = 0
+        self.current_download_elapsed = 0
         self.is_live = False
         self.queue = []
         self.prev_queue = []
@@ -170,6 +171,7 @@ class MusicPlayer:
         self.vchannel = None
         self.streamer = None
         self.current_duration = 0
+        self.current_download_elapsed = 0
         self.is_live = False
         self.queue = []
         self.prev_queue = []
@@ -224,6 +226,7 @@ class MusicPlayer:
         self.vchannel = None
         self.streamer = None
         self.current_duration = 0
+        self.current_download_elapsed = 0
         self.is_live = False
         self.queue = []
         self.prev_queue = []
@@ -843,6 +846,33 @@ class MusicPlayer:
         """Called when youtube-dl updates progress"""
         if d['status'] == 'downloading':
             self.play_empty()
+
+            if "elapsed" in d:
+                if d["elapsed"] > self.current_download_elapsed + 4:
+                    self.current_download_elapsed = d["elapsed"]
+
+                    current_download = 0
+                    current_download_total = 0
+                    current_download_eta = 0
+                    if "total_bytes" in d and d["total_bytes"] > 0:
+                        current_download_total = d["total_bytes"]
+                    elif "total_bytes_estimate" in d and d["total_bytes_estimate"] > 0:
+                        current_download_total = d["total_bytes_estimate"]
+                    if "downloaded_bytes" in d and d["downloaded_bytes"] > 0:
+                        current_download = d["downloaded_bytes"]
+                    if "eta" in d and d["eta"] > 0:
+                        current_download_eta = d["eta"]
+
+                    if current_download_total > 0:
+                        percent = round(100 * (current_download / current_download_total))
+                        if percent > 100:
+                            percent = 100
+                        elif percent < 0:
+                            percent = 0
+
+                        seconds = str(round(current_download_eta)) if current_download_eta > 0 else ""
+                        eta = " ({} {} remaining)".format(seconds, "seconds" if seconds != 1 else "second")
+                        self.timelog.debug("Downloading song: {}%{}".format(percent, eta))
         if d['status'] == 'error':
             self.statuslog.info("Error downloading song")
         elif d['status'] == 'finished':
@@ -856,13 +886,15 @@ class MusicPlayer:
             self.create_ffmpeg_player(output_filename)
 
     def play_empty(self):
-        """Play empty audio to let Discord know we're still here"""
+        """Play blank audio to let Discord know we're still here"""
         if self.vclient:
             if self.streamer:
                 self.streamer.volume = 0
-            self.vclient.play_audio("\0".encode(), encode=True)
+            self.vclient.play_audio("\n".encode(), encode=False)
 
     def download_next_song(self, song):
+        """Downloads the next song and starts playing it"""
+
         class DownloadStreamException(BaseException):
             """Called when trying to download a stream"""
 
@@ -913,6 +945,8 @@ class MusicPlayer:
                 self.vafter_ts()
 
     def create_ffmpeg_player(self, filepath):
+        self.current_download_elapsed = 0
+
         self.streamer = self.vclient.create_ffmpeg_player(filepath, after=self.vafter_ts)
         self.state = "ready"
 
@@ -934,6 +968,8 @@ class MusicPlayer:
             self.is_live = False
 
     async def create_stream_player(self, url, ydl_opts):
+        self.current_download_elapsed = 0
+
         self.streamer = await self.vclient.create_ytdl_player(url, ytdl_options=ydl_opts,
                                                               after=self.vafter_ts)
         self.state = "ready"
@@ -973,7 +1009,7 @@ class MusicPlayer:
                 self.prev_queue.pop(0)
 
             try:
-                self.timelog.debug("Downloading next song")
+                self.statuslog.debug("Downloading next song")
                 dl_thread = threading.Thread(target=self.download_next_song, args=[song])
                 dl_thread.start()
 
@@ -994,6 +1030,7 @@ class MusicPlayer:
 
                 self.streamer = None
                 self.current_duration = 0
+                self.current_download_elapsed = 0
                 self.is_live = False
                 self.state = "ready"
                 await self.vplay()
