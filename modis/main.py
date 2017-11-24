@@ -23,6 +23,8 @@ def start(loop):
     
     from modis import cache
 
+    # TODO data.json setup
+
     # Create client
     logger.debug("Creating Discord client")
     asyncio.set_event_loop(loop)
