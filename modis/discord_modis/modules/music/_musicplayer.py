@@ -858,6 +858,8 @@ class MusicPlayer:
     def play_empty(self):
         """Play empty audio to let Discord know we're still here"""
         if self.vclient:
+            if self.streamer:
+                self.streamer.volume = 0
             self.vclient.play_audio("\0".encode(), encode=True)
 
     def download_next_song(self, song):
