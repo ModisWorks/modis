@@ -170,11 +170,14 @@ def parse_query(query, ilogger):
                 query_search = ' '.join(args[1:])
             query_type = query_type.replace('song', 'track')
             ilogger.info("Queueing Spotify {}: {}".format(query_type, query_search))
-            spotifysearch = search_sp_tracks(query_type, query_search)
-            return get_ytvideos(spotifysearch, ilogger), (0, "Queued YouTube search: {}".format(query))
+            spotify_tracks = get_sp_tracks(query_type, query_search)
+            return get_ytvideos(spotify_tracks, ilogger), (0, "Queued Spotify search: {}".format(query)) 
+        #This sends the track name and artist found with the spotifyAPI to youtube
         except Exception as e:
             logger.exception(e)
             return [], (1, "Error queueing from Spotify")
+
+
     elif args[0].lower() in ["sc", "soundcloud"]:
         if scclient is None:
             return [], (1, "Host does not support SoundCloud")
@@ -188,7 +191,8 @@ def parse_query(query, ilogger):
                 query_search = ' '.join(args[1:])
             query_type = query_type.replace('song', 'track')
             ilogger.info("Queueing SoundCloud {}: {}".format(query_type, query_search))
-            search_sc_tracks(query_type, query_search)
+            soundcloud_tracks = search_sc_tracks(query_type, query_search)
+            return soundcloud_tracks, (0, "Queued SoundCloud {}: {}".format(query_type, query_search))
         except Exception as e:
             logger.exception(e)
             return [], (1, "Could not queue from SoundCloud")
@@ -347,17 +351,38 @@ def get_sc_tracks(result):
     return None
 
 
-def search_sp_tracks(query_type, query_search):
+def get_sp_tracks(query_type, query_search):
     if query_type == 'track':
-        results = spclient.track(query_search)
-        song_name = results['name']
-        song_artist = results['artists'][0]['name']
-        query = ("{} by {}".format(song_name,song_artist))
-        return(query)
+        results = spclient.track(query_search) # looks up the URI on spotify
+        song_name = results['name'] # gather the name of the song by looking for the tag ['name']
+        song_artist = results['artists'][0]['name'] # same as before, might only return the first artist, unsure
+        query = ("{} by {}".format(song_name,song_artist)) # joins both results
+        return(query) # sends query back to parse_query
+    elif query_type == 'artist':
+        results = spclient.artist_top_tracks(query_search)
+        for tracks in results["items"]: # finds all tracks in the album
+             song_name = tracks["name"]
+             song_artist = tracks["artists"][0]["name"]
+             query = ("{} by {}".format(song_name,song_artist))
+             return(query)
+    elif query_type == 'album':
+        results = spclient.album_tracks(query_search)
+        for tracks in results["items"]: # finds all tracks in the album
+             song_name = tracks["name"]
+             song_artist = tracks["artists"][0]["name"]
+             query = ("{} by {}".format(song_name,song_artist))
+             return(query)
+    elif query_type == 'playlist':
+        get_username = query_search.split(":")[2]
+        get_playlist = query_search.split(":")[4]
+        result = spclient.user_playlist_tracks(get_username, get_playlist)
+        for tracks in results["items"]: # finds all tracks in the album
+             song_name = tracks["name"]
+             song_artist = tracks["artists"][0]["name"]
+             query = ("{} by {}".format(song_name,song_artist))
+             return(query)
 
-
-
-    #return []
+    return []
 
 
 
@@ -379,5 +404,3 @@ def duration_to_string(duration):
 build_yt_api()
 build_sc_api()
 build_spotify_api()
-
-parse_query("sp spotify:track:7F8UrR3MuUerhWRQEO2rgi", logger)
