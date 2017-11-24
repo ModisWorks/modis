@@ -393,6 +393,13 @@ class Log(ttk.Labelframe):
         log = tk.Text(self, wrap="none")
         log.grid(column=0, row=0, sticky="W E N S")
 
+        # Config tags
+        log.tag_config('critical', foreground="red", underline=True)
+        log.tag_config('error', foreground="red")
+        log.tag_config('warning', foreground="orange")
+        log.tag_config('info')
+        log.tag_config('debug', foreground="#444444")
+
         # Vertical Scrollbar
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=log.yview)
         scrollbar.grid(column=1, row=0, sticky="N S")
@@ -420,8 +427,21 @@ class Log(ttk.Labelframe):
             def emit(self, record):
                 msg = self.format(record)
                 msg = msg[:9] + msg[29:]
+
+                tags = ()
+                if msg.startswith("CRITICAL"):
+                    tags = 'critical'
+                if msg.startswith("ERROR"):
+                    tags = 'error'
+                if msg.startswith("WARNING"):
+                    tags = 'warning'
+                if msg.startswith("INFO"):
+                    tags = 'info'
+                if msg.startswith("DEBUG"):
+                    tags = 'debug'
+
                 self.text_widget.config(state=tk.NORMAL)
-                self.text_widget.insert("end", msg + "\n")
+                self.text_widget.insert("end", msg + "\n", tags)
                 self.text_widget.config(state=tk.DISABLED)
                 self.flush()
 

@@ -170,8 +170,12 @@ def _get_event_handlers():
                         module_name, event_handler)
                     logger.debug("Found event handler {}".format(import_name[23:]))
 
-                    event_handlers[event_handler].append(
-                        importlib.import_module(import_name, "modis"))
+                    try:
+                        event_handlers[event_handler].append(
+                            importlib.import_module(import_name, "modis"))
+                    except Exception as e:
+                        # Log errors in modules
+                        logger.exception(e)
 
     return event_handlers
 
