@@ -1,6 +1,7 @@
 """The music player for the music module"""
 
 import asyncio
+import json
 import logging
 import os
 import random
@@ -23,7 +24,7 @@ songcache_next_dir = "{}/.songcache/next".format(_dir)
 
 def _match_func(info_dict):
     if "is_live" not in info_dict or not info_dict["is_live"]:
-        if "duration" in info_dict and info_dict["duration"] > 0:
+        if "duration" in info_dict and info_dict["duration"] is not None and info_dict["duration"] > 0:
             return None
     raise DownloadStreamException("Cannot download stream")
 
@@ -42,6 +43,7 @@ ydl_opts = {
     "audio_format": "mp3",
     "extract_audio": True,
     "restrict_filenames": True,
+    "writeinfojson": True,
     "nooverwrites": True,
     "noplaylist": True,
     "socket_timeout": 30,
@@ -945,12 +947,17 @@ class MusicPlayer:
 
                         seconds = str(round(current_download_eta)) if current_download_eta > 0 else ""
                         eta = " ({} {} remaining)".format(seconds, "seconds" if seconds != 1 else "second")
-                        self.timelog.debug("Downloading song: {}%{}".format(percent, eta))
+
+                        downloading = "Downloading song: {}%{}".format(percent, eta)
+                        self.timelog.debug(downloading)
+                        self.prev_time = "---"
         if d['status'] == 'error':
             self.statuslog.info("Error downloading song")
         elif d['status'] == 'finished':
             self.statuslog.info("Downloaded song")
             self.timelog.debug("Downloading song: 100%")
+            self.prev_time = "---"
+
             if "elapsed" in d:
                 download_time = "{} {}".format(d["elapsed"] if d["elapsed"] > 0 else "<1",
                                                "seconds" if d["elapsed"] != 1 else "second")
@@ -981,7 +988,6 @@ class MusicPlayer:
         with youtube_dl.YoutubeDL(dl_ydl_opts) as ydl:
             try:
                 ydl.download([song])
-                self.is_live = False
             except DownloadStreamException:
                 # This is a livestream, use the appropriate player
                 future = asyncio.run_coroutine_threadsafe(self.create_stream_player(song, dl_ydl_opts), client.loop)
@@ -990,9 +996,6 @@ class MusicPlayer:
                 except Exception as e:
                     logger.exception(e)
                     return
-
-                self.current_duration = 0
-                self.is_live = True
             except PermissionError:
                 # File is still in use, it'll get cleared next time
                 pass
@@ -1007,27 +1010,6 @@ class MusicPlayer:
                 self.state = 'ready'
                 self.vafter_ts()
                 return
-
-            try:
-                url_info = ydl.extract_info(song, download=False)
-                self.nowplayinglog.debug(url_info["title"])
-
-                if "duration" in url_info:
-                    self.current_duration = url_info["duration"]
-                else:
-                    self.current_duration = 0
-
-                if "uploader" in url_info:
-                    self.nowplayingauthorlog.info(url_info["uploader"])
-                else:
-                    self.nowplayingauthorlog.info("Unknown")
-
-                if "extractor_key" in url_info:
-                    self.nowplayingsourcelog.info(url_info["extractor_key"])
-                else:
-                    self.nowplayingsourcelog.info("Unknown")
-            except Exception as e:
-                logger.exception(e)
 
     def download_next_song_cache(self):
         """Downloads the next song in the queue to the cache"""
@@ -1051,6 +1033,40 @@ class MusicPlayer:
         self.state = "ready"
         self.setup_streamer()
 
+        try:
+            # Read from the info json
+            info_filename = "{}.info.json".format(filepath)
+            with open(info_filename, 'r') as file:
+                info = json.load(file)
+
+                self.statuslog.debug("Playing")
+                self.nowplayinglog.debug(info["title"])
+                self.current_duration = info["duration"]
+                self.is_live = False
+
+                self.nowplayinglog.debug(info["title"])
+
+                if "duration" in info and info["duration"] is not None:
+                    self.current_duration = info["duration"]
+                else:
+                    self.current_duration = 0
+
+                if "uploader" in info:
+                    self.nowplayingauthorlog.info(info["uploader"])
+                else:
+                    self.nowplayingauthorlog.info("Unknown")
+
+                if "extractor_key" in info:
+                    source = info["extractor_key"]
+                    if source == "Generic":
+                        source = "Link"
+
+                    self.nowplayingsourcelog.info(source)
+                else:
+                    self.nowplayingsourcelog.info("Unknown")
+        except Exception as e:
+            logger.exception(e)
+
         self.statuslog.debug("Playing")
 
     async def create_stream_player(self, url, opts=ydl_opts):
@@ -1060,6 +1076,22 @@ class MusicPlayer:
         self.state = "ready"
         self.setup_streamer()
 
+        self.nowplayinglog.debug(self.streamer.title)
+        self.nowplayingauthorlog.debug(self.streamer.uploader if self.streamer.uploader is not None else "Unknown")
+        self.current_duration = 0
+        self.is_live = True
+
+        info = self.streamer.yt.extract_info(url, download=False)
+        if "extractor_key" in info:
+            source = info["extractor_key"]
+            if source == "Generic":
+                source = "Link"
+
+            self.nowplayingsourcelog.info(source)
+        else:
+            self.nowplayingsourcelog.info("Unknown")
+
+        await self.set_topic("Streaming {}".format(self.streamer.title))
         self.statuslog.debug("Streaming")
 
     def setup_streamer(self):
@@ -1096,8 +1128,12 @@ class MusicPlayer:
                 self.prev_queue.pop(0)
 
             try:
+                self.nowplayinglog.debug("---")
+                self.nowplayingauthorlog.debug("---")
+                self.nowplayingsourcelog.debug("---")
                 self.statuslog.debug("Downloading next song")
                 self.timelog.debug("Loading song")
+                self.prev_time = "---"
 
                 dl_thread = threading.Thread(target=self.download_next_song, args=[song])
                 dl_thread.start()
@@ -1174,6 +1210,7 @@ class MusicPlayer:
 
         # Log a full time bar
         self.timelog.debug(_timebar.make_timebar(self.current_duration, self.current_duration))
+        self.prev_time = "---"
 
         try:
             if self.streamer is None:
