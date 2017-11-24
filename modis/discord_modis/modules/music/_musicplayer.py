@@ -1,11 +1,14 @@
 """The music player for the music module"""
 
 import asyncio
+import json
 import logging
+import os
 import random
 import threading
 
 import discord
+import youtube_dl
 
 from modis import datatools
 from . import _data, _timebar, api_music, ui_embed
@@ -13,6 +16,9 @@ from .._tools import ui_embed as ui_embed_tools
 from ..._client import client
 
 logger = logging.getLogger(__name__)
+
+_dir = os.getcwd()
+songcache_dir = "{}/.songcache".format(_dir)
 
 
 class MusicPlayer:
@@ -34,6 +40,8 @@ class MusicPlayer:
         self.vchannel = None
         self.vclient = None
         self.streamer = None
+        self.current_duration = 0
+        self.is_live = False
         self.queue = []
         self.prev_queue = []
         self.prev_queue_max = 500
@@ -73,6 +81,9 @@ class MusicPlayer:
         self.statuslog = logging.getLogger("{}.{}.status".format(__name__, self.server_id))
         self.statuslog.setLevel("DEBUG")
         self.statustimer = None
+
+        # Clear the cache
+        self.clear_cache()
 
         # Get channel topic
         self.topic = ""
@@ -156,6 +167,8 @@ class MusicPlayer:
         self.vclient = None
         self.vchannel = None
         self.streamer = None
+        self.current_duration = 0
+        self.is_live = False
         self.queue = []
         self.prev_queue = []
 
@@ -205,6 +218,8 @@ class MusicPlayer:
         self.vclient = None
         self.vchannel = None
         self.streamer = None
+        self.current_duration = 0
+        self.is_live = False
         self.queue = []
         self.prev_queue = []
 
@@ -559,32 +574,6 @@ class MusicPlayer:
         embed = ui_embed.topic_update(channel, self.topicchannel)
         await embed.send()
 
-    async def nowplaying_info(self, channel):
-        """
-        Print the info about the currently playing song
-
-        Args:
-            channel (discord.Channel): The channel to send info to
-        """
-
-        await client.send_typing(channel)
-
-        if self.streamer is None:
-            embed = ui_embed.nowplaying_none(channel)
-            await embed.send()
-            return
-
-        if self.streamer.is_live:
-            duration_info = "Livestream"
-        else:
-            duration_info = api_music.duration_to_string(self.streamer.duration)
-
-        embed = ui_embed.nowplaying_info(channel, title=self.streamer.title, duration=duration_info,
-                                         source=self.streamer.uploader, source_date=self.streamer.upload_date,
-                                         views=self.streamer.views, likes=self.streamer.likes,
-                                         description=self.streamer.description)
-        await embed.send()
-
     # Methods
     async def vsetup(self, author):
         """Creates the voice client
@@ -818,16 +807,138 @@ class MusicPlayer:
 
                 if self.streamer is None:
                     time_bar = "Error"
-                elif self.streamer.is_live:
+                elif self.is_live:
                     time_bar = "Livestream"
                 else:
-                    time_bar = _timebar.make_timebar(diff, self.streamer.duration)
+                    time_bar = _timebar.make_timebar(diff, self.current_duration)
 
                 if time_bar != self.prev_time:
                     self.timelog.debug(time_bar)
                     self.prev_time = time_bar
+                    yield from asyncio.sleep(5)
+                else:
+                    yield from asyncio.sleep(1)
 
-            yield from asyncio.sleep(5)
+    def clear_cache(self):
+        """Removes all files from the songcache dir"""
+        self.logger.debug("Clearing cache")
+        if os.path.isdir(songcache_dir):
+            for filename in os.listdir(songcache_dir):
+                file_path = os.path.join(songcache_dir, filename)
+                try:
+                    if os.path.isfile(file_path):
+                        os.unlink(file_path)
+                except PermissionError:
+                    pass
+                except Exception as e:
+                    logger.exception(e)
+        self.logger.debug("Cache cleared")
+
+    def ytdl_progress_hook(self, d):
+        """Called when youtube-dl updates progress"""
+        if d['status'] == 'downloading':
+            self.play_empty()
+        if d['status'] == 'error':
+            self.statuslog.info("Error downloading song")
+        elif d['status'] == 'finished':
+            self.statuslog.info("Downloaded song")
+            if "elapsed" in d:
+                download_time = "{} {}".format(d["elapsed"] if d["elapsed"] > 0 else "<1",
+                                               "seconds" if d["elapsed"] != 1 else "second")
+                self.logger.debug("Downloaded song in {}".format(download_time))
+
+            output_filename = d['filename']
+            self.create_ffmpeg_player(output_filename)
+
+    def play_empty(self):
+        """Play empty audio to let Discord know we're still here"""
+        if self.vclient:
+            self.vclient.play_audio("\0".encode(), encode=True)
+
+    def download_next_song(self, song):
+        class DownloadStreamException(BaseException):
+            """Called when trying to download a stream"""
+
+        def _match_func(info_dict):
+            if "is_live" not in info_dict or not info_dict["is_live"]:
+                if "duration" in info_dict and info_dict["duration"] > 0:
+                    return None
+            raise DownloadStreamException("Cannot download stream")
+
+        output_format = "{}/%(title)s".format(songcache_dir)
+
+        ytdl_formats = [
+            "worstaudio",
+            "worst",
+        ]
+
+        ydl_opts = {
+            "format": '/'.join(ytdl_formats),
+            "audio_format": "mp3",
+            "extract_audio": True,
+            "outtmpl": output_format,
+            "restrict_filenames": True,
+            "writeinfojson": True,
+            "nooverwrites": False,
+            "noplaylist": True,
+            "socket_timeout": 30,
+            "max_downloads": 1,
+            "match_filter": _match_func,
+            'progress_hooks': [self.ytdl_progress_hook],
+        }
+
+        self.play_empty()
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            try:
+                ydl.download([song])
+            except DownloadStreamException:
+                future = asyncio.run_coroutine_threadsafe(self.create_stream_player(song, ydl_opts), client.loop)
+                try:
+                    future.result()
+                except Exception as e:
+                    logger.exception(e)
+            except PermissionError:
+                # File is still in use, it'll get cleared next time
+                pass
+
+    def create_ffmpeg_player(self, filepath):
+        self.streamer = self.vclient.create_ffmpeg_player(filepath, after=self.vafter_ts)
+        self.state = "ready"
+
+        self.vclient_task = asyncio.Task(self.time_loop(), loop=self.vclient.loop)
+        self.vclient_starttime = self.vclient.loop.time()
+
+        self.streamer.volume = self.volume / 100
+        self.streamer.start()
+
+        # Read from the info json
+        info_filename = "{}.info.json".format(filepath)
+        with open(info_filename, 'r') as file:
+            info = json.load(file)
+
+            self.statuslog.debug("Playing")
+            self.nowplayinglog.debug(info["title"])
+            self.nowplayingauthorlog.debug(info["uploader"])
+            self.current_duration = info["duration"]
+            self.is_live = False
+
+    async def create_stream_player(self, url, ydl_opts):
+        self.streamer = await self.vclient.create_ytdl_player(url, ytdl_options=ydl_opts,
+                                                              after=self.vafter_ts)
+        self.state = "ready"
+
+        self.streamer.volume = self.volume / 100
+        self.streamer.start()
+
+        self.vclient_task = asyncio.Task(self.time_loop(), loop=self.vclient.loop)
+        self.vclient_starttime = self.vclient.loop.time()
+
+        # Read from the info json
+        self.statuslog.debug("Playing")
+        self.nowplayinglog.debug(self.streamer.title)
+        self.nowplayingauthorlog.debug(self.streamer.uploader)
+        self.current_duration = self.streamer.duration
+        self.is_live = True
 
     async def vplay(self):
         if self.state != 'ready':
@@ -851,48 +962,11 @@ class MusicPlayer:
                 self.prev_queue.pop(0)
 
             try:
-                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 30", "-reconnect_at_eof 1",
-                             "-timeout 30", "-multiple_requests 1"]
-                boptions = " {}".format(' '.join(bopt_list))
+                self.timelog.debug("Downloading next song")
+                dl_thread = threading.Thread(target=self.download_next_song, args=[song])
+                dl_thread.start()
 
-                ytdl_formats = [
-                    "worstaudio[protocol^=http][ext=mp4]",
-                    "worstaudio[protocol^=http][ext=mp3]",
-                    "worstaudio[protocol^=http]",
-                    "worstaudio",
-                    "worstaudio",
-                ]
-
-                ytoptions = {
-                    "format": '/'.join(ytdl_formats),
-                    "extractaudio": True,
-                    "audioformat": "mp3",
-                    "noplaylist": True,
-                    "socket_timeout": 30,
-                    "retries": 10,
-                    "sleep_interval": 1,
-                    "nocheckcertificate": True,
-                    "logger": self.logger
-                }
-
-                self.streamer = await self.vclient.create_ytdl_player(song,
-                                                                      ytdl_options=ytoptions,
-                                                                      after=self.vafter_ts,
-                                                                      before_options=boptions)
-                self.state = "ready"
-
-                self.vclient_starttime = self.vclient.loop.time()
-                self.vclient_task = asyncio.Task(self.time_loop())
-
-                self.streamer.volume = self.volume / 100
-                self.streamer.start()
-
-                nowplaying = "{} {}".format("Streaming" if self.streamer.is_live else "Playing",
-                                            self.streamer.title)
-                self.statuslog.debug("Playing")
-                await self.set_topic(nowplaying)
-                self.nowplayinglog.debug(self.streamer.title)
-                self.nowplayingauthorlog.debug(self.streamer.uploader)
+                await self.set_topic("Playing {}".format(songname))
             except Exception as e:
                 await self.set_topic("")
                 self.nowplayinglog.info("Error playing {}".format(songname))
@@ -908,10 +982,13 @@ class MusicPlayer:
                     logger.exception(e)
 
                 self.streamer = None
+                self.current_duration = 0
+                self.is_live = False
                 self.state = "ready"
                 await self.vplay()
 
             self.update_queue()
+
 
         # Queue exhausted
         else:
@@ -952,6 +1029,9 @@ class MusicPlayer:
 
         self.pause_time = None
 
+        # Clear the cache
+        self.clear_cache()
+
         if self.vclient_task:
             loop = asyncio.get_event_loop()
             loop.call_soon(self.vclient_task.cancel)
@@ -963,7 +1043,6 @@ class MusicPlayer:
             else:
                 await self.destroy()
                 self.statuslog.error(self.streamer.error)
-                self.statuslog.error("Encountered an error")
         except Exception as e:
             logger.exception(e)
             try:
