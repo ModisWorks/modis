@@ -28,13 +28,22 @@ SERVER_TEMPLATE = {
 }
 
 logger = logging.getLogger(__name__)
-data_soft = {}
+data = {}
 
 
-def create():
-    """Create a new data.json file from the template."""
+def create(template):
+    """Create a new data.json file from the template.
 
-    write(ROOT_TEMPLATE)
+    Args:
+        template (dict): The template dict to create data.json with.
+    """
+
+    global data
+
+    data = template
+
+    with open(DATAFILE, 'w') as file:
+        json.dump(data, file, indent=2)
 
 
 def get():
@@ -48,34 +57,42 @@ def get():
 
     if not os.path.exists(DATAFILE):
         logging.CRITICAL("data.json not found. An empty one was created.")
-        create()
+        create(ROOT_TEMPLATE)
+        return data
 
-    global data_soft
+    global data
+
     with open(DATAFILE, 'r') as file:
-        data_soft = json.load(file)
-        return data_soft
+        data = json.load(file)
+        return data
 
 
-def write(data):
+def write(new_data):
     """Update the data.json file.
 
     Args:
-        data (dict): The updated data.json dict.
+        new_data (dict): The updated data.json dict.
     """
 
     logger.debug("Writing data.json")
 
-    data = _sort(data)
+    if not os.path.exists(DATAFILE):
+        logging.CRITICAL("data.json not found. An empty one was created.")
+        create(ROOT_TEMPLATE)
+        return
+
+    global data
+    data = _sort(new_data)
 
     with open(DATAFILE, 'w') as file:
         json.dump(data, file, indent=2)
 
 
-def _sort(data):
+def _sort(_dict):
     """Recursively sort all elements in a dictionary.
 
     Args:
-        data (dict): The dictionary to sort.
+        _dict (dict): The dictionary to sort.
 
     Returns:
         sorted_dict (OrderedDict): The sorted data dict.
@@ -83,25 +100,27 @@ def _sort(data):
 
     newdict = {}
 
-    for i in data.items():
+    for i in _dict.items():
         if type(i[1]) is dict:
             newdict[i[0]] = _sort(i[1])
         else:
             newdict[i[0]] = i[1]
 
-    def _compare_type(t):
-        """Give the order of the type for the dictionary.
-
-        Args:
-            t (type): The type to compare.
-
-        Returns:
-            order (int): 1=dict/OrderedDict, 0=other
-        """
-
-        if t in [dict, OrderedDict]:
-            return 1
-
-        return 0
     # TODO check if it should be _compare_type(type(item[1]), type(item[0]))
-    return OrderedDict(sorted(newdict.items(), key=lambda item: (_compare_type(type(item[1])), item[0])))
+    return OrderedDict(sorted(newdict.items(), key=lambda item: (_compare(type(item[1])), item[0])))
+
+
+def _compare(_type):
+    """Give the order of the type for the dictionary.
+
+    Args:
+        _type (type): The type to compare.
+
+    Returns:
+        order (int): 1=dict/OrderedDict, 0=other
+    """
+
+    if _type in [dict, OrderedDict]:
+        return 1
+
+    return 0
