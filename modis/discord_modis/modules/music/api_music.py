@@ -170,10 +170,8 @@ def parse_query(query, ilogger):
                 query_search = ' '.join(args[1:])
             query_type = query_type.replace('song', 'track')
             ilogger.info("Queueing Spotify {}: {}".format(query_type, query_search))
-            spotify_tracks = search_sp_tracks(query_type, query_search)
-            if spotify_tracks is None or len(spotify_tracks) == 0:
-                return [], (1, "Could not queue Spotify {}: {}".format(query_type, query_search))
-            return spotify_tracks, (0, "Queued Spotify {}: {}".format(query_type, query_search))
+            spotifysearch = search_sp_tracks(query_type, query_search)
+            return get_ytvideos(spotifysearch, ilogger), (0, "Queued YouTube search: {}".format(query))
         except Exception as e:
             logger.exception(e)
             return [], (1, "Error queueing from Spotify")
@@ -190,8 +188,7 @@ def parse_query(query, ilogger):
                 query_search = ' '.join(args[1:])
             query_type = query_type.replace('song', 'track')
             ilogger.info("Queueing SoundCloud {}: {}".format(query_type, query_search))
-            soundcloud_tracks = search_sc_tracks(query_type, query_search)
-            return soundcloud_tracks, (0, "Queued SoundCloud {}: {}".format(query_type, query_search))
+            search_sc_tracks(query_type, query_search)
         except Exception as e:
             logger.exception(e)
             return [], (1, "Could not queue from SoundCloud")
@@ -351,79 +348,17 @@ def get_sc_tracks(result):
 
 
 def search_sp_tracks(query_type, query_search):
-    results = spclient.search(q=query_search, limit=1, type=query_type)
-
     if query_type == 'track':
-        return get_sp_tracks(results)
-    elif query_type == 'artist':
-        if "artists" in results:
-            if "items" in results["artists"] and len(results["artists"]["items"]) > 0:
-                top_tracks = spclient.artist_top_tracks(results["artists"]["items"][0]["uri"])
-                return get_sp_tracks(top_tracks)
-    elif query_type == 'album':
-        if "albums" in results:
-            if "items" in results["albums"] and len(results["albums"]["items"]) > 0:
-                album_tracks = spclient.album_tracks(results["albums"]["items"][0]["uri"])
-                return get_sp_tracks(album_tracks)
-    elif query_type == 'playlist':
-        if "playlists" in results:
-            if "items" in results["playlists"] and len(results["playlists"]["items"]) > 0:
-                playlist_tracks = spclient.user_playlist_tracks(results["playlists"]["items"][0]["owner"]["id"],
-                                                                results["playlists"]["items"][0]["id"], limit=50)
-                return get_sp_tracks(playlist_tracks)
-
-    return []
+        results = spclient.track(query_search)
+        song_name = results['name']
+        song_artist = results['artists'][0]['name']
+        query = ("{} by {}".format(song_name,song_artist))
+        return(query)
 
 
-def get_sp_tracks(results):
-    if "tracks" in results:
-        if "items" in results["tracks"] and len(results["tracks"]["items"]) > 0:
-            tracks = []
-            for t in results["tracks"]["items"]:
-                tracks.append(get_sp_track(t))
-            return tracks
-        elif isinstance(results["tracks"], list) and len(results["tracks"]) > 0:
-            tracks = []
-            for t in results["tracks"]:
-                tracks.append(get_sp_track(t))
-            return tracks
-    if "items" in results and len(results["items"]) > 0:
-        tracks = []
-        for t in results["items"]:
-            if "track" in t:
-                tracks.append(get_sp_track(t["track"]))
-            else:
-                tracks.append(get_sp_track(t))
-        return tracks
 
-    return []
+    #return []
 
-
-def get_sp_track(track):
-    song_name = None
-    song_artist = None
-    if "name" in track:
-        song_name = track["name"]
-    if "artists" in track and len(track["artists"]) > 0:
-        artists = []
-        for artist in track["artists"]:
-            if "name" in artist:
-                artists.append(artist["name"])
-        song_artist = ', '.join(artists)
-
-    if song_name is not None:
-        if song_artist is not None:
-            yt_query = "{} by {}".format(song_name, song_artist)
-        else:
-            yt_query = song_name
-
-        logger.debug("YouTube search: {}".format(yt_query))
-        yt_videos = get_ytvideos(yt_query, logger)
-        if len(yt_videos) > 0:
-            return yt_videos[0]
-
-    logger.debug("No results found for Spotify track:\n{}".format(track))
-    return []
 
 
 def duration_to_string(duration):
@@ -444,3 +379,5 @@ def duration_to_string(duration):
 build_yt_api()
 build_sc_api()
 build_spotify_api()
+
+parse_query("sp spotify:track:7F8UrR3MuUerhWRQEO2rgi", logger)
