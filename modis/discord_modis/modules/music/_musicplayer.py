@@ -134,7 +134,7 @@ class MusicPlayer:
             if self.streamer is None:
                 await self.vplay()
 
-    async def stop(self):
+    async def stop(self, log_stop=False):
         """The stop command"""
 
         self.logger.debug("stop command")
@@ -145,7 +145,9 @@ class MusicPlayer:
         self.nowplayingauthorlog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
-        self.statuslog.debug("Stopping")
+
+        if log_stop:
+            self.statuslog.debug("Stopping")
 
         self.vready = False
         self.pause_time = None
@@ -178,7 +180,10 @@ class MusicPlayer:
         self.nowplayingauthorlog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
-        self.statuslog.info("Stopped")
+
+        if log_stop:
+            self.statuslog.info("Stopped")
+
         self.state = 'off'
 
         if self.embed:
@@ -728,7 +733,7 @@ class MusicPlayer:
             random.shuffle(yt_videos)
 
         if len(yt_videos) == 0:
-            self.statuslog.warning("No results found for {}".format(query))
+            self.statuslog.error("No results for: {}".format(query))
             return
 
         if front:
@@ -900,6 +905,10 @@ class MusicPlayer:
             except PermissionError:
                 # File is still in use, it'll get cleared next time
                 pass
+            except youtube_dl.utils.DownloadError:
+                self.statuslog.error("Unsupported URL: {}".format(song))
+                self.state = 'ready'
+                self.vafter_ts()
 
     def create_ffmpeg_player(self, filepath):
         self.streamer = self.vclient.create_ffmpeg_player(filepath, after=self.vafter_ts)
@@ -1038,6 +1047,10 @@ class MusicPlayer:
             self.vclient_task = None
 
         try:
+            if self.streamer is None:
+                await self.stop()
+                return
+
             if self.streamer.error is None:
                 await self.vplay()
             else:
