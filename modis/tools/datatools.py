@@ -11,11 +11,9 @@ import os
 import json
 from collections import OrderedDict
 
-logger = logging.getLogger(__name__)
+from modis.cache import WORK_DIR
 
-_dir = os.getcwd()
-datafile = "{}/data.json".format(_dir)
-
+DATAFILE = "{}/data.json".format(WORK_DIR)
 ROOT_TEMPLATE = {
     "log_level": "INFO",
     "keys": {
@@ -23,57 +21,64 @@ ROOT_TEMPLATE = {
     },
     "servers": {}
 }
-
 SERVER_TEMPLATE = {
     "prefix": "!",
     "activation": {},
     "commands": {}
 }
 
+logger = logging.getLogger(__name__)
+data_soft = {}
+
+
+def create():
+    """Create a new data.json file from the template."""
+
+    write(ROOT_TEMPLATE)
+
 
 def get():
-    """
-    Get the current data dict of Discord from the data.json file
+    """Read the data.json file.
 
     Returns:
-        data (dict): Parsed data.json file
+        data (dict): data.json parsed into a dict.
     """
 
     logger.debug("Getting data.json")
 
-    if os.path.exists(datafile):
-        with open(datafile, 'r') as file:
-            return json.load(file)
-    else:
-        write(ROOT_TEMPLATE)
-        return ROOT_TEMPLATE
+    if not os.path.exists(DATAFILE):
+        logging.CRITICAL("data.json not found. An empty one was created.")
+        create()
+
+    global data_soft
+    with open(DATAFILE, 'r') as file:
+        data_soft = json.load(file)
+        return data_soft
 
 
 def write(data):
-    """
-    Write the data to the data.json file
+    """Update the data.json file.
 
     Args:
-        data (dict): The updated data dictionary for Modis
+        data (dict): The updated data.json dict.
     """
 
     logger.debug("Writing data.json")
 
     data = _sort(data)
 
-    with open(datafile, 'w') as file:
+    with open(DATAFILE, 'w') as file:
         json.dump(data, file, indent=2)
 
 
 def _sort(data):
-    """
-    Recursively sorts all elements in a dictionary
+    """Recursively sort all elements in a dictionary.
 
     Args:
-        data (dict): The dictionary to sort
+        data (dict): The dictionary to sort.
 
     Returns:
-        sorted_dict (OrderedDict): The sorted data dict
+        sorted_dict (OrderedDict): The sorted data dict.
     """
 
     newdict = {}
@@ -84,20 +89,19 @@ def _sort(data):
         else:
             newdict[i[0]] = i[1]
 
+    def _compare_type(t):
+        """Give the order of the type for the dictionary.
+
+        Args:
+            t (type): The type to compare.
+
+        Returns:
+            order (int): 1=dict/OrderedDict, 0=other
+        """
+
+        if t in [dict, OrderedDict]:
+            return 1
+
+        return 0
+    # TODO check if it should be _compare_type(type(item[1]), type(item[0]))
     return OrderedDict(sorted(newdict.items(), key=lambda item: (_compare_type(type(item[1])), item[0])))
-
-
-def _compare_type(t):
-    """
-    Gives the order of the type for the dictionary
-
-    Args:
-        t (type): The type to compare
-
-    Returns:
-        1 for (dict, OrderedDict), 0 otherwise
-    """
-    if t in [dict, OrderedDict]:
-        return 1
-
-    return 0

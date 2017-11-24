@@ -7,5 +7,6 @@ access global variables.
 import os as _os
 
 ROOT_DIR = _os.path.dirname(_os.path.realpath(__file__))
+WORK_DIR = _os.getcwd()
 
 client = None

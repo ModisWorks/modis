@@ -78,6 +78,7 @@ def start(loop):
 
     # Run the client loop
     logger.info("Connecting to Discord")
+    # TODO clean up this massive exception stack
     try:
         from modis.tools import datatools
         data = datatools.get()
