@@ -18,7 +18,7 @@ class RootFrame(ttk.Frame):
         """Create the frame.
 
         Args:
-            parent (object): A tk or ttk object.
+            parent: A tk or ttk object.
         """
 
         super(RootFrame, self).__init__(parent)
@@ -30,9 +30,8 @@ class RootFrame(ttk.Frame):
             """Called when the window closes"""
             try:
                 from modis.cache import client
-                if client.loop:
-                    asyncio.run_coroutine_threadsafe(client.logout(),
-                                                     client.loop)
+                if client and client.loop:
+                    asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
             except RuntimeError:
                 pass
             except Exception as e:
@@ -68,7 +67,7 @@ class TabCore(tk.Frame):
         """Create the frame.
 
         Args:
-            parent (object): A tk or ttk object.
+            parent: A tk or ttk object.
         """
 
         super(TabCore, self).__init__(parent)
@@ -93,7 +92,7 @@ class TabCore(tk.Frame):
             """Create the frame.
 
             Args:
-                parent (object): A tk or ttk object.
+                parent: A tk or ttk object.
             """
 
             super(TabCore.CoreControl, self).__init__(parent, padding=8, text="Modis control panel")
@@ -221,7 +220,7 @@ class TabAPI(tk.Frame):
         """Create the frame.
 
         Args:
-            parent (object): A tk or ttk object.
+            parent: A tk or ttk object.
         """
 
         super(TabAPI, self).__init__(parent)
@@ -234,7 +233,7 @@ class TabData(tk.Frame):
         """Create the frame.
 
         Args:
-            parent (object): A tk or ttk object.
+            parent: A tk or ttk object.
         """
 
         super(TabData, self).__init__(parent)
@@ -251,7 +250,7 @@ class TabModules(tk.Frame):
         """Create the frame.
 
         Args:
-            parent (object): A tk or ttk object.
+            parent: A tk or ttk object.
         """
 
         super(TabModules, self).__init__(parent)
@@ -304,7 +303,7 @@ class TabModules(tk.Frame):
         m_button.bind("<Button-1>", lambda e: self.select(module_name, module_ui))
 
     def scan(self):
-        database_dir = "E:\\Server\\MenangorieFTP\\Software\\Modis\\modis-git\\modis\\modules"
+        database_dir = "C:/Data/GitHub/modis/modis/modules"
         # Iterate through modules
         for module_name in os.listdir(database_dir):
             module_dir = "{}/{}".format(database_dir, module_name)
@@ -382,7 +381,7 @@ class TabModules(tk.Frame):
             """Create the frame.
 
             Args:
-                parent (object): A tk or ttk object.
+                parent: A tk or ttk object.
                 module_name (str): The name of the module.
                 module_ui (import): The _ui.py file to add for the module.
             """
@@ -423,7 +422,7 @@ class StatusBar(ttk.Frame):
         Create the status bar.
 
         Args:
-            parent (object): A tk or ttk object
+            parent: A tk or ttk object
         """
 
         logger.debug("Initialising status bar")
