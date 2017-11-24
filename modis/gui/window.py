@@ -263,12 +263,13 @@ class TabModules(tk.Frame):
         self.module_buttons = {}
         self.current_button = None
 
-        # Module view
+        # Add elements
         self.module_list = ttk.Frame(self, width=150, style="Module.TFrame")
         self.header = tk.Label(self.module_list, text="Modules", bg="white", fg="#484848")
         self.module_selection = ttk.Frame(self.module_list, style="Module.TFrame")
         self.module_ui = ttk.Frame(self)
 
+        # Grid elements
         self.module_list.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
         self.header.grid(column=0, row=0, padx=0, pady=0, sticky="W E N")
         self.module_selection.grid(column=0, row=1, padx=0, pady=0, sticky="W E N S")

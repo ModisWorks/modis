@@ -4,4 +4,8 @@ contains references to variables in RAM, making it easy for other modules to
 access global variables.
 """
 
+import os as _os
+
+ROOT_DIR = _os.path.dirname(_os.path.realpath(__file__))
+
 client = None

@@ -14,6 +14,41 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+EH_TYPES = [
+    "on_ready",
+    "on_resume",
+    "on_error",
+    "on_message",
+    "on_socket_raw_receive",
+    "on_socket_raw_send",
+    "on_message_delete",
+    "on_message_edit",
+    "on_reaction_add",
+    "on_reaction_remove",
+    "on_reaction_clear",
+    "on_channel_delete",
+    "on_channel_create",
+    "on_channel_update",
+    "on_member_join",
+    "on_member_remove",
+    "on_member_update",
+    "on_server_join",
+    "on_server_remove",
+    "on_server_update",
+    "on_server_role_create",
+    "on_server_role_delete",
+    "on_server_role_update",
+    "on_server_emojis_update",
+    "on_server_available",
+    "on_server_unavailable",
+    "on_voice_state_update",
+    "on_member_ban",
+    "on_member_unban",
+    "on_typing",
+    "on_group_join",
+    "on_group_remove"
+]
+
 
 def start(loop):
     """Start the Discord client and log Modis into Discord."""
@@ -22,6 +57,7 @@ def start(loop):
     import asyncio
     
     from modis import cache
+    from modis.tools import moduletools
 
     # TODO data.json setup
 
@@ -33,7 +69,7 @@ def start(loop):
 
     # Import event handlers
     logger.debug("Importing event handlers")
-    eh_lib = _eh_get()
+    eh_lib = moduletools.get_files(EH_TYPES)
 
     # Register event handlers
     logger.debug("Registering event handlers")
@@ -80,78 +116,6 @@ def start(loop):
 
             logger.critical("Bot stopped\n")
             client.loop.close()
-
-
-def _eh_get():
-    """Gets a dictionary of all the event handlers in all the modules.
-
-    Returns:
-        eh_db (dict): A dictionary of all the event handlers in all
-        the modules.
-    """
-
-    import os
-    import importlib
-
-    eh_db = {
-        "on_ready": [],
-        "on_resume": [],
-        "on_error": [],
-        "on_message": [],
-        "on_socket_raw_receive": [],
-        "on_socket_raw_send": [],
-        "on_message_delete": [],
-        "on_message_edit": [],
-        "on_reaction_add": [],
-        "on_reaction_remove": [],
-        "on_reaction_clear": [],
-        "on_channel_delete": [],
-        "on_channel_create": [],
-        "on_channel_update": [],
-        "on_member_join": [],
-        "on_member_remove": [],
-        "on_member_update": [],
-        "on_server_join": [],
-        "on_server_remove": [],
-        "on_server_update": [],
-        "on_server_role_create": [],
-        "on_server_role_delete": [],
-        "on_server_role_update": [],
-        "on_server_emojis_update": [],
-        "on_server_available": [],
-        "on_server_unavailable": [],
-        "on_voice_state_update": [],
-        "on_member_ban": [],
-        "on_member_unban": [],
-        "on_typing": [],
-        "on_group_join": [],
-        "on_group_remove": []
-    }
-
-    file_dir = os.path.dirname(os.path.realpath(__file__))
-    database_dir = "{}/modules".format(file_dir)
-
-    # Iterate through modules
-    for module_name in os.listdir(database_dir):
-        module_dir = "{}/{}".format(database_dir, module_name)
-
-        if not os.path.isdir(module_dir):
-            continue
-        if module_name.startswith("_"):
-            continue
-
-        module_eh = os.listdir(module_dir)
-        for event_handler in eh_db.keys():
-            if not "{}.py".format(event_handler) in module_eh:
-                continue
-
-            import_name = ".modules.{}.{}".format(module_name, event_handler)
-            logger.debug("Found event handler {}".format(import_name[9:]))
-
-            eh = importlib.import_module(import_name, "modis")
-            eh_db[event_handler].append(eh)
-
-    return eh_db
 
 
 def _eh_create(eh_type, eh_lib):
