@@ -21,9 +21,13 @@ def cmd():
     logger.debug("Importing packages")
     import asyncio
     from modis import main
+    from modis.tools import versiontools
+
+    logger.info(versiontools.get_str())
 
     logger.info("Starting Modis")
     loop = asyncio.get_event_loop()
+    asyncio.set_event_loop(loop)
     main.start(loop)
 
 
@@ -36,9 +40,12 @@ def gui():
     logger.debug("Importing packages")
     import os
     import tkinter as tk
-    from modis import window
+    from modis.gui import window
+    from modis.tools import versiontools
 
-    logger.debug("Initialising GUI")
+    logger.info(versiontools.get_str())
+
+    logger.info("Starting GUI")
 
     # Setup the root window
     root = tk.Tk()
@@ -51,6 +58,7 @@ def gui():
     # Setup the notebook
     discord = window.RootFrame(root)
     discord.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
+
     # Configure stretch ratios
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
@@ -58,7 +66,6 @@ def gui():
     discord.rowconfigure(0, weight=1)
 
     # Run the window UI
-    logger.info("Starting GUI")
     root.mainloop()
 
 

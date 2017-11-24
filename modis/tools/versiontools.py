@@ -4,7 +4,10 @@ of the current official version and the difference between that version and the
 version currently being used.
 """
 
+import logging
 import requests
+
+logger = logging.getLogger(__name__)
 
 VERSION = "0.4.0"
 
@@ -13,8 +16,10 @@ def get():
     """Compare the current version to the latest on GitHub.
 
     Returns:
-        name (str): The name of the latest version
+        version (list): The latest live version numbers
     """
+
+    logger.debug("Getting version info from GitHub")
 
     # Get version info from GitHub
     r = requests.get("https://api.github.com/repos/Infraxion/Modis/releases/latest").json()
@@ -30,14 +35,17 @@ def get():
         return []
 
 
-def compare():
+def compare(release_version):
     """Compare the current version to the latest on GitHub.
+
+    Args:
+        release_version (list): The latest live version numbers
 
     Returns:
         comparison (int): -1=behind, 0=latest, 1=ahead
     """
+
     current_version = VERSION.split('.')
-    release_version = get()
 
     for vi in range(len(release_version)):
         if len(current_version) > vi:
@@ -60,7 +68,7 @@ def get_str():
     """
 
     latest = get()
-    state = compare()
+    state = compare(latest)
     if state == -1:
         return "A new version of Modis is available (v{})".format(latest)
     elif state == 0:

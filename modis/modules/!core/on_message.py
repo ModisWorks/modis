@@ -19,11 +19,11 @@ async def on_message(message):
 
     # Check prefix
     data = datatools.get()
-    prefix = data["discord"]["servers"][message.server.id]["prefix"]
+    prefix = data["servers"][message.server.id]["prefix"]
     if not message.content.startswith(prefix):
         return
 
-    logger.debug("Cmd call on s{} c{}".format(message.server, message.channel))
+    logger.debug("Cmd call s: {} c: {}".format(message.server, message.channel))
 
     # Parse message
     package = message.content.split(" ")
