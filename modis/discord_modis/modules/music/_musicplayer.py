@@ -972,14 +972,17 @@ class MusicPlayer:
                         eta = " ({} {} remaining)".format(seconds, "seconds" if seconds != 1 else "second")
 
                         downloading = "Downloading song: {}%{}".format(percent, eta)
-                        self.timelog.debug(downloading)
-                        self.prev_time = "---"
+                        if self.prev_time != downloading:
+                            self.timelog.debug(downloading)
+                            self.prev_time = downloading
         if d['status'] == 'error':
-            self.statuslog.info("Error downloading song")
+            self.statuslog.error("Error downloading song")
         elif d['status'] == 'finished':
             self.statuslog.info("Downloaded song")
-            self.timelog.debug("Downloading song: 100%")
-            self.prev_time = "---"
+            downloading = "Downloading song: {}%".format(100)
+            if self.prev_time != downloading:
+                self.timelog.debug(downloading)
+                self.prev_time = downloading
 
             if "elapsed" in d:
                 download_time = "{} {}".format(d["elapsed"] if d["elapsed"] > 0 else "<1",
@@ -1115,6 +1118,7 @@ class MusicPlayer:
         self.streamer.volume = self.volume / 100
         self.streamer.start()
 
+        self.pause_time = None
         self.vclient_starttime = self.vclient.loop.time()
 
         # Cache next song
@@ -1130,6 +1134,7 @@ class MusicPlayer:
         self.state = "starting streamer"
         self.logger.debug("Playing next in queue")
 
+        self.vclient_starttime = None
         self.pause_time = None
         self.clear_cache()
 
