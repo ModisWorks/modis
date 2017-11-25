@@ -1,7 +1,6 @@
 """UI Embed generator for music module"""
 
 import logging
-import math
 
 from ._data import *
 from .._tools import ui_embed
@@ -32,25 +31,24 @@ def topic_update(channel, topic_channel):
 
     # Create embed UI object
     gui = ui_embed.UI(
-        channel,
-        "Topic channel updated",
-        channel_message,
-        modulename=modulename,
-        colour=modulecolor_info,
-        creator=creator
+            channel,
+            "Topic channel updated",
+            channel_message,
+            modulename=modulename,
+            colour=modulecolor_info
     )
 
     return gui
 
 
-def error_message(channel, error_title, error_message):
+def error_message(channel, err_title, err_message):
     """
     Creates an embed UI for the topic update
 
     Args:
         channel (discord.Channel): The Discord channel to bind the embed to
-        error_title: The title for the error
-        error_message: The message for the error
+        err_title: The title for the error
+        err_message: The message for the error
 
     Returns:
         embed: The created embed
@@ -58,12 +56,11 @@ def error_message(channel, error_title, error_message):
 
     # Create embed UI object
     gui = ui_embed.UI(
-        channel,
-        error_title,
-        error_message,
-        modulename=modulename,
-        colour=modulecolor_error,
-        creator=creator
+            channel,
+            err_title,
+            err_message,
+            modulename=modulename,
+            colour=modulecolor_error
     )
 
     return gui

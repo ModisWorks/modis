@@ -20,8 +20,7 @@ def modify_module(channel, module_name, module_state):
         channel,
         "{} updated".format(module_name),
         "{} is now {}".format(module_name, "activated" if module_state else "deactivated"),
-        modulename=modulename,
-        creator=creator
+        modulename=modulename
     )
 
     return gui
@@ -44,8 +43,7 @@ def modify_prefix(channel, new_prefix):
         channel,
         "Prefix updated",
         "Modis prefix is now '{}'".format(new_prefix),
-        modulename=modulename,
-        creator=creator
+        modulename=modulename
     )
 
     return gui
@@ -69,8 +67,7 @@ def error(channel, title, description):
         channel,
         title,
         description,
-        modulename=modulename,
-        creator=creator
+        modulename=modulename
     )
 
     return gui

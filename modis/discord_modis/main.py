@@ -53,9 +53,9 @@ def start(token, client_id, loop, on_ready_handler=None):
                     module_event_handler_func = getattr(module_event_handler,
                                                         event_handler_type)
                     await module_event_handler_func(*args, **kwargs)
-                except Exception as e:
+                except Exception as module_exception:
                     logger.error("An error occured in '{}'".format(module_event_handler))
-                    logger.exception(e)
+                    logger.exception(module_exception)
 
             if on_ready_handler is not None and event_handler_type == "on_ready":
                 await on_ready_handler()

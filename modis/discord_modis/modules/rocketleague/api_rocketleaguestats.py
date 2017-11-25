@@ -20,12 +20,6 @@ def check_rank(player, platform="steam"):
     ).text
 
     try:
-        # Get player's UserID
-        profile_mmr_page = "/profile/mmr/{}/".format(platform)
-        userid_index = webpage.index(profile_mmr_page) + len(profile_mmr_page)
-        userid_end_index = webpage.index("""">""", userid_index)
-        userid = webpage[userid_index:userid_end_index]
-
         # Get player ID
         playerid_index = webpage.index("/live?ids=") + len("/live?ids=")
         playerid_end_index = webpage.index("""">""", playerid_index)
@@ -59,21 +53,7 @@ def check_rank(player, platform="steam"):
     except (IndexError, KeyError):
         return False, ()
 
-    # Get player dp from steam (CURRENTLY DISABLED; EXCESSIVE LOAD)
-    # try:
-    #     int(player)
-    # except ValueError:
-    #     response = _requests.get('http://steamcommunity.com/id/{}'.format(player))
-    # else:
-    #     response = _requests.get('http://steamcommunity.com/profile/{}'.format(player))
-    # parsed = _html.parse(_io.StringIO(response.text)).getroot()
-    # try:
-    #     dp = parsed[0][29].attrib['href']
-    # except (IndexError, KeyError):
-    #     dp = 'https://rocketleague.media.zestyio.com/' \
-    #          'rocket-league-logos-vr-white.f1cb27a519bdb5b6ed34049a5b86e317.png'
-    dp = 'https://rocketleague.media.zestyio.com/' \
-         'rocket-league-logos-vr-white.f1cb27a519bdb5b6ed34049a5b86e317.png'
+    dp = "https://rocketleague.media.zestyio.com/rocket-league-logos-vr-white.f1cb27a519bdb5b6ed34049a5b86e317.png"
 
     platform_display = platform
     if platform == "steam":

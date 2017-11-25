@@ -756,7 +756,6 @@ class MusicPlayer:
             "Music Player",
             "Press the buttons!",
             modulename=_data.modulename,
-            creator=_data.creator,
             colour=_data.modulecolor,
             datapacks=datapacks
         )

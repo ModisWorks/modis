@@ -9,15 +9,15 @@ def success(channel, stats, name, platform, dp):
         channel (discord.Channel): The Discord channel to bind the embed to
         stats (tuple): Tuples of (field, value, percentile)
         name (str): The name of the player
+        platform (str): The playfor to search on, can be 'steam', 'ps', or 'xbox'
         dp (str): URL to the player's dp
 
     Returns:
-
+        (discord.Embed): The created embed
     """
 
     # Create datapacks
-    datapacks = []
-    datapacks.append(("Platform", platform, False))
+    datapacks = [("Platform", platform, False)]
     for stat in stats:
         # Add stats
         if stat[0] in ("Duel 1v1", "Doubles 2v2", "Solo Standard 3v3", "Standard 3v3"):
@@ -39,7 +39,6 @@ def success(channel, stats, name, platform, dp):
         "Rocket League Stats: {}".format(name),
         "*Stats obtained from [Rocket League Tracker Network](https://rocketleague.tracker.network/)*",
         modulename=modulename,
-        creator=creator,
         colour=0x0088FF,
         thumbnail=dp,
         datapacks=datapacks
@@ -64,7 +63,6 @@ def fail_steamid(channel):
         "You can get your SteamID by going to your profile page and looking at the url, "
         "or you can set a custom ID by going to edit profile on your profile page.",
         modulename=modulename,
-        creator=creator,
         colour=0x0088FF
     )
 
@@ -86,7 +84,6 @@ def fail_api(channel):
         "Couldn't get stats off RLTrackerNetwork.",
         "Maybe the API changed, please tell Infraxion.",
         modulename=modulename,
-        creator=creator,
         colour=0x0088FF
     )
 

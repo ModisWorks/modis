@@ -65,7 +65,7 @@ def get_help_datapacks(filepath, prefix="!"):
         else:
             content += help_contents[d]
 
-        datapacks.append((heading, content, True))
+        datapacks.append((heading, content, False))
 
     return datapacks
 

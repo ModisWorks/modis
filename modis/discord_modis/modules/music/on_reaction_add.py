@@ -16,7 +16,6 @@ async def on_reaction_add(reaction, user):
 
     # Simplify reaction info
     server = reaction.message.server
-    channel = reaction.message.channel
     emoji = reaction.emoji
 
     data = datatools.get_data()

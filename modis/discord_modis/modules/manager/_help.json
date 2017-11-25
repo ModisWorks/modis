@@ -16,5 +16,6 @@
       "description": "Updates the prefix for the server"
     }
   ],
-  "About": "manager allows users to activate and deactivate modules within a server, and change the server prefix for Modis."
+  "About": "manager allows users to activate and deactivate modules within a server, and change the server prefix for Modis.",
+  "Creator": "YtnomSnrub"
 }
