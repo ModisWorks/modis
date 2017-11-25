@@ -15,7 +15,9 @@ Have fun!
 def cmd():
     """Start Modis in command line."""
 
-    logger = log_init()
+    from modis.tools import logtools
+
+    logger = logtools.log_init()
     logger.info("Initialising Modis for command line")
 
     logger.debug("Importing packages")
@@ -34,7 +36,9 @@ def cmd():
 def gui():
     """Start Modis with GUI."""
 
-    logger = log_init()
+    from modis.tools import logtools
+
+    logger = logtools.log_init()
     logger.info("Initialising Modis for GUI")
 
     logger.debug("Importing packages")
@@ -67,56 +71,3 @@ def gui():
 
     # Run the window UI
     root.mainloop()
-
-
-def log_init():
-    """Initialises the root logger.
-
-    Returns:
-        logger (logging.logger): The root logger.
-    """
-
-    import os
-    import logging
-    import sys
-    import time
-
-    from modis.tools import datatools
-
-    file_dir = os.path.dirname(os.path.realpath(__file__))
-
-    # Create logging directory
-    logs_dir = "{}/../logs/".format(file_dir)
-    if not os.path.isdir(logs_dir):
-        os.mkdir(logs_dir)
-
-    # Creater logger
-    logger = logging.getLogger(__name__)
-
-    # Set log level
-    data = datatools.get()
-    if "log_level" in data:
-        logger.setLevel(data["log_level"])
-    else:
-        data["log_level"] = "INFO"
-        datatools.write(data)
-        logger.setLevel("INFO")
-
-    # Setup logging format
-    formatter = logging.Formatter("{asctime} {levelname:8} {name} - {message}",
-                                  style="{")
-
-    # Setup logging handlers
-    printhandler = logging.StreamHandler(sys.stdout)
-    printhandler.setFormatter(formatter)
-    filehandler = logging.FileHandler("{}/{}.log".format(logs_dir, time.time()))
-    filehandler.setFormatter(formatter)
-
-    logger.addHandler(printhandler)
-    logger.addHandler(filehandler)
-
-    # Initial logging messages
-    logger.info("----------------NEW INSTANCE----------------")
-    logger.info("Loading Modis")
-
-    return logger
