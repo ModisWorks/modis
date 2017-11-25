@@ -1223,10 +1223,6 @@ class MusicPlayer:
             loop.call_soon(self.vclient_task.cancel)
             self.vclient_task = None
 
-        # Log a full time bar
-        self.timelog.debug(_timebar.make_timebar(self.current_duration, self.current_duration))
-        self.prev_time = "---"
-
         try:
             if self.streamer is None:
                 await self.stop()
