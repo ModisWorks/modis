@@ -12,41 +12,54 @@ Have fun!
 """
 
 
-def cmd():
+def cmd(data_dir=None):
     """Start Modis in command line."""
 
-    logger = log_init()
+    # Set the data dir to the one provided
+    set_data_dir(data_dir)
+
+    # Setup the logger
+    from modis.tools import logtools
+    logger = logtools.log_init()
     logger.info("Initialising Modis for command line")
 
+    # Import packages
     logger.debug("Importing packages")
     import asyncio
     from modis import main
     from modis.tools import versiontools
-
+    # Check the current version comparison
     logger.info(versiontools.get_str())
 
+    # Start Modis for command line
     logger.info("Starting Modis")
     loop = asyncio.get_event_loop()
     asyncio.set_event_loop(loop)
     main.start(loop)
 
 
-def gui():
+def gui(data_dir=None):
     """Start Modis with GUI."""
 
-    logger = log_init()
+    # Set the data dir to the one provided
+    set_data_dir(data_dir)
+
+    # Setup the logger
+    from modis.tools import logtools
+    logger = logtools.log_init()
     logger.info("Initialising Modis for GUI")
 
+    # Import packages
     logger.debug("Importing packages")
     import os
     import tkinter as tk
     from modis.gui import window
     from modis.tools import versiontools
-
+    # Check the current version comparison
     logger.info(versiontools.get_str())
 
+    # Setup the GUI
     logger.info("Starting GUI")
-
     # Setup the root window
     root = tk.Tk()
     root.minsize(width=800, height=400)
@@ -69,22 +82,22 @@ def gui():
     root.mainloop()
 
 
-def log_init():
-    """Initialises the root logger.
+def set_data_dir(data_dir=None):
+    """
+    Sets Modis' data dir from the cache
 
-    Returns:
-        logger (logging.logger): The root logger.
+    Args:
+        data_dir: The new directory to store data in
     """
 
     import os
-    import logging
-    import sys
-    import time
 
-    from modis.tools import datatools
+    if data_dir is None:
+        data_dir = os.getcwd()
+    if not os.path.isdir(data_dir):
+        raise NotADirectoryError("Data dir {} does not exist".format(data_dir))
 
-    file_dir = os.path.dirname(os.path.realpath(__file__))
-
+<<<<<<< HEAD
     # Create logging directory
     logs_dir = "{}/../logs/".format(file_dir)
     if not os.path.isdir(logs_dir):
@@ -120,3 +133,7 @@ def log_init():
     logger.info("Loading Modis")
 
     return logger
+=======
+    from modis import cache
+    cache.WORK_DIR = data_dir
+>>>>>>> fa7ed29dc6ade30abb7b28c64d597f239757f49a
