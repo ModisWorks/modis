@@ -66,4 +66,4 @@ def convert_hex_to_url(hex_value):
     Returns:
         url (str): A url referencing an image of the given hex value
     """
-    return "https://dummyimage.com/400x400.png/{0}/{0}".format(hex_value)
+    return "https://dummyimage.com/350x250.png/{0}/{0}".format(hex_value)

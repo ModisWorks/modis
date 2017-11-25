@@ -21,12 +21,11 @@ def success(channel, image, hex_str):
     gui = ui_embed.UI(
         channel,
         "",
-        # "#{}".format(hex_str),
-        "",
+        "#{}".format(hex_str),
         modulename=modulename,
         creator=creator,
         colour=hex_number,
-        image=image,
+        thumbnail=image,
     )
 
     return gui
