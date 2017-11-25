@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import random
+import shutil
 import threading
 
 import discord
@@ -18,20 +19,34 @@ from ..._client import client
 logger = logging.getLogger(__name__)
 
 _dir = os.getcwd()
-songcache_dir = "{}/.songcache".format(_dir)
-songcache_next_dir = "{}/.songcache/next".format(_dir)
+_root_songcache_dir = "{}/.songcache".format(_dir)
+
+
+def clear_cache_root():
+    """Clears everything in the song cache"""
+    logger.debug("Clearing root cache")
+    if os.path.isdir(_root_songcache_dir):
+        for filename in os.listdir(_root_songcache_dir):
+            file_path = os.path.join(_root_songcache_dir, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except PermissionError:
+                pass
+            except Exception as e:
+                logger.exception(e)
+    logger.debug("Root cache cleared")
 
 
 def _match_func(info_dict):
     if "is_live" not in info_dict or not info_dict["is_live"]:
-        if "duration" in info_dict and info_dict["duration"] is not None and info_dict["duration"] > 0:
-            return None
+        return None
     raise DownloadStreamException("Cannot download stream")
 
 
 file_format = "%(title)s"
-output_format = "{}/{}".format(songcache_dir, file_format)
-output_format_next = "{}/{}".format(songcache_next_dir, file_format)
 
 ytdl_formats = [
     "worstaudio",
@@ -70,6 +85,11 @@ class MusicPlayer:
         # Player variables
         self.server_id = server_id
         self.logger = logging.getLogger("{}.{}".format(__name__, self.server_id))
+        # File variables
+        self.songcache_dir = "{}/{}".format(_root_songcache_dir, self.server_id)
+        self.songcache_next_dir = "{}/{}/next".format(_root_songcache_dir, self.server_id)
+        self.output_format = "{}/{}".format(self.songcache_dir, file_format)
+        self.output_format_next = "{}/{}".format(self.songcache_next_dir, file_format)
 
         # Voice variables
         self.vchannel = None
@@ -332,7 +352,8 @@ class MusicPlayer:
 
         try:
             if not self.streamer.is_playing():
-                self.statuslog.info("Playing")
+                play_state = "Streaming" if self.is_live else "Playing"
+                self.statuslog.info(play_state)
                 self.streamer.resume()
 
                 if self.pause_time is not None:
@@ -872,6 +893,8 @@ class MusicPlayer:
 
                     if self.is_live:
                         time_bar = "Livestream"
+                    elif self.current_duration <= 0:
+                        time_bar = "Unknown"
                     else:
                         time_bar = _timebar.make_timebar(diff, self.current_duration)
 
@@ -889,9 +912,9 @@ class MusicPlayer:
     def clear_cache(self):
         """Removes all files from the songcache dir"""
         self.logger.debug("Clearing cache")
-        if os.path.isdir(songcache_dir):
-            for filename in os.listdir(songcache_dir):
-                file_path = os.path.join(songcache_dir, filename)
+        if os.path.isdir(self.songcache_dir):
+            for filename in os.listdir(self.songcache_dir):
+                file_path = os.path.join(self.songcache_dir, filename)
                 try:
                     if os.path.isfile(file_path):
                         os.unlink(file_path)
@@ -903,14 +926,14 @@ class MusicPlayer:
 
     def move_next_cache(self):
         """Moves files in the 'next' cache dir to the root"""
-        if not os.path.isdir(songcache_next_dir):
+        if not os.path.isdir(self.songcache_next_dir):
             return
 
         logger.debug("Moving next cache")
-        files = os.listdir(songcache_next_dir)
+        files = os.listdir(self.songcache_next_dir)
         for f in files:
             try:
-                os.rename("{}/{}".format(songcache_next_dir, f), "{}/{}".format(songcache_dir, f))
+                os.rename("{}/{}".format(self.songcache_next_dir, f), "{}/{}".format(self.songcache_dir, f))
             except PermissionError:
                 pass
             except Exception as e:
@@ -963,8 +986,13 @@ class MusicPlayer:
                                                "seconds" if d["elapsed"] != 1 else "second")
                 self.logger.debug("Downloaded song in {}".format(download_time))
 
-            output_filename = d['filename']
-            self.create_ffmpeg_player(output_filename)
+            # Create an FFmpeg player
+            future = asyncio.run_coroutine_threadsafe(self.create_ffmpeg_player(d['filename']), client.loop)
+            try:
+                future.result()
+            except Exception as e:
+                logger.exception(e)
+                return
 
     def play_empty(self):
         """Play blank audio to let Discord know we're still here"""
@@ -978,7 +1006,7 @@ class MusicPlayer:
 
         dl_ydl_opts = dict(ydl_opts)
         dl_ydl_opts["progress_hooks"] = [self.ytdl_progress_hook]
-        dl_ydl_opts["outtmpl"] = output_format
+        dl_ydl_opts["outtmpl"] = self.output_format
 
         # Move the songs from the next cache to the current cache
         self.move_next_cache()
@@ -1017,7 +1045,7 @@ class MusicPlayer:
             return
 
         cache_ydl_opts = dict(ydl_opts)
-        cache_ydl_opts["outtmpl"] = output_format_next
+        cache_ydl_opts["outtmpl"] = self.output_format_next
 
         with youtube_dl.YoutubeDL(cache_ydl_opts) as ydl:
             try:
@@ -1026,12 +1054,13 @@ class MusicPlayer:
             except:
                 pass
 
-    def create_ffmpeg_player(self, filepath):
+    async def create_ffmpeg_player(self, filepath):
+        """Creates a streamer that plays from a file"""
         self.current_download_elapsed = 0
 
         self.streamer = self.vclient.create_ffmpeg_player(filepath, after=self.vafter_ts)
         self.state = "ready"
-        self.setup_streamer()
+        await self.setup_streamer()
 
         try:
             # Read from the info json
@@ -1039,12 +1068,8 @@ class MusicPlayer:
             with open(info_filename, 'r') as file:
                 info = json.load(file)
 
-                self.statuslog.debug("Playing")
                 self.nowplayinglog.debug(info["title"])
-                self.current_duration = info["duration"]
                 self.is_live = False
-
-                self.nowplayinglog.debug(info["title"])
 
                 if "duration" in info and info["duration"] is not None:
                     self.current_duration = info["duration"]
@@ -1056,25 +1081,22 @@ class MusicPlayer:
                 else:
                     self.nowplayingauthorlog.info("Unknown")
 
-                if "extractor_key" in info:
-                    source = info["extractor_key"]
-                    if source == "Generic":
-                        source = "Link"
+                self.nowplayingsourcelog.info(api_music.parse_source(info))
 
-                    self.nowplayingsourcelog.info(source)
-                else:
-                    self.nowplayingsourcelog.info("Unknown")
+                play_state = "Streaming" if self.is_live else "Playing"
+                await self.set_topic("{} {}".format(play_state, info["title"]))
+                self.statuslog.debug(play_state)
         except Exception as e:
             logger.exception(e)
 
-        self.statuslog.debug("Playing")
-
     async def create_stream_player(self, url, opts=ydl_opts):
+        """Creates a streamer that plays from a URL"""
         self.current_download_elapsed = 0
 
         self.streamer = await self.vclient.create_ytdl_player(url, ytdl_options=opts, after=self.vafter_ts)
         self.state = "ready"
-        self.setup_streamer()
+
+        await self.setup_streamer()
 
         self.nowplayinglog.debug(self.streamer.title)
         self.nowplayingauthorlog.debug(self.streamer.uploader if self.streamer.uploader is not None else "Unknown")
@@ -1082,19 +1104,14 @@ class MusicPlayer:
         self.is_live = True
 
         info = self.streamer.yt.extract_info(url, download=False)
-        if "extractor_key" in info:
-            source = info["extractor_key"]
-            if source == "Generic":
-                source = "Link"
+        self.nowplayingsourcelog.info(api_music.parse_source(info))
 
-            self.nowplayingsourcelog.info(source)
-        else:
-            self.nowplayingsourcelog.info("Unknown")
+        play_state = "Streaming" if self.is_live else "Playing"
+        await self.set_topic("{} {}".format(play_state, self.streamer.title))
+        self.statuslog.debug(play_state)
 
-        await self.set_topic("Streaming {}".format(self.streamer.title))
-        self.statuslog.debug("Streaming")
-
-    def setup_streamer(self):
+    async def setup_streamer(self):
+        """Sets up basic defaults for the streamer"""
         self.streamer.volume = self.volume / 100
         self.streamer.start()
 
@@ -1118,8 +1135,6 @@ class MusicPlayer:
 
         # Queue has items
         if self.queue is not None and len(self.queue) > 0:
-            self.statuslog.info("Loading next song")
-
             song = self.queue[0][0]
             songname = self.queue[0][1]
 
