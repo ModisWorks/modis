@@ -2,7 +2,7 @@ import logging
 import importlib
 import os
 
-from modis.cache import ROOT_DIR
+from modis.common import ROOT_DIR
 
 logger = logging.getLogger(__name__)
 

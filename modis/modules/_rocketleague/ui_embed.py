@@ -1,4 +1,4 @@
-from .._tools import ui_embed
+from modis.tools import embedtools
 from ._data import *
 
 
@@ -34,7 +34,7 @@ def success(channel, stats, name, platform, dp):
         datapacks.append((stat_name, stat_value, True))
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embedtools.UI(
         channel,
         "Rocket League Stats: {}".format(name),
         "*Stats obtained from [Rocket League Tracker Network](https://rocketleague.tracker.network/)*",
@@ -55,10 +55,10 @@ def fail_steamid(channel):
         channel (discord.Channel): The Discord channel to bind the embed to
 
     Returns:
-        ui (ui_embed.UI): The embed UI object
+        ui (embedtools.UI): The embed UI object
     """
 
-    gui = ui_embed.UI(
+    gui = embedtools.UI(
         channel,
         "That SteamID doesn't exist.",
         "You can get your SteamID by going to your profile page and looking at the url, "
@@ -78,10 +78,10 @@ def fail_api(channel):
         channel (discord.Channel): The Discord channel to bind the embed to
 
     Returns:
-        ui (ui_embed.UI): The embed UI object
+        ui (embedtools.UI): The embed UI object
     """
 
-    gui = ui_embed.UI(
+    gui = embedtools.UI(
         channel,
         "Couldn't get stats off RLTrackerNetwork.",
         "Maybe the API changed, please tell Infraxion.",

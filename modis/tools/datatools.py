@@ -11,7 +11,7 @@ import os
 import json
 from collections import OrderedDict
 
-from modis.cache import WORK_DIR, DATAFILE, ROOT_TEMPLATE, SERVER_TEMPLATE
+from modis.common import WORK_DIR, DATAFILE, ROOT_TEMPLATE, SERVER_TEMPLATE
 
 
 logger = logging.getLogger(__name__)

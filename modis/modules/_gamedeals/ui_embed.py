@@ -1,4 +1,4 @@
-from .._tools import ui_embed
+from modis.tools import embedtools
 from ._data import *
 
 
@@ -17,7 +17,7 @@ def success(channel, post):
     datapacks = [("Game", post[0], True), ("Upvotes", post[2], True)]
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embedtools.UI(
         channel,
         "Link",
         post[1],
@@ -38,10 +38,10 @@ def no_results(channel):
         channel (discord.Channel): The Discord channel to bind the embed to
 
     Returns:
-        ui (ui_embed.UI): The embed UI object
+        ui (embedtools.UI): The embed UI object
     """
 
-    gui = ui_embed.UI(
+    gui = embedtools.UI(
         channel,
         "No results",
         ":c",

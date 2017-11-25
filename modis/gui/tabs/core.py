@@ -88,7 +88,7 @@ class Frame(tk.Frame):
 
             # Stop Modis
             logger.info("Stopping Modis")
-            from modis.cache import client
+            from modis.common import client
             asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
 
     class CoreLog(ttk.Labelframe):

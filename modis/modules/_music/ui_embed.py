@@ -3,8 +3,8 @@
 import logging
 import math
 
+from modis.tools import embedtools
 from ._data import *
-from .._tools import ui_embed
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ def topic_update(channel, topic_channel):
         channel_message = "Topic channel has been cleared."
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embedtools.UI(
         channel,
         "Topic channel updated",
         channel_message,
@@ -53,7 +53,7 @@ def nowplaying_none(channel):
         embed: The created embed
     """
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embedtools.UI(
         channel,
         "Music",
         "Nothing is playing right now",
@@ -98,7 +98,7 @@ def nowplaying_info(channel, title, duration, source, source_date, views=0, like
         datapacks.append(("Likes", number_format(likes), True))
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embedtools.UI(
         channel,
         "",
         "",

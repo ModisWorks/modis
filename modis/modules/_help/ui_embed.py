@@ -1,4 +1,4 @@
-from .._tools import ui_embed
+from modis.tools import embedtools
 from ._data import *
 
 
@@ -12,11 +12,11 @@ def success(channel, title, datapacks):
         datapacks (list): The hex value
 
     Returns:
-        ui (ui_embed.UI): The embed UI object
+        ui (embedtools.UI): The embed UI object
     """
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embedtools.UI(
         channel,
         title,
         "",
@@ -37,11 +37,11 @@ def http_exception(channel, title):
         title (str): The title of the embed
 
     Returns:
-        ui (ui_embed.UI): The embed UI object
+        ui (embedtools.UI): The embed UI object
     """
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embedtools.UI(
         channel,
         "Too much help",
         "{} is too helpful! Try trimming some of the help messages.".format(title),

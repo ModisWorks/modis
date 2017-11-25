@@ -24,7 +24,7 @@ class RootFrame(ttk.Frame):
         def on_closing():
             """Called when the window closes"""
             try:
-                from modis.cache import client
+                from modis.common import client
                 if client and client.loop:
                     asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
             except RuntimeError:

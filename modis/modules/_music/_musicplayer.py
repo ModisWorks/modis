@@ -7,9 +7,8 @@ import threading
 
 import discord
 
-from modis import data
+from modis.tools import embedtools as ui_embed_tools
 from . import _data, _timebar, api_music, ui_embed
-from .._tools import ui_embed as ui_embed_tools
 from ..._client import client
 
 logger = logging.getLogger(__name__)

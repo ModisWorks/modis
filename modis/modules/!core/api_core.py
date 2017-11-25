@@ -4,7 +4,7 @@ import importlib
 
 from modis.tools import datatools
 from . import _data
-from modis.cache import client
+from modis.common import client
 
 logger = logging.getLogger(__name__)
 

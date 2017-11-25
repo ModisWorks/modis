@@ -1,11 +1,10 @@
-from ..._client import client
+from modis 
 
 import discord
 
 
 class UI:
-    def __init__(self, channel, title, description,
-                 modulename="Modis", creator="anonymous", colour=0xAAFF00, thumbnail=None, image=None, datapacks=()):
+    def __init__(self, channel, title, description, modulename="Modis", creator="anonymous", colour=0xAAFF00, thumbnail=None, image=None, datapacks=()):
         """Initialises variables and builds GUI
 
         Args:

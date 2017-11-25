@@ -11,9 +11,7 @@ import sys
 
 
 class ModisStreamHandler(logging.StreamHandler):
-    """
-    A handler for Modis' logging and Unicode characters
-    """
+    """A handler for Modis' logging and Unicode characters"""
 
     def __init__(self, stream, stream_err):
         super(ModisStreamHandler, self).__init__(stream)
@@ -54,7 +52,7 @@ def log_init():
     import time
 
     from modis.tools import datatools
-    from modis.cache import WORK_DIR
+    from modis.common import WORK_DIR
 
     # Create logging directory
     logs_dir = "{}/logs/".format(WORK_DIR)
@@ -65,12 +63,12 @@ def log_init():
     logger = logging.getLogger(__name__)
 
     # Set log level
-    data = datatools.get()
-    if "log_level" in data:
-        logger.setLevel(data["log_level"])
+    datatools.get()
+    if "log_level" in datatools.data:
+        logger.setLevel(datatools.data["log_level"])
     else:
-        data["log_level"] = "INFO"
-        datatools.write(data)
+        datatools.data["log_level"] = "INFO"
+        datatools.write()
         logger.setLevel("INFO")
 
     # Setup logging format
