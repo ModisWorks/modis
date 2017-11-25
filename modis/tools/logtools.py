@@ -54,11 +54,10 @@ def log_init():
     import time
 
     from modis.tools import datatools
-
-    working_dir = os.path.realpath(os.getcwd())
+    from modis.cache import WORK_DIR
 
     # Create logging directory
-    logs_dir = "{}/logs/".format(working_dir)
+    logs_dir = "{}/logs/".format(WORK_DIR)
     if not os.path.isdir(logs_dir):
         os.mkdir(logs_dir)
 

@@ -55,12 +55,12 @@ def get():
 
     logger.debug("Getting data.json")
 
+    global data
+
     if not os.path.exists(DATAFILE):
         logging.CRITICAL("data.json not found. An empty one was created.")
         create(ROOT_TEMPLATE)
         return data
-
-    global data
 
     with open(DATAFILE, 'r') as file:
         data = json.load(file)
