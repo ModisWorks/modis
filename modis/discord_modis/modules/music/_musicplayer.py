@@ -808,7 +808,7 @@ class MusicPlayer:
                 logger.exception(e)
 
     def parse_query(self, query, front, stop_current, shuffle):
-        yt_videos, response = api_music.parse_query(query, self.statuslog)
+        yt_videos = api_music.parse_query(query, self.statuslog)
         if shuffle:
             random.shuffle(yt_videos)
 
@@ -822,10 +822,6 @@ class MusicPlayer:
             self.queue = self.queue + yt_videos
 
         self.update_queue()
-        if response[0] == 0:
-            self.statuslog.info(response[1])
-        else:
-            self.statuslog.error(response[1])
 
         if stop_current:
             if self.streamer:
