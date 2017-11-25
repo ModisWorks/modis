@@ -17,6 +17,8 @@ github_username: Infraxion
 # Build settings
 markdown: kramdown
 theme: jekyll-theme-cayman
+# Analytics
+google_analytics: UA-105356258-2
 
 # Dir for sass files
 sass:
