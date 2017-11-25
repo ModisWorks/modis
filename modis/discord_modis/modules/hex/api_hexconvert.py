@@ -2,6 +2,7 @@ def convert_hex_value(message, needs_prefix=True):
     prefixes = ["0x", "#"]
     hex_chars = "0123456789ABCDEF"
 
+    hex_strs = []
     for s in message.split(' '):
         is_hex_prefix = False
         for prefix in prefixes:
@@ -24,6 +25,6 @@ def convert_hex_value(message, needs_prefix=True):
                         break
 
                 if is_all_hex:
-                    return True, s
+                    hex_strs.append(s)
 
-    return False, ""
+    return hex_strs

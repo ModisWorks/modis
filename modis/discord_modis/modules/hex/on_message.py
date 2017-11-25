@@ -37,24 +37,26 @@ async def on_message(message):
                 await client.send_typing(channel)
 
                 # Parse message
-                success, hex_str = api_hexconvert.convert_hex_value(arg)
+                hex_strs = api_hexconvert.convert_hex_value(arg)
                 # Create embed UI
-                if success:
-                    image_url = convert_hex_to_url(hex_str)
-                    embed = ui_embed.success(channel, image_url, hex_str)
+                if len(hex_strs) > 0:
+                    for hex_str in hex_strs:
+                        image_url = convert_hex_to_url(hex_str)
+                        embed = ui_embed.success(channel, image_url, hex_str)
+                        await embed.send()
                 else:
                     embed = ui_embed.fail_api(channel)
-
-                await embed.send()
+                    await embed.send()
         else:
             # Parse message
-            success, hex_str = api_hexconvert.convert_hex_value(content)
+            hex_strs = api_hexconvert.convert_hex_value(content)
             # Create embed UI
-            if success:
-                await client.send_typing(channel)
-                image_url = convert_hex_to_url(hex_str)
-                embed = ui_embed.success(channel, image_url, hex_str)
-                await embed.send()
+            if len(hex_strs) > 0:
+                for hex_str in hex_strs:
+                    await client.send_typing(channel)
+                    image_url = convert_hex_to_url(hex_str)
+                    embed = ui_embed.success(channel, image_url, hex_str)
+                    await embed.send()
 
 
 def convert_hex_to_url(hex_value):
@@ -64,4 +66,4 @@ def convert_hex_to_url(hex_value):
     Returns:
         url (str): A url referencing an image of the given hex value
     """
-    return "https://dummyimage.com/250.png/{0}/{0}".format(hex_value)
+    return "https://dummyimage.com/400x400.png/{0}/{0}".format(hex_value)
