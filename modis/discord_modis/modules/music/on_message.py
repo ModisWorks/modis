@@ -91,7 +91,7 @@ async def on_message(message):
                 await _data.cache[server.id].set_loop(arg)
 
             elif command == 'stop':
-                await _data.cache[server.id].stop()
+                await _data.cache[server.id].stop(log_stop=True)
 
             elif command == 'volume':
                 await _data.cache[server.id].setvolume(arg)
