@@ -43,9 +43,11 @@ async def on_message(message):
                 _data.cache[server.id] = _musicplayer.MusicPlayer(server.id)
 
             # Remove message
-            if command in ['play', 'playnext', 'playnow', 'playshuffle', 'pause', 'resume', 'skip', 'remove', 'rewind',
-                           'restart', 'shuffle', 'volume', 'stop', 'destroy', 'front', 'movehere', 'settopic',
-                           'cleartopic', 'notopic', 'loop']:
+            if command in ['play', 'playnext', 'playnow', 'playshuffle', 'insert',
+                           'pause', 'resume', 'skip', 'remove',
+                           'rewind', 'restart', 'shuffle', 'volume',
+                           'stop', 'destroy', 'front', 'movehere',
+                           'settopic', 'cleartopic', 'notopic', 'loop']:
                 try:
                     await client.delete_message(message)
                 except discord.errors.NotFound:
@@ -58,13 +60,21 @@ async def on_message(message):
                 await _data.cache[server.id].play(author, channel, arg)
 
             if command == 'playnext':
-                await _data.cache[server.id].play(author, channel, arg, now=True)
+                await _data.cache[server.id].play(author, channel, arg, index=1)
 
             if command == 'playnow':
-                await _data.cache[server.id].play(author, channel, arg, now=True, stop_current=True)
+                await _data.cache[server.id].play(author, channel, arg, index=1, stop_current=True)
 
             if command == 'playshuffle':
                 await _data.cache[server.id].play(author, channel, arg, shuffle=True)
+
+            if command == 'insert':
+                if len(args) >= 2:
+                    index = args[0]
+                    query = ' '.join(args[1:])
+                    await _data.cache[server.id].play(author, channel, query, index=index)
+                else:
+                    await _data.cache[server.id].play(author, channel, arg)
 
             elif command == 'pause':
                 await _data.cache[server.id].pause()

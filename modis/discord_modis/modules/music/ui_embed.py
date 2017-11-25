@@ -36,84 +36,34 @@ def topic_update(channel, topic_channel):
         "Topic channel updated",
         channel_message,
         modulename=modulename,
+        colour=modulecolor_info,
         creator=creator
     )
 
     return gui
 
 
-def nowplaying_none(channel):
+def error_message(channel, error_title, error_message):
     """
-    Creates an embed UI for no song playing
+    Creates an embed UI for the topic update
 
     Args:
         channel (discord.Channel): The Discord channel to bind the embed to
-
-    Returns:
-        embed: The created embed
-    """
-    # Create embed UI object
-    gui = ui_embed.UI(
-        channel,
-        "Music",
-        "Nothing is playing right now",
-        modulename=modulename,
-        creator=creator
-    )
-
-    return gui
-
-
-def nowplaying_info(channel, title, duration, source, source_date, views=0, likes=0, description=""):
-    """
-    Creates an embed UI for no song playing
-
-    Args:
-        channel (discord.Channel): The Discord channel to bind the embed to
-        title (str): The title of the current song
-        duration (str): The duration string for the current song
-        source (str): The uploader for this song
-        source_date (datetime.date): The date that this song was uploaded
-        views (int): The number of views for this video
-        likes (int): The number of likes for this video
-        description (str): The description for the current video
+        error_title: The title for the error
+        error_message: The message for the error
 
     Returns:
         embed: The created embed
     """
 
-    format_date = source_date.strftime("%d %b, %Y")
-    datapacks = [("Now Playing", title, False)]
-
-    if description is not None and description != "":
-        datapacks.append(("Description", description, False))
-
-    datapacks.append(("Duration", duration, True))
-    datapacks.append(("Author", source, True))
-    datapacks.append(("Date", format_date, True))
-
-    if views is not None and views > 0:
-        datapacks.append(("Views", number_format(views), True))
-    if likes is not None and likes > 0:
-        datapacks.append(("Likes", number_format(likes), True))
-
     # Create embed UI object
     gui = ui_embed.UI(
         channel,
-        "",
-        "",
-        datapacks=datapacks,
+        error_title,
+        error_message,
         modulename=modulename,
+        colour=modulecolor_error,
         creator=creator
     )
 
     return gui
-
-
-def number_format(n):
-    number_names = ['', ' Thousand', ' Million', ' Billion', ' Trillion']
-
-    n = float(n)
-    millidx = max(0, min(len(number_names) - 1, int(math.floor(0 if n == 0 else math.log10(abs(n)) / 3))))
-
-    return '{:.0f}{}'.format(n / 10 ** (3 * millidx), number_names[millidx])

@@ -158,7 +158,7 @@ class MusicPlayer:
         else:
             self.write_volume()
 
-    async def play(self, author, text_channel, query, now=False, stop_current=False, shuffle=False):
+    async def play(self, author, text_channel, query, index=None, stop_current=False, shuffle=False):
         """
         The play command
 
@@ -166,7 +166,7 @@ class MusicPlayer:
             author (discord.Member): The member that called the command
             text_channel (discord.Channel): The channel where the command was called
             query (str): The argument that was passed with the command
-            now (bool): Whether to play next or at the end of the queue
+            index (str): Whether to play next or at the end of the queue
             stop_current (bool): Whether to stop the currently playing song
             shuffle (bool): Whether to shuffle the queue after starting
         """
@@ -178,7 +178,7 @@ class MusicPlayer:
             # Init the music player
             await self.msetup(text_channel)
             # Queue the song
-            await self.enqueue(query, now, stop_current, shuffle)
+            await self.enqueue(query, index, stop_current, shuffle)
             # Connect to voice
             await self.vsetup(author)
 
@@ -186,7 +186,7 @@ class MusicPlayer:
             self.state = 'ready' if self.mready and self.vready else 'off'
         else:
             # Queue the song
-            await self.enqueue(query, now, stop_current, shuffle)
+            await self.enqueue(query, index, stop_current, shuffle)
 
         if self.state == 'ready':
             if self.streamer is None:
@@ -807,32 +807,13 @@ class MusicPlayer:
             except Exception as e:
                 logger.exception(e)
 
-    def parse_query(self, query, front, stop_current, shuffle):
-        yt_videos = api_music.parse_query(query, self.statuslog)
-        if shuffle:
-            random.shuffle(yt_videos)
-
-        if len(yt_videos) == 0:
-            self.statuslog.error("No results for: {}".format(query))
-            return
-
-        if front:
-            self.queue = yt_videos + self.queue
-        else:
-            self.queue = self.queue + yt_videos
-
-        self.update_queue()
-
-        if stop_current:
-            if self.streamer:
-                self.streamer.stop()
-
-    async def enqueue(self, query, front=False, stop_current=False, shuffle=False):
-        """Queues songs based on either a YouTube search or a link
+    async def enqueue(self, query, queue_index=None, stop_current=False, shuffle=False):
+        """
+        Queues songs based on either a YouTube search or a link
 
         Args:
             query (str): Either a search term or a link
-            front (bool): Whether to enqueue at the front or the end
+            queue_index (str): The queue index to enqueue at (None for end)
             stop_current (bool): Whether to stop the current song after the songs are queued
             shuffle (bool): Whether to shuffle the added songs
         """
@@ -843,14 +824,70 @@ class MusicPlayer:
         self.statuslog.info("Parsing {}".format(query))
         self.logger.debug("Enqueueing from query")
 
+        indexnum = None
+        if queue_index is not None:
+            try:
+                indexnum = int(queue_index) - 1
+            except TypeError:
+                self.statuslog.error("Play index argument must be a number")
+                return
+            except ValueError:
+                self.statuslog.error("Play index argument must be a number")
+                return
+
         if not self.vready:
-            self.parse_query(query, front, stop_current, shuffle)
+            self.parse_query(query, indexnum, stop_current, shuffle)
         else:
             parse_thread = threading.Thread(
                 target=self.parse_query,
-                args=[query, front, stop_current, shuffle])
+                args=[query, indexnum, stop_current, shuffle])
             # Run threads
             parse_thread.start()
+
+    def parse_query(self, query, index, stop_current, shuffle):
+        """
+        Parses a query and adds it to the queue
+
+        Args:
+            query (str): Either a search term or a link
+            index (int): The index to enqueue at (None for end)
+            stop_current (bool): Whether to stop the current song after the songs are queued
+            shuffle (bool): Whether to shuffle the added songs
+        """
+
+        if index is not None:
+            if index < 0 or index >= len(self.queue):
+                if len(self.queue) == 0:
+                    self.statuslog.error("Cannot queue at index because queue is empty")
+                    return
+                elif len(self.queue) == 1:
+                    self.statuslog.error("Play index must be 1 (1 song in queue)")
+                    return
+                else:
+                    self.statuslog.error("Play index must be between 1 and {}".format(len(self.queue)))
+                    return
+
+        try:
+            yt_videos = api_music.parse_query(query, self.statuslog)
+            if shuffle:
+                random.shuffle(yt_videos)
+
+            if len(yt_videos) == 0:
+                self.statuslog.error("No results for: {}".format(query))
+                return
+
+            if index is None:
+                self.queue = self.queue + yt_videos
+            else:
+                self.queue = self.queue[:index] + yt_videos + self.queue[index:]
+
+            self.update_queue()
+
+            if stop_current:
+                if self.streamer:
+                    self.streamer.stop()
+        except Exception as e:
+            logger.exception(e)
 
     def update_queue(self):
         """Updates the queue in the music player """
