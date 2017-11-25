@@ -9,4 +9,18 @@ import os as _os
 ROOT_DIR = _os.path.dirname(_os.path.realpath(__file__))
 WORK_DIR = _os.getcwd()
 
+DATAFILE = "{}/data.json".format(WORK_DIR)
+ROOT_TEMPLATE = {
+    "log_level": "INFO",
+    "keys": {
+        "discord_token": ""
+    },
+    "servers": {}
+}
+SERVER_TEMPLATE = {
+    "prefix": "!",
+    "activation": {},
+    "commands": {}
+}
+
 client = None

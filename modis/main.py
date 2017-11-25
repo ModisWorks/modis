@@ -57,9 +57,11 @@ def start(loop):
     import asyncio
     
     from modis import cache
+    from modis.tools import datatools
     from modis.tools import moduletools
 
-    # TODO data.json setup
+    # Update data.json cache
+    datatools.get()
 
     # Create client
     logger.debug("Creating Discord client")
@@ -80,9 +82,7 @@ def start(loop):
     logger.info("Connecting to Discord")
     # TODO clean up this massive exception stack
     try:
-        from modis.tools import datatools
-        data = datatools.get()
-        token = data["keys"]["discord_token"]
+        token = datatools.data["keys"]["discord_token"]
         client.loop.run_until_complete(client.login(token))
     except Exception as e:
         logger.exception(e)

@@ -11,23 +11,11 @@ import os
 import json
 from collections import OrderedDict
 
-from modis.cache import WORK_DIR
+from modis.cache import WORK_DIR, DATAFILE, ROOT_TEMPLATE, SERVER_TEMPLATE
 
-DATAFILE = "{}/data.json".format(WORK_DIR)
-ROOT_TEMPLATE = {
-    "log_level": "INFO",
-    "keys": {
-        "discord_token": ""
-    },
-    "servers": {}
-}
-SERVER_TEMPLATE = {
-    "prefix": "!",
-    "activation": {},
-    "commands": {}
-}
 
 logger = logging.getLogger(__name__)
+
 data = {}
 
 
@@ -55,19 +43,19 @@ def get():
 
     logger.debug("Getting data.json")
 
+    global data
+
     if not os.path.exists(DATAFILE):
         logging.CRITICAL("data.json not found. An empty one was created.")
         create(ROOT_TEMPLATE)
         return data
-
-    global data
 
     with open(DATAFILE, 'r') as file:
         data = json.load(file)
         return data
 
 
-def write(new_data):
+def write(new_data=None):
     """Update the data.json file.
 
     Args:
@@ -76,13 +64,16 @@ def write(new_data):
 
     logger.debug("Writing data.json")
 
+    global data
+
     if not os.path.exists(DATAFILE):
         logging.CRITICAL("data.json not found. An empty one was created.")
         create(ROOT_TEMPLATE)
         return
 
-    global data
-    data = _sort(new_data)
+    if new_data:
+        data = new_data
+    data = _sort(data)
 
     with open(DATAFILE, 'w') as file:
         json.dump(data, file, indent=2)

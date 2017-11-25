@@ -22,9 +22,13 @@ def get():
     logger.debug("Getting version info from GitHub")
 
     # Get version info from GitHub
-    r = requests.get("https://api.github.com/repos/Infraxion/Modis/releases/latest").json()
-    if "message" not in r or r["message"] == "Not Found":
-        r = requests.get("https://api.github.com/repos/Infraxion/Modis/releases").json()[0]
+    try:
+        r = requests.get("https://api.github.com/repos/Infraxion/Modis/releases/latest").json()
+        if "message" not in r or r["message"] == "Not Found":
+            r = requests.get("https://api.github.com/repos/Infraxion/Modis/releases").json()[0]
+    except requests.ConnectionError:
+        logger.warning("Could not connect to GitHub for version info")
+        return []
 
     # Parse version info
     if "tag_name" in r:
