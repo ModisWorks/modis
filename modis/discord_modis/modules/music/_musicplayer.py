@@ -754,8 +754,8 @@ class MusicPlayer:
         # Create embed UI object
         self.embed = ui_embed_tools.UI(
             self.mchannel,
-            "Music Player",
-            "Press the buttons!",
+            "",
+            "",
             modulename=_data.modulename,
             colour=_data.modulecolor,
             datapacks=datapacks
