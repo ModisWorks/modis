@@ -11,6 +11,21 @@
       "description": "Deactivates the given module for this server"
     },
     {
+      "name": "warn",
+      "params": ["module"],
+      "description": "Gives a warning to the mentioned user"
+    },
+    {
+      "name": "ban",
+      "params": ["mention"],
+      "description": "Bans the mentioned user from the server"
+    },
+    {
+      "name": "warnmax",
+      "params": ["n"],
+      "description": "Sets the number of warnings a user must have before being banned to [n]"
+    },
+    {
       "name": "prefix",
       "params": ["prefix"],
       "description": "Updates the prefix for the server"
