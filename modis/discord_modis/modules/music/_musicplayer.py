@@ -204,6 +204,7 @@ class MusicPlayer:
         self.nowplayingsourcelog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
+        self.embed.thumbnail = ""
 
         if log_stop:
             self.statuslog.debug("Stopping")
@@ -241,6 +242,7 @@ class MusicPlayer:
         self.nowplayingsourcelog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
+        self.embed.thumbnail = ""
 
         self.clear_cache()
 
@@ -265,6 +267,7 @@ class MusicPlayer:
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
         self.statuslog.debug("Destroying")
+        self.embed.thumbnail = ""
 
         self.mready = False
         self.vready = False
@@ -1118,6 +1121,11 @@ class MusicPlayer:
 
                 self.nowplayingsourcelog.info(api_music.parse_source(info))
 
+                if "thumbnail" in info:
+                    self.embed.thumbnail = info["thumbnail"]
+                else:
+                    self.embed.thumbnail = ""
+
                 play_state = "Streaming" if self.is_live else "Playing"
                 await self.set_topic("{} {}".format(play_state, info["title"]))
                 self.statuslog.debug(play_state)
@@ -1140,6 +1148,11 @@ class MusicPlayer:
 
         info = self.streamer.yt.extract_info(url, download=False)
         self.nowplayingsourcelog.info(api_music.parse_source(info))
+
+        if "thumbnail" in info:
+            self.embed.thumbnail = info["thumbnail"]
+        else:
+            self.embed.thumbnail = ""
 
         play_state = "Streaming" if self.is_live else "Playing"
         await self.set_topic("{} {}".format(play_state, self.streamer.title))
@@ -1186,6 +1199,8 @@ class MusicPlayer:
                 self.statuslog.debug("Downloading next song")
                 self.timelog.debug("Loading song")
                 self.prev_time = "---"
+
+                self.embed.thumbnail = ""
 
                 dl_thread = threading.Thread(target=self.download_next_song, args=[song])
                 dl_thread.start()
