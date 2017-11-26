@@ -6,9 +6,13 @@ access global variables.
 
 import os as _os
 
+# Directory
 ROOT_DIR = _os.path.dirname(_os.path.realpath(__file__))
+MODULES_DIR = ROOT_DIR + "/modules"
 WORK_DIR = _os.getcwd()
+LOGS_DIR = WORK_DIR + "/logs"
 
+# Discord
 EH_TYPES = [
     "on_ready",
     "on_resume",
@@ -43,7 +47,9 @@ EH_TYPES = [
     "on_group_join",
     "on_group_remove"
 ]
+client = None
 
+# data.json
 DATAFILE = "{}/data.json".format(WORK_DIR)
 ROOT_TEMPLATE = {
     "log_level": "INFO",
@@ -58,4 +64,5 @@ SERVER_TEMPLATE = {
     "commands": {}
 }
 
-client = None
+# Logging
+LOG_FORMAT = "{asctime} {levelname:8} {name} - {message}"

@@ -16,20 +16,25 @@ def cmd(data_dir=None):
     """Start Modis in command line."""
 
     # Set the data dir to the one provided
-    set_dir(data_dir)
+    if data_dir:
+        set_dir(data_dir)
 
     # Setup the logger
+    import logging
     from modis.tools import logtools
-    logger = logtools.log_init()
-    logger.info("Initialising Modis for command line")
+    logger = logging.getLogger(__name__)
+    logtools.init_print(logger)
+    logtools.init_file(logger)
+
+    logger.info("----------------NEW INSTANCE----------------")
 
     # Import packages
-    logger.debug("Importing packages")
     import asyncio
     from modis import main
     from modis.tools import versiontools
 
-    # Check the current version comparison
+    # Check the current version
+    logger.info("Checking version...")
     logger.info(versiontools.get_str())
 
     # Start Modis for command line
@@ -43,25 +48,31 @@ def gui(data_dir=None):
     """Start Modis with GUI."""
 
     # Set the data dir to the one provided
-    set_dir(data_dir)
+    if data_dir:
+        set_dir(data_dir)
 
     # Setup the logger
+    import logging
     from modis.tools import logtools
-    logger = logtools.log_init()
-    logger.info("Initialising Modis for GUI")
+    logger = logging.getLogger(__name__)
+    logtools.init_print(logger)
+    logtools.init_file(logger)
+
+    logger.info("----------------NEW INSTANCE----------------")
 
     # Import packages
-    logger.debug("Importing packages")
     import os
     import tkinter as tk
     from modis.gui import window
     from modis.tools import versiontools
 
-    # Check the current version comparison
+    # Check the current version
+    logger.info("Checking version...")
     logger.info(versiontools.get_str())
 
-    # Setup the GUI
+    # Start Modis for GUI
     logger.info("Starting GUI")
+
     # Setup the root window
     root = tk.Tk()
     root.minsize(width=800, height=400)
@@ -71,33 +82,30 @@ def gui(data_dir=None):
     root.iconbitmap(r"{}/assets/modis.ico".format(file_dir))
 
     # Setup the notebook
-    discord = window.RootFrame(root)
-    discord.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
+    main = window.RootFrame(root)
+    main.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
 
     # Configure stretch ratios
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
-    discord.columnconfigure(0, weight=1)
-    discord.rowconfigure(0, weight=1)
+    main.columnconfigure(0, weight=1)
+    main.rowconfigure(0, weight=1)
 
     # Run the window UI
     root.mainloop()
 
 
 def set_dir(data_dir=None):
-    """
-    Sets Modis' data dir from the cache
+    """Set the data directory.
 
     Args:
-        data_dir: The new directory to store data in
+        data_dir: The new directory to store data in.
     """
 
     import os
 
-    from modis import common
-    common.WORK_DIR = data_dir
-
-    if data_dir is None:
-        data_dir = os.getcwd()
     if not os.path.isdir(data_dir):
         raise NotADirectoryError("Data dir {} does not exist".format(data_dir))
+    else:
+        from modis import common
+        common.WORK_DIR = data_dir

@@ -16,7 +16,7 @@ def get_modules():
         module_names (list): List of strings of module names.
     """
 
-    logging.debug("Retrieving list of modules")
+    logger.debug("Retrieving list of modules")
 
     module_names = []
 

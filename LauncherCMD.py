@@ -1,0 +1,3 @@
+import modis
+
+modis.cmd()

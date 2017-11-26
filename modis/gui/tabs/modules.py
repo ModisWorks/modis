@@ -70,10 +70,10 @@ class Frame(tk.Frame):
         m_button.bind("<Button-1>", lambda e: self.select(module_name, module_ui))
 
     def scan(self):
-        database_dir = "C:/Data/GitHub/modis/modis/modules"
+        from modis import common
         # Iterate through modules
-        for module_name in os.listdir(database_dir):
-            module_dir = "{}/{}".format(database_dir, module_name)
+        for module_name in os.listdir(common.MODULES_DIR):
+            module_dir = "{}/{}".format(common.MODULES_DIR, module_name)
 
             if not os.path.isdir(module_dir):
                 continue

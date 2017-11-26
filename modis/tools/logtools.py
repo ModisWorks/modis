@@ -1,5 +1,5 @@
 """
-This tool handles loggin in Modis, making sure everything prints where it's
+This tool handles logging in Modis, making sure everything prints where it's
 meant to go (GUI log, console, etc), and handles Unicode encoding.
 
 Modis uses the logging package for logging. To create a new logger first import
@@ -10,12 +10,13 @@ import logging
 import sys
 
 
-class ModisStreamHandler(logging.StreamHandler):
+class UnicodeStreamHandler(logging.StreamHandler):
     """A handler for Modis' logging and Unicode characters"""
 
     def __init__(self, stream, stream_err):
-        super(ModisStreamHandler, self).__init__(stream)
-        if stream_err is None:
+        super(UnicodeStreamHandler, self).__init__(stream)
+
+        if not stream_err:
             stream_err = sys.stderr
         self.stream_err = stream_err
 
@@ -25,7 +26,7 @@ class ModisStreamHandler(logging.StreamHandler):
             level = getattr(record, "levelname")
 
             stream = self.stream
-            if level in ["CRITICAL", "ERROR"]:
+            if level in ["WARNING", "CRITICAL", "ERROR"]:
                 stream = self.stream_err
 
             try:
@@ -41,53 +42,70 @@ class ModisStreamHandler(logging.StreamHandler):
             self.handleError(record)
 
 
-def log_init():
-    """Initialises the root logger.
+def init_print(logger):
+    """Adds a print handler to a logger
 
-    Returns:
-        logger (logging.logger): The root logger.
+    Args:
+        logger (logging.logger): The logger to add the print handler to.
+    """
+
+    import os
+
+    from modis import common
+    from modis.tools import datatools
+
+    # Create logging directory
+    if not os.path.isdir(common.LOGS_DIR):
+        os.mkdir(common.LOGS_DIR)
+
+    # Set log level
+    datatools.get()
+    if "log_level" not in datatools.data:
+        datatools.data["log_level"] = "INFO"
+        datatools.write()
+    logger.setLevel(datatools.data["log_level"])
+
+    # Setup format
+    formatter = logging.Formatter(common.LOG_FORMAT, style="{")
+
+    # Setup handler
+    handler = UnicodeStreamHandler(sys.stdout, sys.stderr)
+    handler.setFormatter(formatter)
+
+    # Add handler
+    logger.addHandler(handler)
+
+
+def init_file(logger):
+    """Adds a file handler to a logger
+
+    Args:
+        logger (logging.logger): The logger to add the file handler to.
     """
 
     import os
     import time
 
+    from modis import common
     from modis.tools import datatools
-    from modis.common import WORK_DIR
 
     # Create logging directory
-    logs_dir = "{}/logs/".format(WORK_DIR)
-    if not os.path.isdir(logs_dir):
-        os.mkdir(logs_dir)
-
-    # Create logger
-    logger = logging.getLogger(__name__)
+    if not os.path.isdir(common.LOGS_DIR):
+        os.mkdir(common.LOGS_DIR)
 
     # Set log level
     datatools.get()
-    if "log_level" in datatools.data:
-        logger.setLevel(datatools.data["log_level"])
-    else:
+    if "log_level" not in datatools.data:
         datatools.data["log_level"] = "INFO"
         datatools.write()
-        logger.setLevel("INFO")
+    logger.setLevel(datatools.data["log_level"])
 
-    # Setup logging format
-    formatter = logging.Formatter("{asctime} {levelname:8} {name} - {message}",
-                                  style="{")
+    # Setup format
+    formatter = logging.Formatter(common.LOG_FORMAT, style="{")
 
-    # Setup logging handlers
-    printhandler = ModisStreamHandler(sys.stdout, sys.stderr)
-    printhandler.setFormatter(formatter)
-    filehandler = logging.FileHandler("{}/{}.log".format(logs_dir, time.time()),
-                                      encoding="UTF-8")
-    filehandler.setFormatter(formatter)
+    # Setup handlers
+    handler = logging.FileHandler("{}/{}.log".format(common.LOGS_DIR, time.time()), encoding="UTF-8")
+    handler.setFormatter(formatter)
 
-    logger.propagate = False
-    logger.addHandler(printhandler)
-    logger.addHandler(filehandler)
-
-    # Initial logging messages
-    logger.info("----------------NEW INSTANCE----------------")
-    logger.info("Loading Modis")
-
-    return logger
+    # Add handler
+    logger.addHandler(handler)

@@ -1,6 +1,10 @@
-from modis 
-
+import logging
 import discord
+
+from modis import common
+
+logger = logging.getLogger(__name__)
+client = common.client
 
 
 class UI:
