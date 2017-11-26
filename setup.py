@@ -83,7 +83,9 @@ setup(
         'google-api-python-client>=1.6.4',
         'requests>=2.18.4',
         'lxml>=4.1.1',
-        'praw>=5.2.0'
+        'praw>=5.2.0',
+        'soundcloud>=0.5.0',
+        'spotipy>=2.4.4'
     ],
 
     python_requires=">=3.6, <4",
