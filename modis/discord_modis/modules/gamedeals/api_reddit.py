@@ -15,7 +15,7 @@ def build_api():
             "reddit_api_client_id" not in data["discord"]["keys"] or \
             "reddit_api_client_secret" not in data["discord"]["keys"]:
         logger.warning("For gamedeals to work, please make sure \"reddit_api_user_agent\", " +
-                       "\"reddit_api_client_id\", and \"reddit_api_client_id\" are all added as API keys")
+                       "\"reddit_api_client_id\", and \"reddit_api_client_secret\" are all added as API keys")
 
     logger.debug("Building Reddit API")
     try:
