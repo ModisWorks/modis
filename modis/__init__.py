@@ -15,6 +15,10 @@ Have fun!
 def cmd(data_dir=None):
     """Start Modis in command line."""
 
+    # Update data
+    from modis.tools import datatools
+    datatools.get()
+
     # Set the data dir to the one provided
     if data_dir:
         set_dir(data_dir)
@@ -34,7 +38,6 @@ def cmd(data_dir=None):
     from modis.tools import versiontools
 
     # Check the current version
-    logger.info("Checking version...")
     logger.info(versiontools.get_str())
 
     # Start Modis for command line
@@ -46,6 +49,10 @@ def cmd(data_dir=None):
 
 def gui(data_dir=None):
     """Start Modis with GUI."""
+
+    # Update data
+    from modis.tools import datatools
+    datatools.get()
 
     # Set the data dir to the one provided
     if data_dir:
@@ -67,7 +74,6 @@ def gui(data_dir=None):
     from modis.tools import versiontools
 
     # Check the current version
-    logger.info("Checking version...")
     logger.info(versiontools.get_str())
 
     # Start Modis for GUI

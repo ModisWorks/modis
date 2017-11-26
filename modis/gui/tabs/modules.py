@@ -20,7 +20,6 @@ class Frame(tk.Frame):
         """
 
         super(Frame, self).__init__(parent)
-        logger.debug("Initialising module tabs")
 
         # Setup styles
         style = ttk.Style()

@@ -18,8 +18,6 @@ class RootFrame(ttk.Frame):
 
         super(RootFrame, self).__init__(parent)
 
-        logger.debug("Initialising root frame")
-
         # Define window close action
         def on_closing():
             """Called when the window closes"""
@@ -66,8 +64,6 @@ class StatusBar(ttk.Frame):
         Args:
             parent: A tk or ttk object
         """
-
-        logger.debug("Initialising status bar")
 
         super(StatusBar, self).__init__(parent)
 

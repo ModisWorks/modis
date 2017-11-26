@@ -18,8 +18,7 @@ async def on_message(message):
         return
 
     # Check prefix
-    data = datatools.get()
-    prefix = data["servers"][message.server.id]["prefix"]
+    prefix = datatools.data["servers"][message.server.id]["prefix"]
     if not message.content.startswith(prefix):
         return
 

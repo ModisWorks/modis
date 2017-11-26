@@ -59,7 +59,6 @@ def init_print(logger):
         os.mkdir(common.LOGS_DIR)
 
     # Set log level
-    datatools.get()
     if "log_level" not in datatools.data:
         datatools.data["log_level"] = "INFO"
         datatools.write()
@@ -94,7 +93,6 @@ def init_file(logger):
         os.mkdir(common.LOGS_DIR)
 
     # Set log level
-    datatools.get()
     if "log_level" not in datatools.data:
         datatools.data["log_level"] = "INFO"
         datatools.write()

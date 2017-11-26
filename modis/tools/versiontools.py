@@ -19,7 +19,7 @@ def get():
         version (list): The latest live version numbers
     """
 
-    logger.debug("Getting version info from GitHub")
+    logger.debug("Checking version...")
 
     # Get version info from GitHub
     try:

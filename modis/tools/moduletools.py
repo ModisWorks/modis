@@ -2,11 +2,9 @@ import logging
 import importlib
 import os
 
-from modis.common import ROOT_DIR
+from modis import common
 
 logger = logging.getLogger(__name__)
-
-modules_dir = "{}/modules".format(ROOT_DIR)
 
 
 def get_modules():
@@ -20,8 +18,8 @@ def get_modules():
 
     module_names = []
 
-    for module_folder in os.listdir(modules_dir):
-        if not os.path.isdir("{}/{}".format(modules_dir, module_folder)):
+    for module_folder in os.listdir(common.MODULES_DIR):
+        if not os.path.isdir("{}/{}".format(common.MODULES_DIR, module_folder)):
             # Is a file, not a folder
             continue
         if module_folder.startswith("_"):
@@ -50,7 +48,7 @@ def get_files(filenames):
 
     # Import requested files for each module
     for module_name in get_modules():
-        for file in os.listdir("{}/{}".format(modules_dir, module_name)):
+        for file in os.listdir("{}/{}".format(common.MODULES_DIR, module_name)):
             file = file[:-3]
             if file not in filenames:
                 # Requested file does not exist in module

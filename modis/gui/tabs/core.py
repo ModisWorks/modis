@@ -44,8 +44,6 @@ class Frame(tk.Frame):
 
             super(Frame.CoreControl, self).__init__(parent, padding=8, text="Modis control panel")
 
-            logger.debug("Initialising main control panel")
-
             # Toggle button
             self.state = "off"
             self.button_text = tk.StringVar(value="Start Modis")
@@ -100,8 +98,6 @@ class Frame(tk.Frame):
             Args:
                 parent: A tk or ttk object.
             """
-
-            logger.debug("Initialising log panel")
 
             super(Frame.CoreLog, self).__init__(parent, padding=8, text="Python console log")
 
