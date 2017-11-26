@@ -12,7 +12,7 @@
     },
     {
       "name": "warn",
-      "params": ["module"],
+      "params": ["mention"],
       "description": "Gives a warning to the mentioned user"
     },
     {
