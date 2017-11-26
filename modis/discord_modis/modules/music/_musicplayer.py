@@ -1058,6 +1058,7 @@ class MusicPlayer:
                     future.result()
                 except Exception as e:
                     logger.exception(e)
+                    self.state = 'ready'
                     return
             except PermissionError:
                 # File is still in use, it'll get cleared next time
@@ -1073,6 +1074,8 @@ class MusicPlayer:
                 self.state = 'ready'
                 self.vafter_ts()
                 return
+
+        self.state = 'ready'
 
     def download_next_song_cache(self):
         """Downloads the next song in the queue to the cache"""
