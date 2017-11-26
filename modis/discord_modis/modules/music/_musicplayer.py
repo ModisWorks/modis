@@ -42,7 +42,8 @@ def clear_cache_root():
 
 def _match_func(info_dict):
     if "is_live" not in info_dict or not info_dict["is_live"]:
-        return None
+        if "duration" in info_dict and info_dict["duration"] and info_dict["duration"] > 0:
+            return None
     raise DownloadStreamException("Cannot download stream")
 
 
@@ -854,12 +855,9 @@ class MusicPlayer:
             shuffle (bool): Whether to shuffle the added songs
         """
 
-        if index is not None:
+        if index is not None and len(self.queue) > 0:
             if index < 0 or index >= len(self.queue):
-                if len(self.queue) == 0:
-                    self.statuslog.error("Cannot queue at index because queue is empty")
-                    return
-                elif len(self.queue) == 1:
+                if len(self.queue) == 1:
                     self.statuslog.error("Play index must be 1 (1 song in queue)")
                     return
                 else:
@@ -878,7 +876,10 @@ class MusicPlayer:
             if index is None:
                 self.queue = self.queue + yt_videos
             else:
-                self.queue = self.queue[:index] + yt_videos + self.queue[index:]
+                if len(self.queue) > 0:
+                    self.queue = self.queue[:index] + yt_videos + self.queue[index:]
+                else:
+                    self.queue = yt_videos
 
             self.update_queue()
 

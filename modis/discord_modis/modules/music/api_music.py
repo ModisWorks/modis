@@ -15,6 +15,12 @@ ytdiscoveryapi = None
 scclient = None
 spclient = None
 
+SOURCE_TO_NAME = {
+    "soundcloud": "SoundCloud",
+    "twitchstream": "Twitch",
+    "youtube": "YouTube"
+}
+
 
 def build_yt_api():
     """Build the YouTube API for future use"""
@@ -477,15 +483,12 @@ def parse_source(info):
 
     if "extractor_key" in info:
         source = info["extractor_key"]
+        lower_source = source.lower()
 
-        source_to_name = {
-            "soundcloud": "SoundCloud",
-            "youtube": "YouTube"
-        }
-
-        for key in source_to_name:
-            if source.lower() == key:
-                source = source_to_name[key]
+        for key in SOURCE_TO_NAME:
+            lower_key = key.lower()
+            if lower_source == lower_key:
+                source = SOURCE_TO_NAME[lower_key]
 
         if source != "Generic":
             return source
