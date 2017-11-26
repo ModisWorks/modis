@@ -1046,6 +1046,7 @@ class MusicPlayer:
         # Move the songs from the next cache to the current cache
         self.move_next_cache()
 
+        self.state = 'ready'
         self.play_empty()
         # Download the file and create the stream
         with youtube_dl.YoutubeDL(dl_ydl_opts) as ydl:
@@ -1058,7 +1059,7 @@ class MusicPlayer:
                     future.result()
                 except Exception as e:
                     logger.exception(e)
-                    self.state = 'ready'
+                    self.vafter_ts()
                     return
             except PermissionError:
                 # File is still in use, it'll get cleared next time
@@ -1066,16 +1067,12 @@ class MusicPlayer:
             except youtube_dl.utils.DownloadError as e:
                 self.logger.exception(e)
                 self.statuslog.error(e)
-                self.state = 'ready'
                 self.vafter_ts()
                 return
             except Exception as e:
                 self.logger.exception(e)
-                self.state = 'ready'
                 self.vafter_ts()
                 return
-
-        self.state = 'ready'
 
     def download_next_song_cache(self):
         """Downloads the next song in the queue to the cache"""
