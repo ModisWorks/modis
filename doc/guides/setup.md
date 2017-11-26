@@ -25,9 +25,11 @@ When you're installing Python on Windows, make sure you check the option that ad
 
 ## FFmpeg
 
+FFmpeg is required for Modis to use audio and voice features of Discord (such as playing music with the `music` module). If you don't need any modules that use voice functionality then you can skip this step.
+
 ### FFmpeg on Windows
 
-For the audio stuff to work, you'll need the FFmpeg library in your PATH.
+For the audio stuff to work on Windows, you'll need the FFmpeg library in your PATH.
 Go to the FFmpeg org's [official website](https://www.ffmpeg.org/download.html) to get a download for FFmpeg.
 
 > *DON'T* press the big green download button. That gives you an uncompiled version of FFmpeg. We totally have not made this mistake multiple times before.
