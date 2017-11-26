@@ -19,12 +19,12 @@ class Frame(tk.Frame):
 
         super(Frame, self).__init__(parent)
 
-        # Log
+        # Add elements
         log = self.CoreLog(self)
-        log.grid(column=0, row=0, padx=8, pady=8, sticky="W E N S")
-
-        # Bot control panel
         botcontrol = self.CoreControl(self)
+
+        # Grid elements
+        log.grid(column=0, row=0, padx=8, pady=8, sticky="W E N S")
         botcontrol.grid(column=0, row=1, padx=8, pady=8, sticky="W E S")
 
         # Configure stretch ratios

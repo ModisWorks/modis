@@ -41,9 +41,9 @@ class RootFrame(ttk.Frame):
         statusbar = StatusBar(self)
 
         nav = ttk.Notebook(self)
-        from modis.gui.tabs import core, api, data, modules
+        from modis.gui.tabs import core, config, data, modules
         nav.add(core.Frame(nav), text="Global")
-        nav.add(api.Frame(nav), text="API")
+        nav.add(config.Frame(nav), text="Config")
         nav.add(data.Frame(nav), text="Data")
         nav.add(modules.Frame(nav), text="Modules")
 
