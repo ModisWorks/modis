@@ -665,7 +665,7 @@ class MusicPlayer:
         """
 
         if self.vready:
-            logger.error("Attempt to init voice when already initialised")
+            logger.warning("Attempt to init voice when already initialised")
             return
 
         if self.state != 'starting':
@@ -711,7 +711,7 @@ class MusicPlayer:
         """
 
         if self.mready:
-            logger.error("Attempt to init music when already initialised")
+            logger.warning("Attempt to init music when already initialised")
             return
 
         if self.state != 'starting':
@@ -1269,8 +1269,8 @@ class MusicPlayer:
             if self.streamer.error is None:
                 await self.vplay()
             else:
-                await self.destroy()
                 self.statuslog.error(self.streamer.error)
+                await self.destroy()
         except Exception as e:
             logger.exception(e)
             try:
