@@ -40,8 +40,8 @@ module_list = os.listdir(database_dir)
 
 # Title
 readme = add_md(readme, "MODIS", 1)
-latest_release = "Latest release: [v{0}{1}]({2}/{0})".format(datatools.version,
-                                                             " Beta" if datatools.version[0] < "1" else "",
+latest_release = "Latest release: [{1}v{0}]({2}/{0})".format(datatools.version,
+                                                             "Beta " if datatools.version[0] < "1" else "",
                                                              "https://github.com/Infraxion/modis/releases/tag")
 readme = add_md(readme, latest_release)
 
