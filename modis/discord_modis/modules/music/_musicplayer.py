@@ -60,6 +60,9 @@ ydl_opts = {
     "extract_audio": True,
     "restrict_filenames": True,
     "writeinfojson": True,
+    "writesubtitles": True,
+    "subtitlesformat": "ttml",
+    "outtmpl": "{}/{}".format(_root_songcache_dir, file_format),
     "nooverwrites": True,
     "noplaylist": True,
     "socket_timeout": 30,
@@ -1120,7 +1123,14 @@ class MusicPlayer:
                 self.nowplayingsourcelog.info(api_music.parse_source(info))
 
                 play_state = "Streaming" if self.is_live else "Playing"
-                await self.set_topic("{} {}".format(play_state, info["title"]))
+                topic_text = "{} {}".format(play_state, info["title"])
+
+                subtitles = api_music.get_subtitles(info)
+                if subtitles is not None and subtitles != "":
+                    topic_text += "\n\n\n" + subtitles
+
+                logger.debug(topic_text)
+                await self.set_topic(topic_text)
                 self.statuslog.debug(play_state)
         except Exception as e:
             logger.exception(e)
@@ -1141,9 +1151,17 @@ class MusicPlayer:
 
         info = self.streamer.yt.extract_info(url, download=False)
         self.nowplayingsourcelog.info(api_music.parse_source(info))
+        logger.debug(api_music.get_subtitles(info))
 
         play_state = "Streaming" if self.is_live else "Playing"
-        await self.set_topic("{} {}".format(play_state, self.streamer.title))
+        topic_text = "{} {}".format(play_state, info["title"])
+
+        subtitles = api_music.get_subtitles(info)
+        if subtitles is not None and subtitles != "":
+            topic_text += "\n\n\n" + subtitles
+
+        logger.debug(topic_text)
+        await self.set_topic(topic_text)
         self.statuslog.debug(play_state)
 
     async def setup_streamer(self):

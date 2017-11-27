@@ -1,7 +1,9 @@
 import logging
+import xml.etree.ElementTree as ElementTree
 from urllib.parse import urlparse
 
 import googleapiclient.discovery
+import requests
 import soundcloud
 import spotipy
 from soundcloud.resource import Resource, ResourceList
@@ -499,6 +501,22 @@ def parse_source(info):
             return p.netloc
 
     return "Unknown"
+
+
+def get_subtitles(info):
+    try:
+        if "subtitles" in info and "en" in info["subtitles"]:
+            for s_format in info["subtitles"]["en"]:
+                if "ext" in s_format and "url" in s_format and s_format["ext"] in ["ttml"]:
+                    sub_raw = requests.get(s_format["url"]).text
+                    root = ElementTree.fromstring(sub_raw)
+
+                    return sub_raw
+
+        return None
+    except Exception as e:
+        logger.exception(e)
+        return None
 
 
 build_yt_api()
