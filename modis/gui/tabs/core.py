@@ -129,8 +129,7 @@ class Frame(tk.Frame):
             discord_logger = logging.getLogger("modis")
 
             # Setup format
-            formatter = logging.Formatter("{levelname:8} {name} - {message}",
-                                          style="{")
+            formatter = logging.Formatter("{levelname:8} {name} - {message}", style="{")
 
             # Setup handler
             class PanelHandler(logging.Handler):
@@ -148,8 +147,9 @@ class Frame(tk.Frame):
 
                 def emit(self, record):
                     msg = self.format(record)
-                    msg = msg[:9] + msg[15:]
                     msg_level = logging.Formatter("{levelname}", style="{").format(record)
+                    # Remove '.modis' from start of logs
+                    msg = msg[:9] + msg[15:]
                     # Exceptions
                     if msg_level.startswith("ERROR"):
                         msg_level = "ERROR"
