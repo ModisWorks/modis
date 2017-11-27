@@ -1,5 +1,4 @@
-from modis import data
-from ..._client import client
+from modis import main
 
 from . import _data
 
@@ -18,10 +17,9 @@ async def on_reaction_add(reaction, user):
     server = reaction.message.server
     emoji = reaction.emoji
 
-    data = data.get_data()
-
-    if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
-        return
+    # TODO port to new activation
+    # if not data.cache["servers"][server.id][_data.modulename]["activated"]:
+    #     return
 
     # Commands section
     if user != reaction.message.channel.server.me:
@@ -36,7 +34,7 @@ async def on_reaction_add(reaction, user):
             if valid_reaction:
                 # Remove reaction
                 try:
-                    await client.remove_reaction(reaction.message, emoji, user)
+                    await main.client.remove_reaction(reaction.message, emoji, user)
                 except discord.errors.NotFound:
                     pass
                 except discord.errors.Forbidden:

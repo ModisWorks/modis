@@ -1,5 +1,5 @@
 """Handles the timebar, edit this for custom time bars"""
-from modis.discord_modis.modules.music import api_music
+from . import api_music
 
 TIMEBAR_LENGTH = 21
 TIMEBAR_PCHAR = "◆"

@@ -7,7 +7,7 @@ import spotipy
 from soundcloud.resource import Resource, ResourceList
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from modis import data
+from modis.tools import data
 
 logger = logging.getLogger(__name__)
 
@@ -24,15 +24,14 @@ SOURCE_TO_NAME = {
 
 def build_yt_api():
     """Build the YouTube API for future use"""
-    data = data.get_data()
-    if "google_api_key" not in data["discord"]["keys"]:
+    if "google_api_key" not in data.cache["keys"]:
         logger.warning("No API key found with name 'google_api_key'")
         logger.info("Please add your Google API key with name 'google_api_key' "
                     "in data.json to use YouTube features of the music module")
         return False
 
     logger.debug("Building YouTube discovery API")
-    ytdevkey = data["discord"]["keys"]["google_api_key"]
+    ytdevkey = data.cache["keys"]["google_api_key"]
 
     try:
         global ytdiscoveryapi
@@ -47,8 +46,7 @@ def build_yt_api():
 
 def build_sc_api():
     """Build the SoundCloud API for future use"""
-    data = data.get_data()
-    if "soundcloud_client_id" not in data["discord"]["keys"]:
+    if "soundcloud_client_id" not in data.cache["keys"]:
         logger.warning("No API key found with name 'soundcloud_client_id'")
         logger.info("Please add your SoundCloud client id with name 'soundcloud_client_id' "
                     "in data.json to use Soundcloud features of the music module")
@@ -56,7 +54,7 @@ def build_sc_api():
 
     try:
         global scclient
-        scclient = soundcloud.Client(client_id=data["discord"]["keys"]["soundcloud_client_id"])
+        scclient = soundcloud.Client(client_id=data.cache["keys"]["soundcloud_client_id"])
         logger.debug("SoundCloud build successful")
         return True
     except Exception as e:
@@ -66,13 +64,12 @@ def build_sc_api():
 
 def build_spotify_api():
     """Build the Spotify API for future use"""
-    data = data.get_data()
-    if "spotify_client_id" not in data["discord"]["keys"]:
+    if "spotify_client_id" not in data.cache["keys"]:
         logger.warning("No API key found with name 'spotify_client_id'")
         logger.info("Please add your Spotify client id with name 'spotify_client_id' "
                     "in data.json to use Spotify features of the music module")
         return False
-    if "spotify_client_secret" not in data["discord"]["keys"]:
+    if "spotify_client_secret" not in data.cache["keys"]:
         logger.warning("No API key found with name 'spotify_client_secret'")
         logger.info("Please add your Spotify client secret with name 'spotify_client_secret' "
                     "in data.json to use Spotify features of the music module")
@@ -81,8 +78,8 @@ def build_spotify_api():
     try:
         global spclient
         client_credentials_manager = SpotifyClientCredentials(
-                data["discord"]["keys"]["spotify_client_id"],
-                data["discord"]["keys"]["spotify_client_secret"])
+                data.cache["keys"]["spotify_client_id"],
+                data.cache["keys"]["spotify_client_secret"])
         spclient = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
         logger.debug("Spotify build successful")
         return True

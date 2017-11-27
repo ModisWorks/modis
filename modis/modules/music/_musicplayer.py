@@ -11,9 +11,11 @@ import threading
 import discord
 import youtube_dl
 
+from modis import main
+from modis.tools import data
 from modis.tools import embed as ui_embed_tools
+
 from . import _data, _timebar, api_music, ui_embed
-from ..._client import client
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +83,6 @@ class MusicPlayer:
             server_id (str): The Discord ID of the server to lock on to
         """
 
-        data = data.get_data()
         # Player variables
         self.server_id = server_id
         self.logger = logging.getLogger("{}.{}".format(__name__, self.server_id))
@@ -147,14 +148,14 @@ class MusicPlayer:
         self.topic = ""
         self.topicchannel = None
         # Set topic channel
-        if "topic_id" in data["discord"]["servers"][self.server_id][_data.modulename]:
-            topic_id = data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"]
+        if "topic_id" in data.cache["servers"][self.server_id][_data.modulename]:
+            topic_id = data.cache["servers"][self.server_id][_data.modulename]["topic_id"]
             if topic_id is not None and topic_id != "":
                 logger.debug("Topic channel id: {}".format(topic_id))
-                self.topicchannel = client.get_channel(topic_id)
+                self.topicchannel = main.client.get_channel(topic_id)
         # Get volume
-        if "volume" in data["discord"]["servers"][self.server_id][_data.modulename]:
-            self.volume = data["discord"]["servers"][self.server_id][_data.modulename]["volume"]
+        if "volume" in data.cache["servers"][self.server_id][_data.modulename]:
+            self.volume = data.cache["servers"][self.server_id][_data.modulename]["volume"]
         else:
             self.write_volume()
 
@@ -598,9 +599,8 @@ class MusicPlayer:
     def write_volume(self):
         """Writes the current volume to the data.json"""
         # Update the volume
-        data = data.get_data()
-        data["discord"]["servers"][self.server_id][_data.modulename]["volume"] = self.volume
-        data.write_data(data)
+        data.cache["servers"][self.server_id][_data.modulename]["volume"] = self.volume
+        data.write()
 
     async def movehere(self, channel):
         """
@@ -625,14 +625,13 @@ class MusicPlayer:
 
     async def set_topic_channel(self, channel):
         """Set the topic channel for this server"""
-        data = data.get_data()
-        data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"] = channel.id
-        data.write_data(data)
+        data.cache["servers"][self.server_id][_data.modulename]["topic_id"] = channel.id
+        data.write()
 
         self.topicchannel = channel
         await self.set_topic(self.topic)
 
-        await client.send_typing(channel)
+        await main.client.send_typing(channel)
         embed = ui_embed.topic_update(channel, self.topicchannel)
         await embed.send()
 
@@ -640,18 +639,17 @@ class MusicPlayer:
         """Set the topic channel for this server"""
         try:
             if self.topicchannel:
-                await client.edit_channel(self.topicchannel, topic="")
+                await main.client.edit_channel(self.topicchannel, topic="")
         except Exception as e:
             logger.exception(e)
 
         self.topicchannel = None
         logger.debug("Clearing topic channel")
 
-        data = data.get_data()
-        data["discord"]["servers"][self.server_id][_data.modulename]["topic_id"] = ""
-        data.write_data(data)
+        data.cache["servers"][self.server_id][_data.modulename]["topic_id"] = ""
+        data.write()
 
-        await client.send_typing(channel)
+        await main.client.send_typing(channel)
         embed = ui_embed.topic_update(channel, self.topicchannel)
         await embed.send()
 
@@ -678,7 +676,7 @@ class MusicPlayer:
         if self.vchannel:
             self.statuslog.info("Connecting to voice")
             try:
-                self.vclient = await client.join_voice_channel(self.vchannel)
+                self.vclient = await main.client.join_voice_channel(self.vchannel)
             except discord.ClientException as e:
                 logger.exception(e)
                 self.statuslog.warning("I'm already connected to a voice channel.")
@@ -799,7 +797,7 @@ class MusicPlayer:
         for e in ("⏯", "⏮", "⏹", "⏭", "🔀", "🔉", "🔊"):
             try:
                 if self.embed is not None:
-                    await client.add_reaction(self.embed.sent_embed, e)
+                    await main.client.add_reaction(self.embed.sent_embed, e)
             except discord.DiscordException as e:
                 logger.exception(e)
                 self.statuslog.error("I couldn't add the buttons. Check my permissions.")
@@ -912,7 +910,7 @@ class MusicPlayer:
         self.topic = topic
         try:
             if self.topicchannel:
-                await client.edit_channel(self.topicchannel, topic=topic)
+                await main.client.edit_channel(self.topicchannel, topic=topic)
         except Exception as e:
             logger.exception(e)
 
@@ -1022,7 +1020,7 @@ class MusicPlayer:
                 self.logger.debug("Downloaded song in {}".format(download_time))
 
             # Create an FFmpeg player
-            future = asyncio.run_coroutine_threadsafe(self.create_ffmpeg_player(d['filename']), client.loop)
+            future = asyncio.run_coroutine_threadsafe(self.create_ffmpeg_player(d['filename']), main.client.loop)
             try:
                 future.result()
             except Exception as e:
@@ -1054,7 +1052,7 @@ class MusicPlayer:
                 ydl.download([song])
             except DownloadStreamException:
                 # This is a livestream, use the appropriate player
-                future = asyncio.run_coroutine_threadsafe(self.create_stream_player(song, dl_ydl_opts), client.loop)
+                future = asyncio.run_coroutine_threadsafe(self.create_stream_player(song, dl_ydl_opts), main.client.loop)
                 try:
                     future.result()
                 except Exception as e:
@@ -1214,7 +1212,7 @@ class MusicPlayer:
                 await self.vplay()
 
             self.update_queue()
-            self.vclient_task = asyncio.Task(self.time_loop(), loop=client.loop)
+            self.vclient_task = asyncio.Task(self.time_loop(), loop=main.client.loop)
 
         # Queue exhausted
         else:
@@ -1240,7 +1238,7 @@ class MusicPlayer:
     def vafter_ts(self):
         """Function that is called after a song finishes playing"""
         logger.debug("Song finishing")
-        future = asyncio.run_coroutine_threadsafe(self.vafter(), client.loop)
+        future = asyncio.run_coroutine_threadsafe(self.vafter(), main.client.loop)
         try:
             future.result()
         except Exception as e:
@@ -1294,7 +1292,7 @@ class EmbedLogHandler(logging.Handler):
 
     def flush(self):
         try:
-            asyncio.run_coroutine_threadsafe(self.usend_when_ready(), client.loop)
+            asyncio.run_coroutine_threadsafe(self.usend_when_ready(), main.client.loop)
         except Exception as e:
             logger.exception(e)
             return

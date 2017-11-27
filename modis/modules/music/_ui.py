@@ -21,8 +21,7 @@ class ModuleUIFrame(ttk.Frame):
         self.rowconfigure(1, weight=1)
 
         # Set default values
-        from ....datatools import get_data
-        data = get_data()
+        from modis.tools import data
 
         # API Frame
         api_frame = ttk.LabelFrame(self, padding=8, text="Google API")
@@ -40,13 +39,14 @@ class ModuleUIFrame(ttk.Frame):
         ttk.Button(api_frame, command=lambda: self.update_keys(), text="Update API Data").grid(
             column=0, row=4, padx=0, pady=4, sticky="W E N S")
 
-        if "google_api_key" in data["discord"]["keys"]:
-            self.google_api_key.set(data["discord"]["keys"]["google_api_key"])
-        if "soundcloud_client_id" in data["discord"]["keys"]:
-            self.soundcloud_client_id.set(data["discord"]["keys"]["soundcloud_client_id"])
+        if "google_api_key" in data.cache["keys"]:
+            self.google_api_key.set(data.cache["keys"]["google_api_key"])
+        if "soundcloud_client_id" in data.cache["keys"]:
+            self.soundcloud_client_id.set(data.cache["keys"]["soundcloud_client_id"])
 
+    # TODO fix this
     def update_keys(self):
         """Updates the Google API key with the text value"""
-        from ...main import add_api_key
-        add_api_key("google_api_key", self.google_api_key.get())
-        add_api_key("soundcloud_client_id", self.soundcloud_client_id.get())
+        # from ...main import add_api_key
+        # add_api_key("google_api_key", self.google_api_key.get())
+        # add_api_key("soundcloud_client_id", self.soundcloud_client_id.get())

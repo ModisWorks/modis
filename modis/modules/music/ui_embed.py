@@ -3,7 +3,8 @@
 import logging
 
 from modis.tools import embed
-from ._data import *
+
+from . import _data
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +18,7 @@ def topic_update(channel, topic_channel):
         topic_channel: The new topic channel
 
     Returns:
-        embed: The created embed
+        gui (embed.UI): The created embed
     """
 
     if topic_channel is not None:
@@ -30,12 +31,12 @@ def topic_update(channel, topic_channel):
         channel_message = "Topic channel has been cleared."
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embed.UI(
             channel,
             "Topic channel updated",
             channel_message,
-            modulename=modulename,
-            colour=modulecolor_info
+            modulename=_data.modulename,
+            colour=_data.modulecolor_info
     )
 
     return gui
@@ -51,16 +52,16 @@ def error_message(channel, err_title, err_message):
         err_message: The message for the error
 
     Returns:
-        embed: The created embed
+        hui (embed.UI): The created embed
     """
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embed.UI(
             channel,
             err_title,
             err_message,
-            modulename=modulename,
-            colour=modulecolor_error
+            modulename=_data.modulename,
+            colour=_data.modulecolor_error
     )
 
     return gui
