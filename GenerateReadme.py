@@ -40,14 +40,13 @@ module_list = os.listdir(database_dir)
 
 # Title
 readme = add_md(readme, "MODIS", 1)
-latest_release = "Latest release: [v{0}{1}]({2}/{0})".format(data.version,
-                                                             " Beta" if data.version[0] < "1" else "",
-                                                             "https://github.com/Infraxion/modis/releases/tag")
+latest_release = "Latest release: [v{0}{1}]({2}/{0})".format(data.version, " Beta" if data.version[0] < "1" else "", "https://github.com/Infraxion/modis/releases/tag")
 readme = add_md(readme, latest_release)
 
 # About
 readme = add_md(readme, "About Modis", 2)
-modis_about = """Modis is a Discord bot that runs with a GUI and is designed to be as modular as possible so that anyone with some basic Python knowledge can quickly and easily create new modules that run on the bot."""
+modis_about = """Modis is a Discord bot that runs with a GUI and is designed to be as modular as possible
+so that anyone with some basic Python knowledge can quickly and easily create new modules that run on the bot."""
 readme = add_md(readme, modis_about)
 
 # Module list
@@ -74,8 +73,8 @@ for module_name in module_list:
 
 # Commands
 readme = add_md(readme, "Documentation", 2)
-readme = add_md(readme,
-                "More detailed information about each module can be found in the [Documentation](https://infraxion.github.io/modis/documentation/#modules).")
+readme = add_md(readme, "More detailed information about each module can be found in the"
+                        "[Documentation](https://infraxion.github.io/modis/documentation/#modules).")
 
 newreadme_path = "{}/README.md".format(filepath)
 with open(newreadme_path, 'w') as file:

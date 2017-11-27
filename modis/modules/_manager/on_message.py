@@ -1,11 +1,9 @@
-import importlib
 import logging
-import os
 
 import discord
 
-from modis import data
-from . import _data, ui_embed
+from modis import datatools
+from . import _data, api_manager, ui_embed
 from ..._client import client
 
 logger = logging.getLogger(__name__)
@@ -44,20 +42,17 @@ async def on_message(message):
             arg = ' '.join(args)
 
             # Commands
-            if command not in ["prefix", "activate", "deactivate"]:
+            if command not in ["prefix", "activate", "deactivate", "warnmax", "warn", "ban"]:
                 return
 
-            is_admin = False
+            is_admin = author == server.owner
             for role in message.author.roles:
-                if role.permissions.administrator or \
-                        role.permissions.manage_server or \
-                        role.permissions.manage_channels:
+                if role.permissions.administrator:
                     is_admin = True
 
             if not is_admin:
                 await client.send_typing(channel)
-                reason = "You must have a role that has the permission" + \
-                         "'Administrator', 'Manage Server', or 'Manage Channels'"
+                reason = "You must have a role that has the permission 'Administrator'"
                 embed = ui_embed.error(channel, "Insufficient Permissions", reason)
                 await embed.send()
                 return
@@ -72,51 +67,35 @@ async def on_message(message):
                 embed = ui_embed.modify_prefix(channel, new_prefix)
                 await embed.send()
 
-            if command in ["activate", "deactivate"] and args:
-                _dir = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-                _dir_modules = "{}/../".format(_dir)
-                if not os.path.isfile("{}/{}/_data.py".format(_dir_modules, arg)):
-                    await client.send_typing(channel)
-                    embed = ui_embed.error(channel, "Error", "No module found named '{}'".format(arg))
-                    await embed.send()
-                    return
-
+            if command == "warnmax" and args:
                 try:
-                    import_name = ".discord_modis.modules.{}.{}".format(arg, "_data")
-                    module_data = importlib.import_module(import_name, "modis")
-
-                    # Don't try and deactivate this module (not that it would do anything)
-                    if module_data.modulename == _data.modulename:
+                    warn_max = int(arg)
+                    if warn_max > 0:
+                        data["discord"]["servers"][server.id][_data.modulename]["warnings_max"] = warn_max
+                        datatools.write_data(data)
                         await client.send_typing(channel)
-                        embed = ui_embed.error(channel, "Error", "I'm sorry, Dave. I'm afraid I can't do that.")
+                        embed = ui_embed.warning_max_changed(channel, warn_max)
                         await embed.send()
-                        return
-
-                    # This /should/ never happen if everything goes well
-                    if module_data.modulename not in data["discord"]["servers"][server.id]:
-                        await client.send_typing(channel)
-                        embed = ui_embed.error(channel, "Error",
-                                               "No data found for module '{}'".format(module_data.modulename))
-                        await embed.send()
-                        return
-
-                    # Modify the module
-                    if "activated" in data["discord"]["servers"][server.id][module_data.modulename]:
-                        is_activate = command == "activate"
-                        data["discord"]["servers"][server.id][module_data.modulename]["activated"] = is_activate
-                        # Write the data
-                        data.write_data(data)
-
-                        await client.send_typing(channel)
-                        embed = ui_embed.modify_module(channel, module_data.modulename, is_activate)
-                        await embed.send()
-                        return
                     else:
-                        await client.send_typing(channel)
-                        embed = ui_embed.error(channel, "Error",
-                                               "Can't deactivate module '{}'".format(module_data.modulename))
+                        reason = "Maximum warnings must be greater than 0"
+                        embed = ui_embed.error(channel, "Error", reason)
                         await embed.send()
-                        return
+                except (ValueError, TypeError):
+                    reason = "Warning maximum must be a number"
+                    embed = ui_embed.error(channel, "Error", reason)
+                    await embed.send()
                 except Exception as e:
-                    logger.error("Could not modify module {}".format(arg))
                     logger.exception(e)
+
+            if command == "warn" and args:
+                for user in message.mentions:
+                    await api_manager.warn_user(channel, user)
+
+            if command == "ban" and args:
+                for user in message.mentions:
+                    await api_manager.ban_user(channel, user)
+
+            if command == "activate" and args:
+                await api_manager.activate_module(channel, arg, True)
+            elif command == "deactivate" and args:
+                await api_manager.activate_module(channel, arg, False)

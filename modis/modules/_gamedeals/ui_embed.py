@@ -22,7 +22,6 @@ def success(channel, post):
         "Link",
         post[1],
         modulename=modulename,
-        creator=creator,
         colour=0xFF8800,
         thumbnail=post[1],
         datapacks=datapacks
@@ -46,7 +45,6 @@ def no_results(channel):
         "No results",
         ":c",
         modulename=modulename,
-        creator=creator,
         colour=0xFF8800
     )
 
