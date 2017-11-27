@@ -38,7 +38,7 @@ def start(loop):
 
     # Import event handlers
     logger.debug("Importing event handlers")
-    eh_lib = moduledb.get_files(config.EH_TYPES)
+    eh_lib = moduledb.get_py(config.EH_TYPES)
 
     # Register event handlers
     logger.debug("Registering event handlers")

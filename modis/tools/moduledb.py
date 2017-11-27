@@ -31,11 +31,11 @@ def get_modules():
     return module_names
 
 
-def get_files(filenames):
-    """Get a dictionary with module files organised by file type.
+def get_py(filenames):
+    """Get a dictionary with imported Python module files organised by name.
 
     Args:
-        filenames (list): The file types to import.
+        filenames (list): The names to scan.
 
     Returns:
         imports (dict): The imported files.
@@ -58,3 +58,33 @@ def get_files(filenames):
             imports[file].append(imported_file)
 
     return imports
+
+
+# TODO implement getting filepaths I'm too tired to do it atm
+def get_file(filenames):
+    """Get a dictionary with file paths organised by file name.
+
+    Args:
+        filenames (list): The file names to scan.
+
+    Returns:
+        files (dict): The file paths.
+    """
+
+    # Setup files dict
+    files = {}
+    for filename in filenames:
+        files[filename] = []
+
+    # Get paths for each file
+    for module_name in get_modules():
+        for file in os.listdir("{}/{}".format(config.MODULES_DIR, module_name)):
+            file = file[:-3]
+            if file not in filenames:
+                # Requested file does not exist in module
+                continue
+            import_name = ".modules.{}.{}".format(module_name, file)
+            imported_file = importlib.import_module(import_name, "modis")
+            files[file].append(imported_file)
+
+    return files

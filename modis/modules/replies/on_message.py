@@ -1,6 +1,7 @@
-from modis import data
+from modis import main
+from modis.tools import data
+
 from . import _data
-from ..._client import client
 
 
 async def on_message(message):
@@ -16,25 +17,24 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    data = data.get_data()
-
-    if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
-        return
+    # TODO port to new activation
+    # if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
+    #     return
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Retrieve replies from server data
-        normal_replies = data["discord"]["servers"][server.id][_data.modulename]["normal"]
-        tts_replies = data["discord"]["servers"][server.id][_data.modulename]["tts"]
+        normal_replies = data.cache["servers"][server.id][_data.modulename]["normal"]
+        tts_replies = data.cache["servers"][server.id][_data.modulename]["tts"]
 
         # Check normal replies
         for r in normal_replies.keys():
             if r in content.lower().replace(' ', ''):
-                await client.send_typing(channel)
-                await client.send_message(channel, normal_replies[r])
+                await main.client.send_typing(channel)
+                await main.client.send_message(channel, normal_replies[r])
 
         # Check tts replies
         for r in tts_replies.keys():
             if r in content.lower().replace(' ', ''):
-                await client.send_typing(channel)
-                await client.send_message(channel, tts_replies[r])
+                await main.client.send_typing(channel)
+                await main.client.send_message(channel, tts_replies[r])

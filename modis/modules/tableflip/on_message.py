@@ -1,6 +1,7 @@
-from modis import data
-from . import _data, api_flipcheck
-from ..._client import client
+from modis import main
+from modis.tools import data
+
+from . import api_flipcheck
 
 
 async def on_message(message):
@@ -16,15 +17,14 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    data = data.get_data()
-
-    if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
-        return
+    # TODO port to new activation
+    # if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
+    #     return
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Do a flip check
         flipchecked = api_flipcheck.flipcheck(content)
         if flipchecked:
-            await client.send_typing(channel)
-            await client.send_message(channel, flipchecked)
+            await main.client.send_typing(channel)
+            await main.client.send_message(channel, flipchecked)

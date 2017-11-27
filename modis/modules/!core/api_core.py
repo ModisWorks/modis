@@ -22,6 +22,8 @@ def server_update(server_id):
         data.cache["servers"][server_id] = config.SERVER_TEMPLATE
         data.write()
 
+    # TODO add module subdata
+
 
 def server_remove(server_id):
     """Remove a server from data.json.
@@ -60,6 +62,6 @@ def cmd_db_update():
 
     logger.debug("Updating command database")
 
-    cmd_event_handlers = moduledb.get_files(["commands"])["commands"]
+    cmd_event_handlers = moduledb.get_py(["commands"])["commands"]
 
     _data.cmd_db = cmd_event_handlers

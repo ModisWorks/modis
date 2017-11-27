@@ -10,6 +10,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 VERSION = "0.4.0"
+NICKNAME = "CHOPIN"
 
 
 def get():
