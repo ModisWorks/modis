@@ -81,7 +81,7 @@ class Frame(tk.Frame):
             files = os.listdir(module_dir)
             if "_ui.py" in files:
                 logger.debug("Importing UI for {} module".format(module_name))
-                import_name = ".discord_modis.modules.{}.{}".format(module_name, "_ui")
+                import_name = ".modules.{}.{}".format(module_name, "_ui")
                 self.add(module_name, importlib.import_module(import_name, "modis"))
             else:
                 logger.debug("No UI for {} module".format(module_name))

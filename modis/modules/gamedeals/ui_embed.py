@@ -1,5 +1,6 @@
 from modis.tools import embed
-from ._data import *
+
+from . import _data
 
 
 def success(channel, post):
@@ -21,7 +22,7 @@ def success(channel, post):
         channel,
         "Link",
         post[1],
-        modulename=modulename,
+        modulename=_data.modulename,
         colour=0xFF8800,
         thumbnail=post[1],
         datapacks=datapacks
@@ -44,7 +45,7 @@ def no_results(channel):
         channel,
         "No results",
         ":c",
-        modulename=modulename,
+        modulename=_data.modulename,
         colour=0xFF8800
     )
 

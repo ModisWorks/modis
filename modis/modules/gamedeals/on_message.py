@@ -1,6 +1,7 @@
-from modis import data
-from . import _data, api_reddit, ui_embed
-from ..._client import client
+from modis import main
+from modis.tools import data
+
+from . import api_reddit, ui_embed
 
 
 async def on_message(message):
@@ -16,15 +17,14 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    data = data.get_data()
-
-    if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
-        return
+    # TODO port to new activation
+    # if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
+    #     return
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Commands section
-        prefix = data["discord"]["servers"][server.id]["prefix"]
+        prefix = data.cache["servers"][server.id]["prefix"]
         if content.startswith(prefix):
             # Parse message
             package = content.split(" ")
@@ -32,7 +32,7 @@ async def on_message(message):
 
             # Commands
             if command == 'gamedeals':
-                await client.send_typing(channel)
+                await main.client.send_typing(channel)
 
                 # Get posts from Reddit API
                 posts = api_reddit.get_top10()
