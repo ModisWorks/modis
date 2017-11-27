@@ -105,6 +105,13 @@ class Frame(tk.Frame):
             log_panel = tk.Text(self, wrap="none")
             log_panel.grid(column=0, row=0, sticky="W E N S")
 
+            # Log colours
+            log_panel.tag_config('CRITICAL', foreground="red", underline=True)
+            log_panel.tag_config('ERROR', foreground="red")
+            log_panel.tag_config('WARNING', foreground="orange")
+            log_panel.tag_config('INFO', foreground="black")
+            log_panel.tag_config('DEBUG', foreground="dark grey")
+
             # Vertical scrollbar
             scrollbar = ttk.Scrollbar(self, orient="vertical",
                                       command=log_panel.yview)
@@ -142,8 +149,13 @@ class Frame(tk.Frame):
                 def emit(self, record):
                     msg = self.format(record)
                     msg = msg[:9] + msg[15:]
+                    msg_level = logging.Formatter("{levelname}", style="{").format(record)
+                    # Exceptions
+                    if msg_level.startswith("ERROR"):
+                        msg_level = "ERROR"
+
                     self.text_widget.config(state=tk.NORMAL)
-                    self.text_widget.insert("end", msg + "\n")
+                    self.text_widget.insert("end", msg + "\n", msg_level)
                     self.text_widget.config(state=tk.DISABLED)
                     self.flush()
 
