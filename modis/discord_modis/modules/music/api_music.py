@@ -178,11 +178,14 @@ def parse_query(query, ilogger):
                 query_type = uri[1].lower()
                 query_search = ' '.join(uri[2:])
             else:
-                 return [], (1, "Error malformed Spotify URI")
+                ilogger.error("Error malformed Spotify URI")
+                return []
             query_type = query_type.replace('user', 'playlist')
-            ilogger.info("Queueing Spotify {} URI: {}".format(query_type, query_search))
             spotify_tracks = get_sp_tracks(query_type, query_search)
-            return get_ytvideos(spotify_tracks, ilogger), (0, "Queued Yotube search: {}".format(spotify_tracks)) 
+            ilogger.info("Queueing Spotify {} URI: {}".format(query_type, query_search))
+            ilogger.info("Queued Yotube search: {}".format(spotify_tracks))
+            print(spotify_tracks)
+            return get_ytvideos(spotify_tracks, ilogger)
             #This sends the track name and artist found with the spotifyAPI to youtube
             #--------Spotify Patch--------
         except Exception as e:
@@ -247,13 +250,15 @@ def get_ytvideos(query, ilogger):
     """
 
     queue = []
+    querylist = []
+    print(query)
     #--------Spotify Patch--------
-    if isinstance(query, str) == True:
-        buffer = query # store query elsewhere
-        query = "a" # setting the length of query to 1 so it only runs once
-    for tracks in query:
-        if isinstance(query, str) == True: # Checks if a string was passed. Otherwise we only pass the first letter to the search not the whole name
-            tracks = buffer # resets tracks to the query
+    if isinstance(query, list) == True:
+        querylist = query
+    else:
+        querylist.append(query)
+    for tracks in querylist:
+        print(querylist)
     #--------Spotify Patch--------
     # Search YouTube
         search_result = ytdiscoveryapi.search().list(
