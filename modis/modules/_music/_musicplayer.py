@@ -7,7 +7,7 @@ import threading
 
 import discord
 
-from modis.tools import embedtools as ui_embed_tools
+from modis.tools import embed as ui_embed_tools
 from . import _data, _timebar, api_music, ui_embed
 from ..._client import client
 

@@ -51,21 +51,21 @@ def init_print(logger):
 
     import os
 
-    from modis import common
-    from modis.tools import datatools
+    from modis.tools import config
+    from modis.tools import data
 
     # Create logging directory
-    if not os.path.isdir(common.LOGS_DIR):
-        os.mkdir(common.LOGS_DIR)
+    if not os.path.isdir(config.LOGS_DIR):
+        os.mkdir(config.LOGS_DIR)
 
     # Set log level
-    if "log_level" not in datatools.data:
-        datatools.data["log_level"] = "INFO"
-        datatools.write()
-    logger.setLevel(datatools.data["log_level"])
+    if "log_level" not in data.cache:
+        data.cache["log_level"] = "INFO"
+        data.write()
+    logger.setLevel(data.cache["log_level"])
 
     # Setup format
-    formatter = logging.Formatter(common.LOG_FORMAT, style="{")
+    formatter = logging.Formatter(config.LOG_FORMAT, style="{")
 
     # Setup handler
     handler = UnicodeStreamHandler(sys.stdout, sys.stderr)
@@ -85,24 +85,24 @@ def init_file(logger):
     import os
     import time
 
-    from modis import common
-    from modis.tools import datatools
+    from modis.tools import config
+    from modis.tools import data
 
     # Create logging directory
-    if not os.path.isdir(common.LOGS_DIR):
-        os.mkdir(common.LOGS_DIR)
+    if not os.path.isdir(config.LOGS_DIR):
+        os.mkdir(config.LOGS_DIR)
 
     # Set log level
-    if "log_level" not in datatools.data:
-        datatools.data["log_level"] = "INFO"
-        datatools.write()
-    logger.setLevel(datatools.data["log_level"])
+    if "log_level" not in data.cache:
+        data.cache["log_level"] = "INFO"
+        data.write()
+    logger.setLevel(data.cache["log_level"])
 
     # Setup format
-    formatter = logging.Formatter(common.LOG_FORMAT, style="{")
+    formatter = logging.Formatter(config.LOG_FORMAT, style="{")
 
     # Setup handlers
-    handler = logging.FileHandler("{}/{}.log".format(common.LOGS_DIR, time.time()), encoding="UTF-8")
+    handler = logging.FileHandler("{}/{}.log".format(config.LOGS_DIR, time.time()), encoding="UTF-8")
     handler.setFormatter(formatter)
 
     # Add handler

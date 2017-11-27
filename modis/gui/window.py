@@ -1,5 +1,5 @@
-import logging
 import asyncio
+import logging
 import tkinter as tk
 import tkinter.ttk as ttk
 
@@ -22,9 +22,9 @@ class RootFrame(ttk.Frame):
         def on_closing():
             """Called when the window closes"""
             try:
-                from modis.common import client
-                if client and client.loop:
-                    asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
+                from modis import main
+                if main.client and main.client.loop:
+                    asyncio.run_coroutine_threadsafe(main.client.logout(), main.client.loop)
             except RuntimeError:
                 pass
             except Exception as e:

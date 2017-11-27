@@ -16,8 +16,8 @@ def cmd(data_dir=None):
     """Start Modis in command line."""
 
     # Update data
-    from modis.tools import datatools
-    datatools.get()
+    from modis.tools import data
+    data.get()
 
     # Set the data dir to the one provided
     if data_dir:
@@ -25,20 +25,20 @@ def cmd(data_dir=None):
 
     # Setup the logger
     import logging
-    from modis.tools import logtools
+    from modis.tools import log
     logger = logging.getLogger(__name__)
-    logtools.init_print(logger)
-    logtools.init_file(logger)
+    log.init_print(logger)
+    log.init_file(logger)
 
     logger.info("----------------NEW INSTANCE----------------")
 
     # Import packages
     import asyncio
     from modis import main
-    from modis.tools import versiontools
+    from modis.tools import version
 
     # Check the current version
-    logger.info(versiontools.get_str())
+    logger.info(version.get_str())
 
     # Start Modis for command line
     logger.info("Starting Modis")
@@ -51,8 +51,8 @@ def gui(data_dir=None):
     """Start Modis with GUI."""
 
     # Update data
-    from modis.tools import datatools
-    datatools.get()
+    from modis.tools import data
+    data.get()
 
     # Set the data dir to the one provided
     if data_dir:
@@ -60,10 +60,10 @@ def gui(data_dir=None):
 
     # Setup the logger
     import logging
-    from modis.tools import logtools
+    from modis.tools import log
     logger = logging.getLogger(__name__)
-    logtools.init_print(logger)
-    logtools.init_file(logger)
+    log.init_print(logger)
+    log.init_file(logger)
 
     logger.info("----------------NEW INSTANCE----------------")
 
@@ -71,10 +71,10 @@ def gui(data_dir=None):
     import os
     import tkinter as tk
     from modis.gui import window
-    from modis.tools import versiontools
+    from modis.tools import version
 
     # Check the current version
-    logger.info(versiontools.get_str())
+    logger.info(version.get_str())
 
     # Start Modis for GUI
     logger.info("Starting GUI")
@@ -113,5 +113,5 @@ def set_dir(data_dir=None):
     if not os.path.isdir(data_dir):
         raise NotADirectoryError("Data dir {} does not exist".format(data_dir))
     else:
-        from modis import common
-        common.WORK_DIR = data_dir
+        from modis.tools import config
+        config.WORK_DIR = data_dir

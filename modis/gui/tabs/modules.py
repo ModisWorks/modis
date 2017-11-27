@@ -1,10 +1,10 @@
+import importlib
 import logging
 import os
-import importlib
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from modis.tools import helptools
+from modis.tools import help, config
 
 logger = logging.getLogger(__name__)
 
@@ -69,10 +69,9 @@ class Frame(tk.Frame):
         m_button.bind("<Button-1>", lambda e: self.select(module_name, module_ui))
 
     def scan(self):
-        from modis import common
         # Iterate through modules
-        for module_name in os.listdir(common.MODULES_DIR):
-            module_dir = "{}/{}".format(common.MODULES_DIR, module_name)
+        for module_name in os.listdir(config.MODULES_DIR):
+            module_dir = "{}/{}".format(config.MODULES_DIR, module_name)
 
             if not os.path.isdir(module_dir):
                 continue
@@ -162,7 +161,7 @@ class Frame(tk.Frame):
             help_path = "{}/modules/{}/{}".format(_dir, module_name, "_help.json")
             if os.path.isfile(help_path):
                 # Load the text
-                helptools.add_help_text(self.help_frame, help_path)
+                help.add_help_text(self.help_frame, help_path)
             else:
                 # Default message
                 tk.Label(self.help_frame, text="No _help.json file found for '{}'".format(module_name)).grid(row=0, column=0, sticky="W E N S")

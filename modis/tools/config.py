@@ -7,7 +7,7 @@ access global variables.
 import os as _os
 
 # Directory
-ROOT_DIR = _os.path.dirname(_os.path.realpath(__file__))
+ROOT_DIR = _os.path.dirname(_os.path.dirname(_os.path.realpath(__file__)))
 MODULES_DIR = ROOT_DIR + "/modules"
 WORK_DIR = _os.getcwd()
 LOGS_DIR = WORK_DIR + "/logs"
@@ -47,7 +47,6 @@ EH_TYPES = [
     "on_group_join",
     "on_group_remove"
 ]
-client = None
 
 # data.json
 DATAFILE = "{}/data.json".format(WORK_DIR)

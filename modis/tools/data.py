@@ -6,17 +6,16 @@ This tool also contains the templates for the data structure of both the root
 structure and the structure for each server.
 """
 
+import json
 import logging
 import os
-import json
 from collections import OrderedDict
 
-from modis.common import WORK_DIR, DATAFILE, ROOT_TEMPLATE, SERVER_TEMPLATE
-
+from modis.tools.config import DATAFILE, ROOT_TEMPLATE
 
 logger = logging.getLogger(__name__)
 
-data = {}
+cache = {}
 
 
 def create(template):
@@ -26,12 +25,12 @@ def create(template):
         template (dict): The template dict to create data.json with.
     """
 
-    global data
+    global cache
 
-    data = template
+    cache = template
 
     with open(DATAFILE, 'w') as file:
-        json.dump(data, file, indent=2)
+        json.dump(cache, file, indent=2)
 
 
 def get():
@@ -43,16 +42,16 @@ def get():
 
     logger.debug("Getting data.json")
 
-    global data
+    global cache
 
     if not os.path.exists(DATAFILE):
         logger.warning("data.json not found. An empty one was created.")
         create(ROOT_TEMPLATE)
-        return data
+        return cache
 
     with open(DATAFILE, 'r') as file:
-        data = json.load(file)
-        return data
+        cache = json.load(file)
+        return cache
 
 
 def write(new_data=None):
@@ -64,7 +63,7 @@ def write(new_data=None):
 
     logger.debug("Writing data.json")
 
-    global data
+    global cache
 
     if not os.path.exists(DATAFILE):
         logging.CRITICAL("data.json not found. An empty one was created.")
@@ -72,11 +71,11 @@ def write(new_data=None):
         return
 
     if new_data:
-        data = new_data
-    data = _sort(data)
+        cache = new_data
+    cache = _sort(cache)
 
     with open(DATAFILE, 'w') as file:
-        json.dump(data, file, indent=2)
+        json.dump(cache, file, indent=2)
 
 
 def _sort(_dict):

@@ -1,5 +1,5 @@
-import logging
 import asyncio
+import logging
 import threading
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -86,7 +86,7 @@ class Frame(tk.Frame):
 
             # Stop Modis
             logger.info("Stopping Modis")
-            from modis.common import client
+            from modis.tools.config import client
             asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
 
     class CoreLog(ttk.Labelframe):

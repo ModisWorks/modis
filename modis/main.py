@@ -14,29 +14,31 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+client = None
+
 
 def start(loop):
     """Start the Discord client and log Modis into Discord."""
 
     import discord
     import asyncio
-    
-    from modis import common
-    from modis.tools import datatools
-    from modis.tools import moduletools
+
+    from modis.tools import config
+    from modis.tools import data
+    from modis.tools import moduledb
 
     # Update data.json cache
-    datatools.get()
+    data.get()
 
     # Create client
     logger.debug("Creating Discord client")
     asyncio.set_event_loop(loop)
+    global client
     client = discord.Client()
-    common.client = client
 
     # Import event handlers
     logger.debug("Importing event handlers")
-    eh_lib = moduletools.get_files(common.EH_TYPES)
+    eh_lib = moduledb.get_files(config.EH_TYPES)
 
     # Register event handlers
     logger.debug("Registering event handlers")
@@ -47,7 +49,7 @@ def start(loop):
     logger.info("Connecting to Discord")
     # TODO clean up this massive exception stack
     try:
-        token = datatools.data["keys"]["discord_token"]
+        token = data.cache["keys"]["discord_token"]
         client.loop.run_until_complete(client.login(token))
     except Exception as e:
         logger.exception(e)

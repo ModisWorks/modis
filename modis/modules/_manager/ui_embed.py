@@ -1,4 +1,4 @@
-from modis.tools import embedtools
+from modis.tools import embed
 from ._data import *
 
 
@@ -16,7 +16,7 @@ def modify_module(channel, module_name, module_state):
     """
 
     # Create embed UI object
-    gui = embedtools.UI(
+    gui = embed.UI(
         channel,
         "{} updated".format(module_name),
         "{} is now {}".format(module_name, "activated" if module_state else "deactivated"),
@@ -40,7 +40,7 @@ def modify_prefix(channel, new_prefix):
     """
 
     # Create embed UI object
-    gui = embedtools.UI(
+    gui = embed.UI(
         channel,
         "Prefix updated",
         "Modis prefix is now '{}'".format(new_prefix),
@@ -61,11 +61,11 @@ def error(channel, title, description):
         description (str): The description for the error
 
     Returns:
-        ui (embedtools.UI): The embed UI object
+        ui (embed.UI): The embed UI object
     """
 
     # Create embed UI object
-    gui = embedtools.UI(
+    gui = embed.UI(
         channel,
         title,
         description,

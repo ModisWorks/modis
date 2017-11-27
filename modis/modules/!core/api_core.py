@@ -1,8 +1,7 @@
 import logging
 
-from modis import common
-from modis.tools import datatools
-from modis.tools import moduletools
+from modis import main
+from modis.tools import data, config, moduledb
 from . import _data
 
 logger = logging.getLogger(__name__)
@@ -18,10 +17,10 @@ def server_update(server_id):
     logger.debug("Updating server {}".format(server_id))
 
     # Add the server to server data if it doesn't yet exist
-    if server_id not in datatools.data["servers"]:
+    if server_id not in data.cache["servers"]:
         logger.debug("Adding new server to data.json")
-        datatools.data["servers"][server_id] = datatools.SERVER_TEMPLATE
-        datatools.write()
+        data.cache["servers"][server_id] = config.SERVER_TEMPLATE
+        data.write()
 
 
 def server_remove(server_id):
@@ -34,12 +33,12 @@ def server_remove(server_id):
     logger.debug("Removing server from data.json")
 
     try:
-        datatools.data["servers"].pop(server_id)
+        data.cache["servers"].pop(server_id)
     except KeyError:
         logger.warning("Server to be removed does not exist")
     else:
         logger.debug("Removed server {}".format(server_id))
-        datatools.write()
+        data.write()
 
 
 def server_clean():
@@ -47,9 +46,9 @@ def server_clean():
 
     logger.debug("Cleaning servers")
 
-    for server_id in datatools.data["servers"]:
+    for server_id in data.cache["servers"]:
         exists = False
-        for server_obj in common.client.servers:
+        for server_obj in main.client.servers:
             if server_obj.id == server_id:
                 exists = True
         if not exists:
@@ -61,6 +60,6 @@ def cmd_db_update():
 
     logger.debug("Updating command database")
 
-    cmd_event_handlers = moduletools.get_files(["commands"])["commands"]
+    cmd_event_handlers = moduledb.get_files(["commands"])["commands"]
 
     _data.cmd_db = cmd_event_handlers

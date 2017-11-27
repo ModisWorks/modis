@@ -1,4 +1,4 @@
-from modis.tools import embedtools
+from modis.tools import embed
 from ._data import *
 
 
@@ -12,13 +12,13 @@ def success(channel, image, hex_str):
         hex_str (str): The hex value
 
     Returns:
-        ui (embedtools.UI): The embed UI object that was created
+        ui (embed.UI): The embed UI object that was created
     """
 
     hex_number = int(hex_str, 16)
 
     # Create embed UI object
-    gui = embedtools.UI(
+    gui = embed.UI(
         channel,
         "",
         "#{}".format(hex_str),
@@ -39,10 +39,10 @@ def fail_api(channel):
         channel (discord.Channel): The Discord channel to bind the embed to
 
     Returns:
-        ui (embedtools.UI): The embed UI object
+        ui (embed.UI): The embed UI object
     """
 
-    gui = embedtools.UI(
+    gui = embed.UI(
         channel,
         "Invalid value",
         "Hex values must be 3 or 6 characters long, starting with '#' or '0x'.",

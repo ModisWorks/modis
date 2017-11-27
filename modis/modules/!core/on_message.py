@@ -1,6 +1,6 @@
 import logging
 
-from modis.tools import datatools
+from modis.tools import data
 from . import _data
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ async def on_message(message):
         return
 
     # Check prefix
-    prefix = datatools.data["servers"][message.server.id]["prefix"]
+    prefix = data.cache["servers"][message.server.id]["prefix"]
     if not message.content.startswith(prefix):
         return
 

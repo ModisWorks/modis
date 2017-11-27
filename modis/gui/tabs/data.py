@@ -64,7 +64,7 @@ class Frame(tk.Frame):
             self.rowconfigure(0, weight=1)
 
         def update(self):
-            from modis.tools import datatools
+            from modis.tools import data
 
             def recursive_add(data, parent=""):
                 for key in data:
@@ -73,4 +73,4 @@ class Frame(tk.Frame):
                     else:
                         self.tree.insert(parent, "end", text=key, values=str(data[key]))
 
-            recursive_add(datatools.data)
+            recursive_add(data.cache)
