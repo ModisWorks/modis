@@ -46,7 +46,7 @@ def get():
     global data
 
     if not os.path.exists(DATAFILE):
-        logger.CRITICAL("data.json not found. An empty one was created.")
+        logger.warning("data.json not found. An empty one was created.")
         create(ROOT_TEMPLATE)
         return data
 
