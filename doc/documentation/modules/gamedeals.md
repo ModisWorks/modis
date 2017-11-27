@@ -9,3 +9,7 @@
 ## About
 
 gamedeals uses Reddit to find the best game deals.
+
+## Creator
+
+Infraxion

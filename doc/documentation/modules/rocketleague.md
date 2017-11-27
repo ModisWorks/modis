@@ -10,3 +10,7 @@
 ## About
 
 rocketleague lets you look up player's Rocket League stats.
+
+## Creator
+
+Infraxion
