@@ -162,21 +162,20 @@ def parse_query(query, ilogger):
             return [], (1, "Host does not support Spotify")
 
         try:
-            if len(args) > 2 and args[1] in ['album', 'artist', 'song', 'track', 'playlist']:
-                query_type = args[1].lower()
-                query_search = ' '.join(args[2:])
+            uri = query.split(':')
+            if len(uri) > 2 and uri[1] in ['album', 'artist', 'track', 'user']:
+                query_type = uri[1].lower()
+                query_search = ' '.join(uri[2:])
             else:
-                query_type = 'track'
-                query_search = ' '.join(args[1:])
-            query_type = query_type.replace('song', 'track')
-            ilogger.info("Queueing Spotify {}: {}".format(query_type, query_search))
+                 return [], (1, "Error malformed Spotify URI")
+            query_type = query_type.replace('user', 'playlist')
+            ilogger.info("Queueing Spotify {} URI: {}".format(query_type, query_search))
             spotify_tracks = get_sp_tracks(query_type, query_search)
-            return get_ytvideos(spotify_tracks, ilogger), (0, "Queued Spotify search: {}".format(query)) 
+            return get_ytvideos(spotify_tracks, ilogger), (0, "Queued Yotube search: {}".format(spotify_tracks)) 
         #This sends the track name and artist found with the spotifyAPI to youtube
         except Exception as e:
             logger.exception(e)
             return [], (1, "Error queueing from Spotify")
-
 
     elif args[0].lower() in ["sc", "soundcloud"]:
         if scclient is None:
@@ -228,32 +227,36 @@ def get_ytvideos(query, ilogger):
 
     queue = []
 
-    # Search YouTube
-    search_result = ytdiscoveryapi.search().list(
-        q=query,
-        part="id,snippet",
-        maxResults=1,
-        type="video,playlist"
-    ).execute()
+    for tracks in query:
+        if isinstance(query, str) == True: # Checks if a string was passed. Otherwise we only pass the first letter to the search not the whole name
+            tracks = query
 
-    if not search_result["items"]:
-        return []
+        # Search YouTube
+        search_result = ytdiscoveryapi.search().list(
+            q=tracks,
+            part="id,snippet",
+            maxResults=1,
+            type="video,playlist"
+        ).execute()
 
-    # Get video/playlist title
-    title = search_result["items"][0]["snippet"]["title"]
-    ilogger.info("Queueing {}".format(title))
+        if not search_result["items"]:
+            return []
 
-    # Queue video if video
-    if search_result["items"][0]["id"]["kind"] == "youtube#video":
-        # Get ID of video
-        videoid = search_result["items"][0]["id"]["videoId"]
+        # Get video/playlist title
+        title = search_result["items"][0]["snippet"]["title"]
+        ilogger.info("Queueing {}".format(title))
 
-        # Append video to queue
-        queue.append(["https://www.youtube.com/watch?v={}".format(videoid), title])
+        # Queue video if video
+        if search_result["items"][0]["id"]["kind"] == "youtube#video":
+            # Get ID of video
+            videoid = search_result["items"][0]["id"]["videoId"]
 
-    # Queue playlist if playlist
-    elif search_result["items"][0]["id"]["kind"] == "youtube#playlist":
-        queue = get_queue_from_playlist(search_result["items"][0]["id"]["playlistId"])
+            # Append video to queue
+            queue.append(["https://www.youtube.com/watch?v={}".format(videoid), title])
+
+        # Queue playlist if playlist
+        elif search_result["items"][0]["id"]["kind"] == "youtube#playlist":
+            queue = get_queue_from_playlist(search_result["items"][0]["id"]["playlistId"])
 
     return queue
 
@@ -359,28 +362,34 @@ def get_sp_tracks(query_type, query_search):
         query = ("{} by {}".format(song_name,song_artist)) # joins both results
         return(query) # sends query back to parse_query
     elif query_type == 'artist':
+        listofsongs = []
         results = spclient.artist_top_tracks(query_search)
-        for tracks in results["items"]: # finds all tracks in the album
-             song_name = tracks["name"]
-             song_artist = tracks["artists"][0]["name"]
+        for tracks in results['tracks'][:10]: # finds all tracks in the album
+             song_name = tracks['name']
+             song_artist = tracks['artists'][0]['name']
              query = ("{} by {}".format(song_name,song_artist))
-             return(query)
+             listofsongs.append(query)
+        return(listofsongs)
     elif query_type == 'album':
+        listofsongs = []
         results = spclient.album_tracks(query_search)
-        for tracks in results["items"]: # finds all tracks in the album
-             song_name = tracks["name"]
-             song_artist = tracks["artists"][0]["name"]
+        for tracks in results['items']: # finds all tracks in the album
+             song_name = tracks['name']
+             song_artist = tracks['artists'][0]['name']
              query = ("{} by {}".format(song_name,song_artist))
-             return(query)
+             listofsongs.append(query)
+        return(listofsongs)
     elif query_type == 'playlist':
-        get_username = query_search.split(":")[2]
-        get_playlist = query_search.split(":")[4]
-        result = spclient.user_playlist_tracks(get_username, get_playlist)
-        for tracks in results["items"]: # finds all tracks in the album
-             song_name = tracks["name"]
-             song_artist = tracks["artists"][0]["name"]
+        listofsongs = []
+        get_username = query_search.split(" ")[0]
+        get_playlist = query_search.split(" ")[2]
+        results = spclient.user_playlist_tracks(get_username, get_playlist)
+        for tracks in results['items']: # finds all tracks in the album
+             song_name = tracks['track']['name']
+             song_artist = tracks['track']['artists'][0]['name']
              query = ("{} by {}".format(song_name,song_artist))
-             return(query)
+             listofsongs.append(query)
+        return(listofsongs)
 
     return []
 
