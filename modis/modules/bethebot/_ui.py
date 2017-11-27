@@ -3,9 +3,7 @@ import logging
 import tkinter as tk
 from tkinter import ttk
 
-from modis import data
-from ._data import *
-from ..._client import client
+from modis import main
 
 logger = logging.getLogger(__name__)
 
@@ -78,19 +76,20 @@ def send_message(channel_id, message):
         message (str): The message to send to the channel
     """
 
-    channel = client.get_channel(channel_id)
+    channel = main.client.get_channel(channel_id)
 
     if channel is None:
         logger.info("{} is not a channel".format(channel_id))
         return
 
     # Check that it's enabled in the server
-    data = data.get_data()
-    if not data["discord"]["servers"][channel.server.id][modulename]["activated"]:
-        logger.info("This module has been disabled in {} ({})".format(channel.server.name, channel.server.id))
+    # TODO port to new activation
+    # data = data.get_data()
+    # if not data["discord"]["servers"][channel.server.id][modulename]["activated"]:
+    #     logger.info("This module has been disabled in {} ({})".format(channel.server.name, channel.server.id))
 
     try:
-        runcoro(client.send_message(channel, message))
+        runcoro(main.client.send_message(channel, message))
     except Exception as e:
         logger.exception(e)
 
@@ -103,6 +102,6 @@ def runcoro(async_function):
         async_function (Coroutine): The asynchronous function to run
     """
 
-    future = _asyncio.run_coroutine_threadsafe(async_function, client.loop)
+    future = _asyncio.run_coroutine_threadsafe(async_function, main.client.loop)
     result = future.result()
     return result
