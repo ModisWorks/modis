@@ -53,9 +53,9 @@ def start(token, client_id, loop, on_ready_handler=None):
                     module_event_handler_func = getattr(module_event_handler,
                                                         event_handler_type)
                     await module_event_handler_func(*args, **kwargs)
-                except Exception as e:
+                except Exception as module_exception:
                     logger.error("An error occured in '{}'".format(module_event_handler))
-                    logger.exception(e)
+                    logger.exception(module_exception)
 
             if on_ready_handler is not None and event_handler_type == "on_ready":
                 await on_ready_handler()
@@ -170,8 +170,12 @@ def _get_event_handlers():
                         module_name, event_handler)
                     logger.debug("Found event handler {}".format(import_name[23:]))
 
-                    event_handlers[event_handler].append(
-                        importlib.import_module(import_name, "modis"))
+                    try:
+                        event_handlers[event_handler].append(
+                            importlib.import_module(import_name, "modis"))
+                    except Exception as e:
+                        # Log errors in modules
+                        logger.exception(e)
 
     return event_handlers
 

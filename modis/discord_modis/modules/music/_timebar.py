@@ -20,7 +20,7 @@ def make_timebar(progress=0, duration=0):
 
     duration_string = api_music.duration_to_string(duration)
     if duration <= 0:
-        return duration_string
+        return "---"
 
     time_counts = int(round((progress / duration) * TIMEBAR_LENGTH))
     if time_counts > TIMEBAR_LENGTH:

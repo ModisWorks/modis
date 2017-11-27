@@ -1,11 +1,15 @@
 """The music player for the music module"""
 
 import asyncio
+import json
 import logging
+import os
 import random
+import shutil
 import threading
 
 import discord
+import youtube_dl
 
 from modis import datatools
 from . import _data, _timebar, api_music, ui_embed
@@ -13,6 +17,59 @@ from .._tools import ui_embed as ui_embed_tools
 from ..._client import client
 
 logger = logging.getLogger(__name__)
+
+_dir = os.getcwd()
+_root_songcache_dir = "{}/.songcache".format(_dir)
+
+
+def clear_cache_root():
+    """Clears everything in the song cache"""
+    logger.debug("Clearing root cache")
+    if os.path.isdir(_root_songcache_dir):
+        for filename in os.listdir(_root_songcache_dir):
+            file_path = os.path.join(_root_songcache_dir, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except PermissionError:
+                pass
+            except Exception as e:
+                logger.exception(e)
+    logger.debug("Root cache cleared")
+
+
+def _match_func(info_dict):
+    if "is_live" not in info_dict or not info_dict["is_live"]:
+        if "duration" in info_dict and info_dict["duration"] and info_dict["duration"] > 0:
+            return None
+    raise DownloadStreamException("Cannot download stream")
+
+
+file_format = "%(title)s"
+
+ytdl_formats = [
+    "worstaudio",
+    "worst",
+]
+
+ydl_opts = {
+    "format": '/'.join(ytdl_formats),
+    "audio_format": "mp3",
+    "extract_audio": True,
+    "restrict_filenames": True,
+    "writeinfojson": True,
+    "nooverwrites": True,
+    "noplaylist": True,
+    "socket_timeout": 30,
+    "max_downloads": 1,
+    "match_filter": _match_func
+}
+
+
+class DownloadStreamException(BaseException):
+    """Called when trying to download a stream"""
 
 
 class MusicPlayer:
@@ -29,11 +86,19 @@ class MusicPlayer:
         # Player variables
         self.server_id = server_id
         self.logger = logging.getLogger("{}.{}".format(__name__, self.server_id))
+        # File variables
+        self.songcache_dir = "{}/{}".format(_root_songcache_dir, self.server_id)
+        self.songcache_next_dir = "{}/{}/next".format(_root_songcache_dir, self.server_id)
+        self.output_format = "{}/{}".format(self.songcache_dir, file_format)
+        self.output_format_next = "{}/{}".format(self.songcache_next_dir, file_format)
 
         # Voice variables
         self.vchannel = None
         self.vclient = None
         self.streamer = None
+        self.current_duration = 0
+        self.current_download_elapsed = 0
+        self.is_live = False
         self.queue = []
         self.prev_queue = []
         self.prev_queue_max = 500
@@ -57,6 +122,10 @@ class MusicPlayer:
         self.queue_display = 9
         self.nowplayinglog = logging.getLogger("{}.{}.nowplaying".format(__name__, self.server_id))
         self.nowplayinglog.setLevel("DEBUG")
+        self.nowplayingauthorlog = logging.getLogger("{}.{}.nowplayingauthor".format(__name__, self.server_id))
+        self.nowplayingauthorlog.setLevel("DEBUG")
+        self.nowplayingsourcelog = logging.getLogger("{}.{}.nowplayingsource".format(__name__, self.server_id))
+        self.nowplayingsourcelog.setLevel("DEBUG")
         self.timelog = logging.getLogger("{}.{}.time".format(__name__, self.server_id))
         self.timelog.setLevel("DEBUG")
         self.timelog.propagate = False
@@ -71,6 +140,9 @@ class MusicPlayer:
         self.statuslog = logging.getLogger("{}.{}.status".format(__name__, self.server_id))
         self.statuslog.setLevel("DEBUG")
         self.statustimer = None
+
+        # Clear the cache
+        self.clear_cache()
 
         # Get channel topic
         self.topic = ""
@@ -87,7 +159,7 @@ class MusicPlayer:
         else:
             self.write_volume()
 
-    async def play(self, author, text_channel, query, now=False, stop_current=False, shuffle=False):
+    async def play(self, author, text_channel, query, index=None, stop_current=False, shuffle=False):
         """
         The play command
 
@@ -95,7 +167,7 @@ class MusicPlayer:
             author (discord.Member): The member that called the command
             text_channel (discord.Channel): The channel where the command was called
             query (str): The argument that was passed with the command
-            now (bool): Whether to play next or at the end of the queue
+            index (str): Whether to play next or at the end of the queue
             stop_current (bool): Whether to stop the currently playing song
             shuffle (bool): Whether to shuffle the queue after starting
         """
@@ -107,7 +179,7 @@ class MusicPlayer:
             # Init the music player
             await self.msetup(text_channel)
             # Queue the song
-            await self.enqueue(query, now, stop_current, shuffle)
+            await self.enqueue(query, index, stop_current, shuffle)
             # Connect to voice
             await self.vsetup(author)
 
@@ -115,13 +187,13 @@ class MusicPlayer:
             self.state = 'ready' if self.mready and self.vready else 'off'
         else:
             # Queue the song
-            await self.enqueue(query, now, stop_current, shuffle)
+            await self.enqueue(query, index, stop_current, shuffle)
 
         if self.state == 'ready':
             if self.streamer is None:
                 await self.vplay()
 
-    async def stop(self):
+    async def stop(self, log_stop=False):
         """The stop command"""
 
         self.logger.debug("stop command")
@@ -129,9 +201,13 @@ class MusicPlayer:
 
         await self.set_topic("")
         self.nowplayinglog.debug("---")
+        self.nowplayingauthorlog.debug("---")
+        self.nowplayingsourcelog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
-        self.statuslog.debug("Stopping")
+
+        if log_stop:
+            self.statuslog.debug("Stopping")
 
         self.vready = False
         self.pause_time = None
@@ -153,15 +229,25 @@ class MusicPlayer:
         self.vclient = None
         self.vchannel = None
         self.streamer = None
+        self.current_duration = 0
+        self.current_download_elapsed = 0
+        self.is_live = False
         self.queue = []
         self.prev_queue = []
 
         self.update_queue()
 
         self.nowplayinglog.debug("---")
+        self.nowplayingauthorlog.debug("---")
+        self.nowplayingsourcelog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
-        self.statuslog.info("Stopped")
+
+        self.clear_cache()
+
+        if log_stop:
+            self.statuslog.info("Stopped")
+
         self.state = 'off'
 
         if self.embed:
@@ -175,6 +261,8 @@ class MusicPlayer:
 
         await self.set_topic("")
         self.nowplayinglog.debug("---")
+        self.nowplayingauthorlog.debug("---")
+        self.nowplayingsourcelog.debug("---")
         self.timelog.debug(_timebar.make_timebar())
         self.prev_time = "---"
         self.statuslog.debug("Destroying")
@@ -200,6 +288,9 @@ class MusicPlayer:
         self.vclient = None
         self.vchannel = None
         self.streamer = None
+        self.current_duration = 0
+        self.current_download_elapsed = 0
+        self.is_live = False
         self.queue = []
         self.prev_queue = []
 
@@ -207,12 +298,17 @@ class MusicPlayer:
             await self.embed.delete()
             self.embed = None
 
+        self.clear_cache()
+
     async def toggle(self):
-        """Toggles between paused and not paused command"""
+        """Toggles between pause and resume command"""
 
         self.logger.debug("toggle command")
 
         if not self.state == 'ready':
+            return
+
+        if self.streamer is None:
             return
 
         try:
@@ -232,12 +328,14 @@ class MusicPlayer:
         if not self.state == 'ready':
             return
 
+        if self.streamer is None:
+            return
+
         try:
             if self.streamer.is_playing():
-                self.statuslog.info("Paused")
                 self.streamer.pause()
-
                 self.pause_time = self.vclient.loop.time()
+                self.statuslog.info("Paused")
         except Exception as e:
             logger.error(e)
             pass
@@ -245,14 +343,18 @@ class MusicPlayer:
     async def resume(self):
         """Resumes playback if paused"""
 
-        self.logger.debug("toggle command")
+        self.logger.debug("resume command")
 
         if not self.state == 'ready':
             return
 
+        if self.streamer is None:
+            return
+
         try:
             if not self.streamer.is_playing():
-                self.statuslog.info("Playing")
+                play_state = "Streaming" if self.is_live else "Playing"
+                self.statuslog.info(play_state)
                 self.streamer.resume()
 
                 if self.pause_time is not None:
@@ -554,32 +656,6 @@ class MusicPlayer:
         embed = ui_embed.topic_update(channel, self.topicchannel)
         await embed.send()
 
-    async def nowplaying_info(self, channel):
-        """
-        Print the info about the currently playing song
-
-        Args:
-            channel (discord.Channel): The channel to send info to
-        """
-
-        await client.send_typing(channel)
-
-        if self.streamer is None:
-            embed = ui_embed.nowplaying_none(channel)
-            await embed.send()
-            return
-
-        if self.streamer.is_live:
-            duration_info = "Livestream"
-        else:
-            duration_info = api_music.duration_to_string(self.streamer.duration)
-
-        embed = ui_embed.nowplaying_info(channel, title=self.streamer.title, duration=duration_info,
-                                         source=self.streamer.uploader, source_date=self.streamer.upload_date,
-                                         views=self.streamer.views, likes=self.streamer.likes,
-                                         description=self.streamer.description)
-        await embed.send()
-
     # Methods
     async def vsetup(self, author):
         """Creates the voice client
@@ -589,7 +665,7 @@ class MusicPlayer:
         """
 
         if self.vready:
-            logger.error("Attempt to init voice when already initialised")
+            logger.warning("Attempt to init voice when already initialised")
             return
 
         if self.state != 'starting':
@@ -635,7 +711,7 @@ class MusicPlayer:
         """
 
         if self.mready:
-            logger.error("Attempt to init music when already initialised")
+            logger.warning("Attempt to init music when already initialised")
             return
 
         if self.state != 'starting':
@@ -666,7 +742,9 @@ class MusicPlayer:
         # Initial datapacks
         datapacks = [
             ("Now playing", "---", False),
-            ("Time", "```http\n" + _timebar.make_timebar() + "\n```", True),
+            ("Author", "---", True),
+            ("Source", "---", True),
+            ("Time", "```http\n" + _timebar.make_timebar() + "\n```", False),
             ("Queue", "```md\n{}\n```".format(''.join(queue_display)), False),
             ("Songs left in queue", "---", True),
             ("Volume", "{}%".format(self.volume), True),
@@ -676,10 +754,9 @@ class MusicPlayer:
         # Create embed UI object
         self.embed = ui_embed_tools.UI(
             self.mchannel,
-            "Music Player",
-            "Press the buttons!",
+            "",
+            "",
             modulename=_data.modulename,
-            creator=_data.creator,
             colour=_data.modulecolor,
             datapacks=datapacks
         )
@@ -693,18 +770,24 @@ class MusicPlayer:
 
         nowplayinghandler = EmbedLogHandler(self, self.embed, 0)
         nowplayinghandler.setFormatter(noformatter)
-        timehandler = EmbedLogHandler(self, self.embed, 1)
+        nowplayingauthorhandler = EmbedLogHandler(self, self.embed, 1)
+        nowplayingauthorhandler.setFormatter(noformatter)
+        nowplayingsourcehandler = EmbedLogHandler(self, self.embed, 2)
+        nowplayingsourcehandler.setFormatter(noformatter)
+        timehandler = EmbedLogHandler(self, self.embed, 3)
         timehandler.setFormatter(timeformatter)
-        queuehandler = EmbedLogHandler(self, self.embed, 2)
+        queuehandler = EmbedLogHandler(self, self.embed, 4)
         queuehandler.setFormatter(mdformatter)
-        queuelenhandler = EmbedLogHandler(self, self.embed, 3)
+        queuelenhandler = EmbedLogHandler(self, self.embed, 5)
         queuelenhandler.setFormatter(noformatter)
-        volumehandler = EmbedLogHandler(self, self.embed, 4)
+        volumehandler = EmbedLogHandler(self, self.embed, 6)
         volumehandler.setFormatter(volumeformatter)
-        statushandler = EmbedLogHandler(self, self.embed, 5)
+        statushandler = EmbedLogHandler(self, self.embed, 7)
         statushandler.setFormatter(statusformatter)
 
         self.nowplayinglog.addHandler(nowplayinghandler)
+        self.nowplayingauthorlog.addHandler(nowplayingauthorhandler)
+        self.nowplayingsourcelog.addHandler(nowplayingsourcehandler)
         self.timelog.addHandler(timehandler)
         self.queuelog.addHandler(queuehandler)
         self.queuelenlog.addHandler(queuelenhandler)
@@ -724,36 +807,13 @@ class MusicPlayer:
             except Exception as e:
                 logger.exception(e)
 
-    def parse_query(self, query, front, stop_current, shuffle):
-        yt_videos, response = api_music.parse_query(query, self.statuslog)
-        if shuffle:
-            random.shuffle(yt_videos)
-
-        if len(yt_videos) == 0:
-            self.statuslog.warning("No results found for {}".format(query))
-            return
-
-        if front:
-            self.queue = yt_videos + self.queue
-        else:
-            self.queue = self.queue + yt_videos
-
-        self.update_queue()
-        if response[0] == 0:
-            self.statuslog.info(response[1])
-        else:
-            self.statuslog.error(response[1])
-
-        if stop_current:
-            if self.streamer:
-                self.streamer.stop()
-
-    async def enqueue(self, query, front=False, stop_current=False, shuffle=False):
-        """Queues songs based on either a YouTube search or a link
+    async def enqueue(self, query, queue_index=None, stop_current=False, shuffle=False):
+        """
+        Queues songs based on either a YouTube search or a link
 
         Args:
             query (str): Either a search term or a link
-            front (bool): Whether to enqueue at the front or the end
+            queue_index (str): The queue index to enqueue at (None for end)
             stop_current (bool): Whether to stop the current song after the songs are queued
             shuffle (bool): Whether to shuffle the added songs
         """
@@ -764,14 +824,70 @@ class MusicPlayer:
         self.statuslog.info("Parsing {}".format(query))
         self.logger.debug("Enqueueing from query")
 
+        indexnum = None
+        if queue_index is not None:
+            try:
+                indexnum = int(queue_index) - 1
+            except TypeError:
+                self.statuslog.error("Play index argument must be a number")
+                return
+            except ValueError:
+                self.statuslog.error("Play index argument must be a number")
+                return
+
         if not self.vready:
-            self.parse_query(query, front, stop_current, shuffle)
+            self.parse_query(query, indexnum, stop_current, shuffle)
         else:
             parse_thread = threading.Thread(
                 target=self.parse_query,
-                args=[query, front, stop_current, shuffle])
+                args=[query, indexnum, stop_current, shuffle])
             # Run threads
             parse_thread.start()
+
+    def parse_query(self, query, index, stop_current, shuffle):
+        """
+        Parses a query and adds it to the queue
+
+        Args:
+            query (str): Either a search term or a link
+            index (int): The index to enqueue at (None for end)
+            stop_current (bool): Whether to stop the current song after the songs are queued
+            shuffle (bool): Whether to shuffle the added songs
+        """
+
+        if index is not None and len(self.queue) > 0:
+            if index < 0 or index >= len(self.queue):
+                if len(self.queue) == 1:
+                    self.statuslog.error("Play index must be 1 (1 song in queue)")
+                    return
+                else:
+                    self.statuslog.error("Play index must be between 1 and {}".format(len(self.queue)))
+                    return
+
+        try:
+            yt_videos = api_music.parse_query(query, self.statuslog)
+            if shuffle:
+                random.shuffle(yt_videos)
+
+            if len(yt_videos) == 0:
+                self.statuslog.error("No results for: {}".format(query))
+                return
+
+            if index is None:
+                self.queue = self.queue + yt_videos
+            else:
+                if len(self.queue) > 0:
+                    self.queue = self.queue[:index] + yt_videos + self.queue[index:]
+                else:
+                    self.queue = yt_videos
+
+            self.update_queue()
+
+            if stop_current:
+                if self.streamer:
+                    self.streamer.stop()
+        except Exception as e:
+            logger.exception(e)
 
     def update_queue(self):
         """Updates the queue in the music player """
@@ -805,20 +921,243 @@ class MusicPlayer:
     def time_loop(self):
         while True:
             if self.pause_time is None:
-                diff = self.vclient.loop.time() - self.vclient_starttime
+                if self.vclient is not None and self.vclient_starttime is not None and self.streamer is not None:
+                    diff = self.vclient.loop.time() - self.vclient_starttime
 
-                if self.streamer is None:
-                    time_bar = "Error"
-                elif self.streamer.is_live:
-                    time_bar = "Livestream"
+                    if self.is_live:
+                        time_bar = "Livestream"
+                    elif self.current_duration <= 0:
+                        time_bar = "Unknown"
+                    else:
+                        time_bar = _timebar.make_timebar(diff, self.current_duration)
+
+                    if time_bar != self.prev_time:
+                        self.timelog.debug(time_bar)
+                        self.prev_time = time_bar
+                        yield from asyncio.sleep(5)
+                    else:
+                        yield from asyncio.sleep(1)
                 else:
-                    time_bar = _timebar.make_timebar(diff, self.streamer.duration)
+                    yield from asyncio.sleep(1)
+            else:
+                yield from asyncio.sleep(2)
 
-                if time_bar != self.prev_time:
-                    self.timelog.debug(time_bar)
-                    self.prev_time = time_bar
+    def clear_cache(self):
+        """Removes all files from the songcache dir"""
+        self.logger.debug("Clearing cache")
+        if os.path.isdir(self.songcache_dir):
+            for filename in os.listdir(self.songcache_dir):
+                file_path = os.path.join(self.songcache_dir, filename)
+                try:
+                    if os.path.isfile(file_path):
+                        os.unlink(file_path)
+                except PermissionError:
+                    pass
+                except Exception as e:
+                    logger.exception(e)
+        self.logger.debug("Cache cleared")
 
-            yield from asyncio.sleep(5)
+    def move_next_cache(self):
+        """Moves files in the 'next' cache dir to the root"""
+        if not os.path.isdir(self.songcache_next_dir):
+            return
+
+        logger.debug("Moving next cache")
+        files = os.listdir(self.songcache_next_dir)
+        for f in files:
+            try:
+                os.rename("{}/{}".format(self.songcache_next_dir, f), "{}/{}".format(self.songcache_dir, f))
+            except PermissionError:
+                pass
+            except Exception as e:
+                logger.exception(e)
+        logger.debug("Next cache moved")
+
+    def ytdl_progress_hook(self, d):
+        """Called when youtube-dl updates progress"""
+        if d['status'] == 'downloading':
+            self.play_empty()
+
+            if "elapsed" in d:
+                if d["elapsed"] > self.current_download_elapsed + 4:
+                    self.current_download_elapsed = d["elapsed"]
+
+                    current_download = 0
+                    current_download_total = 0
+                    current_download_eta = 0
+                    if "total_bytes" in d and d["total_bytes"] > 0:
+                        current_download_total = d["total_bytes"]
+                    elif "total_bytes_estimate" in d and d["total_bytes_estimate"] > 0:
+                        current_download_total = d["total_bytes_estimate"]
+                    if "downloaded_bytes" in d and d["downloaded_bytes"] > 0:
+                        current_download = d["downloaded_bytes"]
+                    if "eta" in d and d["eta"] > 0:
+                        current_download_eta = d["eta"]
+
+                    if current_download_total > 0:
+                        percent = round(100 * (current_download / current_download_total))
+                        if percent > 100:
+                            percent = 100
+                        elif percent < 0:
+                            percent = 0
+
+                        seconds = str(round(current_download_eta)) if current_download_eta > 0 else ""
+                        eta = " ({} {} remaining)".format(seconds, "seconds" if seconds != 1 else "second")
+
+                        downloading = "Downloading song: {}%{}".format(percent, eta)
+                        if self.prev_time != downloading:
+                            self.timelog.debug(downloading)
+                            self.prev_time = downloading
+        if d['status'] == 'error':
+            self.statuslog.error("Error downloading song")
+        elif d['status'] == 'finished':
+            self.statuslog.info("Downloaded song")
+            downloading = "Downloading song: {}%".format(100)
+            if self.prev_time != downloading:
+                self.timelog.debug(downloading)
+                self.prev_time = downloading
+
+            if "elapsed" in d:
+                download_time = "{} {}".format(d["elapsed"] if d["elapsed"] > 0 else "<1",
+                                               "seconds" if d["elapsed"] != 1 else "second")
+                self.logger.debug("Downloaded song in {}".format(download_time))
+
+            # Create an FFmpeg player
+            future = asyncio.run_coroutine_threadsafe(self.create_ffmpeg_player(d['filename']), client.loop)
+            try:
+                future.result()
+            except Exception as e:
+                logger.exception(e)
+                return
+
+    def play_empty(self):
+        """Play blank audio to let Discord know we're still here"""
+        if self.vclient:
+            if self.streamer:
+                self.streamer.volume = 0
+            self.vclient.play_audio("\n".encode(), encode=False)
+
+    def download_next_song(self, song):
+        """Downloads the next song and starts playing it"""
+
+        dl_ydl_opts = dict(ydl_opts)
+        dl_ydl_opts["progress_hooks"] = [self.ytdl_progress_hook]
+        dl_ydl_opts["outtmpl"] = self.output_format
+
+        # Move the songs from the next cache to the current cache
+        self.move_next_cache()
+
+        self.state = 'ready'
+        self.play_empty()
+        # Download the file and create the stream
+        with youtube_dl.YoutubeDL(dl_ydl_opts) as ydl:
+            try:
+                ydl.download([song])
+            except DownloadStreamException:
+                # This is a livestream, use the appropriate player
+                future = asyncio.run_coroutine_threadsafe(self.create_stream_player(song, dl_ydl_opts), client.loop)
+                try:
+                    future.result()
+                except Exception as e:
+                    logger.exception(e)
+                    self.vafter_ts()
+                    return
+            except PermissionError:
+                # File is still in use, it'll get cleared next time
+                pass
+            except youtube_dl.utils.DownloadError as e:
+                self.logger.exception(e)
+                self.statuslog.error(e)
+                self.vafter_ts()
+                return
+            except Exception as e:
+                self.logger.exception(e)
+                self.vafter_ts()
+                return
+
+    def download_next_song_cache(self):
+        """Downloads the next song in the queue to the cache"""
+        if len(self.queue) == 0:
+            return
+
+        cache_ydl_opts = dict(ydl_opts)
+        cache_ydl_opts["outtmpl"] = self.output_format_next
+
+        with youtube_dl.YoutubeDL(cache_ydl_opts) as ydl:
+            try:
+                url = self.queue[0][0]
+                ydl.download([url])
+            except:
+                pass
+
+    async def create_ffmpeg_player(self, filepath):
+        """Creates a streamer that plays from a file"""
+        self.current_download_elapsed = 0
+
+        self.streamer = self.vclient.create_ffmpeg_player(filepath, after=self.vafter_ts)
+        self.state = "ready"
+        await self.setup_streamer()
+
+        try:
+            # Read from the info json
+            info_filename = "{}.info.json".format(filepath)
+            with open(info_filename, 'r') as file:
+                info = json.load(file)
+
+                self.nowplayinglog.debug(info["title"])
+                self.is_live = False
+
+                if "duration" in info and info["duration"] is not None:
+                    self.current_duration = info["duration"]
+                else:
+                    self.current_duration = 0
+
+                if "uploader" in info:
+                    self.nowplayingauthorlog.info(info["uploader"])
+                else:
+                    self.nowplayingauthorlog.info("Unknown")
+
+                self.nowplayingsourcelog.info(api_music.parse_source(info))
+
+                play_state = "Streaming" if self.is_live else "Playing"
+                await self.set_topic("{} {}".format(play_state, info["title"]))
+                self.statuslog.debug(play_state)
+        except Exception as e:
+            logger.exception(e)
+
+    async def create_stream_player(self, url, opts=ydl_opts):
+        """Creates a streamer that plays from a URL"""
+        self.current_download_elapsed = 0
+
+        self.streamer = await self.vclient.create_ytdl_player(url, ytdl_options=opts, after=self.vafter_ts)
+        self.state = "ready"
+
+        await self.setup_streamer()
+
+        self.nowplayinglog.debug(self.streamer.title)
+        self.nowplayingauthorlog.debug(self.streamer.uploader if self.streamer.uploader is not None else "Unknown")
+        self.current_duration = 0
+        self.is_live = True
+
+        info = self.streamer.yt.extract_info(url, download=False)
+        self.nowplayingsourcelog.info(api_music.parse_source(info))
+
+        play_state = "Streaming" if self.is_live else "Playing"
+        await self.set_topic("{} {}".format(play_state, self.streamer.title))
+        self.statuslog.debug(play_state)
+
+    async def setup_streamer(self):
+        """Sets up basic defaults for the streamer"""
+        self.streamer.volume = self.volume / 100
+        self.streamer.start()
+
+        self.pause_time = None
+        self.vclient_starttime = self.vclient.loop.time()
+
+        # Cache next song
+        self.logger.debug("Caching next song")
+        dl_thread = threading.Thread(target=self.download_next_song_cache)
+        dl_thread.start()
 
     async def vplay(self):
         if self.state != 'ready':
@@ -828,12 +1167,12 @@ class MusicPlayer:
         self.state = "starting streamer"
         self.logger.debug("Playing next in queue")
 
+        self.vclient_starttime = None
         self.pause_time = None
+        self.clear_cache()
 
         # Queue has items
         if self.queue is not None and len(self.queue) > 0:
-            self.statuslog.info("Loading next song")
-
             song = self.queue[0][0]
             songname = self.queue[0][1]
 
@@ -842,50 +1181,22 @@ class MusicPlayer:
                 self.prev_queue.pop(0)
 
             try:
-                bopt_list = ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 30", "-reconnect_at_eof 1",
-                             "-timeout 30", "-multiple_requests 1"]
-                boptions = " {}".format(' '.join(bopt_list))
+                self.nowplayinglog.debug("---")
+                self.nowplayingauthorlog.debug("---")
+                self.nowplayingsourcelog.debug("---")
+                self.statuslog.debug("Downloading next song")
+                self.timelog.debug("Loading song")
+                self.prev_time = "---"
 
-                ytdl_formats = [
-                    "worstaudio[protocol^=http][ext=mp4]",
-                    "worstaudio[protocol^=http][ext=mp3]",
-                    "worstaudio[protocol^=http]",
-                    "worstaudio",
-                    "worstaudio",
-                ]
+                dl_thread = threading.Thread(target=self.download_next_song, args=[song])
+                dl_thread.start()
 
-                ytoptions = {
-                    "format": '/'.join(ytdl_formats),
-                    "extractaudio": True,
-                    "audioformat": "mp3",
-                    "noplaylist": True,
-                    "socket_timeout": 30,
-                    "retries": 10,
-                    "sleep_interval": 1,
-                    "nocheckcertificate": True,
-                    "logger": self.logger
-                }
-
-                self.streamer = await self.vclient.create_ytdl_player(song,
-                                                                      ytdl_options=ytoptions,
-                                                                      after=self.vafter_ts,
-                                                                      before_options=boptions)
-                self.state = "ready"
-
-                self.vclient_starttime = self.vclient.loop.time()
-                self.vclient_task = asyncio.Task(self.time_loop())
-
-                self.streamer.volume = self.volume / 100
-                self.streamer.start()
-
-                nowplaying = "{} {}".format("Streaming" if self.streamer.is_live else "Playing",
-                                            self.streamer.title)
-                self.statuslog.debug("Playing")
-                await self.set_topic(nowplaying)
-                self.nowplayinglog.debug(self.streamer.title)
+                await self.set_topic("Playing {}".format(songname))
             except Exception as e:
                 await self.set_topic("")
                 self.nowplayinglog.info("Error playing {}".format(songname))
+                self.nowplayingauthorlog.info("---")
+                self.nowplayingsourcelog.info("---")
                 self.timelog.debug(_timebar.make_timebar())
                 self.prev_time = "---"
                 self.statuslog.error("Had a problem playing {}".format(songname))
@@ -897,10 +1208,14 @@ class MusicPlayer:
                     logger.exception(e)
 
                 self.streamer = None
+                self.current_duration = 0
+                self.current_download_elapsed = 0
+                self.is_live = False
                 self.state = "ready"
                 await self.vplay()
 
             self.update_queue()
+            self.vclient_task = asyncio.Task(self.time_loop(), loop=client.loop)
 
         # Queue exhausted
         else:
@@ -947,12 +1262,15 @@ class MusicPlayer:
             self.vclient_task = None
 
         try:
+            if self.streamer is None:
+                await self.stop()
+                return
+
             if self.streamer.error is None:
                 await self.vplay()
             else:
-                await self.destroy()
                 self.statuslog.error(self.streamer.error)
-                self.statuslog.error("Encountered an error")
+                await self.destroy()
         except Exception as e:
             logger.exception(e)
             try:

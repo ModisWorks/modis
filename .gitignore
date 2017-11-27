@@ -4,6 +4,7 @@ TestModis.py
 OfficialModis.py
 data.json
 modis/discord_modis/modules/pingpong/
+.songcache/
 
 ######## PYCHARM ########
 .idea

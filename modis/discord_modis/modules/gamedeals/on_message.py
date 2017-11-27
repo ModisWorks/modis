@@ -29,8 +29,6 @@ async def on_message(message):
             # Parse message
             package = content.split(" ")
             command = package[0][len(prefix):]
-            args = package[1:]
-            arg = ' '.join(args)
 
             # Commands
             if command == 'gamedeals':

@@ -3,7 +3,7 @@
     {
       "name": "play",
       "params": ["query/link"],
-      "description": "Starts playing the first result of the query or link"
+      "description": "Starts playing the first result of the query or link, or adds it to the end of the queue if something is already playing"
     },
     {
       "name": "playnow",
@@ -19,6 +19,11 @@
       "name": "playshuffle",
       "params": ["query/link"],
       "description": "Plays the first result of the query or link in a random order"
+    },
+    {
+      "name": "insert",
+      "params": ["index", "query/link"],
+      "description": "Adds the first result of the query of link at the given index"
     }
   ],
   "Music Player Commands": [
@@ -115,14 +120,11 @@
       "description": "Stops Modis from updating this channel's topic with the currently playing song"
     },
     {
-      "name": "nowplaying",
-      "description": "Gives information about the current song"
-    },
-    {
       "name": "front",
       "description": "Moves the music player to the front of the channel the command was sent from"
     }
   ],
   "Documentation": "To see all commands, go to the Music Module Documentation at https://infraxion.github.io/modis/documentation/modules/music/",
-  "About": "music plays videos and playlists from YouTube, and music files stored on the internet."
+  "About": "music plays videos and playlists from YouTube, and music files stored on the internet.",
+  "Creators": "Infraxion and YtnomSnrub"
 }

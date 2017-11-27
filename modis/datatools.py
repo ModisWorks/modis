@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 _dir = _os.getcwd()
 _datafile = "{}/data.json".format(_dir)
 
-version = "0.3.1b3"
+version = "0.3.2a2"
 version_nickname = "Beethoven"
 
 

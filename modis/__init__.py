@@ -1,12 +1,13 @@
 """Initialises Modis."""
 
+from __future__ import unicode_literals
+
 import logging
 import os
 import sys
 import time
 
 from modis import datatools
-
 
 working_dir = os.getcwd()
 file_dir = os.path.dirname(os.path.realpath(__file__))

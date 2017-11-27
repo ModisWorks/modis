@@ -5,7 +5,7 @@ import discord
 
 class UI:
     def __init__(self, channel, title, description,
-                 modulename="Modis", creator="anonymous", colour=0xAAFF00, thumbnail=None, image=None, datapacks=()):
+                 modulename="Modis", colour=0xAAFF00, thumbnail=None, image=None, datapacks=()):
         """Initialises variables and builds GUI
 
         Args:
@@ -13,7 +13,6 @@ class UI:
             title (str): GUI title, in bold
             description (str): GUI description
             modulename (str): Name of your module, default "Modis"
-            creator (str): Your name/screen name, default "anonymous"
             colour (int): Colour of line on left, default 0xAAFF00
             thumbnail (str): URL to picture shown in top right corner, default None
             datapacks (list): Contains tuples of (title str, data str, inline bool)
@@ -23,7 +22,6 @@ class UI:
         self.title = title
         self.description = description
         self.modulename = modulename
-        self.creator = creator
         self.colour = colour
         self.thumbnail = thumbnail
         self.image = image
@@ -68,8 +66,6 @@ class UI:
                 value=pack[1],
                 inline=pack[2]
             )
-
-        embed.set_footer(text="{} module by {}".format(self.modulename, self.creator))
 
         return embed
 

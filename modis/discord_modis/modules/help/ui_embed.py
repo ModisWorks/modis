@@ -21,7 +21,6 @@ def success(channel, title, datapacks):
         title,
         "",
         modulename=modulename,
-        creator=creator,
         datapacks=datapacks
     )
 
@@ -45,8 +44,7 @@ def http_exception(channel, title):
         channel,
         "Too much help",
         "{} is too helpful! Try trimming some of the help messages.".format(title),
-        modulename=modulename,
-        creator=creator
+        modulename=modulename
     )
 
     return gui
