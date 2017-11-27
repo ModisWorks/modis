@@ -1,6 +1,6 @@
-from modis import data
-from . import _data, api_rocketleaguestats, ui_embed
-from ..._client import client
+from modis import main
+from modis.tools import data
+from . import api_rocketleaguestats, ui_embed
 
 
 async def on_message(message):
@@ -16,15 +16,14 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    data = data.get_data()
-
-    if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
-        return
+    # TODO port to new activation
+    # if not data["discord"]["servers"][server.id][_data.modulename]["activated"]:
+    #     return
 
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Commands section
-        prefix = data["discord"]["servers"][server.id]["prefix"]
+        prefix = data.cache["servers"][server.id]["prefix"]
         if content.startswith(prefix):
             # Parse message
             package = content.split(" ")
@@ -32,8 +31,8 @@ async def on_message(message):
             args = package[1:]
 
             alias_steam = ["steam", "pc"]
-            alias_ps = ["ps", "psn", "playstation", "ps4", "playstation 4"]
-            alias_xbox = ["xbox", "xb", "xb1", "xbone", "xbox one", "xbox one"]
+            alias_ps = ["ps", "psn", "playstation", "ps4", "playstation4"]
+            alias_xbox = ["xbox", "xb", "xb1", "xbone", "xboxone", "xbox1"]
 
             platform = "steam"
             if len(args) > 0:
@@ -53,7 +52,7 @@ async def on_message(message):
 
             # Commands
             if command == 'rlstats':
-                await client.send_typing(channel)
+                await main.client.send_typing(channel)
 
                 # Get Rocket League stats from stats API
                 success, rldata = api_rocketleaguestats.check_rank(player_name, platform)

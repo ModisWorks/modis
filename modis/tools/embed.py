@@ -2,10 +2,9 @@ import logging
 
 import discord
 
-from modis.tools import config
+from modis import main
 
 logger = logging.getLogger(__name__)
-client = config.client
 
 
 class UI:
@@ -77,14 +76,14 @@ class UI:
     async def send(self):
         """Send new GUI"""
 
-        await client.send_typing(self.channel)
-        self.sent_embed = await client.send_message(self.channel, embed=self.built_embed)
+        await main.client.send_typing(self.channel)
+        self.sent_embed = await main.client.send_message(self.channel, embed=self.built_embed)
 
     async def usend(self):
         """Edit existing GUI if available, else send new GUI"""
 
         try:
-            await client.edit_message(self.sent_embed, embed=self.built_embed)
+            await main.client.edit_message(self.sent_embed, embed=self.built_embed)
         except:
             pass
 
@@ -92,7 +91,7 @@ class UI:
         """Deletes the existing GUI if available"""
 
         try:
-            await client.delete_message(self.sent_embed)
+            await main.client.delete_message(self.sent_embed)
         except:
             pass
 

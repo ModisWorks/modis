@@ -1,5 +1,5 @@
 from modis.tools import embed
-from ._data import *
+from . import _data
 
 
 def success(channel, stats, name, platform, dp):
@@ -38,7 +38,7 @@ def success(channel, stats, name, platform, dp):
         channel,
         "Rocket League Stats: {}".format(name),
         "*Stats obtained from [Rocket League Tracker Network](https://rocketleague.tracker.network/)*",
-        modulename=modulename,
+        modulename=_data.modulename,
         colour=0x0088FF,
         thumbnail=dp,
         datapacks=datapacks
@@ -62,7 +62,7 @@ def fail_steamid(channel):
         "That SteamID doesn't exist.",
         "You can get your SteamID by going to your profile page and looking at the url, "
         "or you can set a custom ID by going to edit profile on your profile page.",
-        modulename=modulename,
+        modulename=_data.modulename,
         colour=0x0088FF
     )
 
@@ -83,7 +83,7 @@ def fail_api(channel):
         channel,
         "Couldn't get stats off RLTrackerNetwork.",
         "Maybe the API changed, please tell Infraxion.",
-        modulename=modulename,
+        modulename=_data.modulename,
         colour=0x0088FF
     )
 
