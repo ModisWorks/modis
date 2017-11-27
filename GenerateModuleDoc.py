@@ -25,7 +25,7 @@ def add_md(text, s, level=0):
 
 # Get module
 module_name = input("Module name: ")
-module_help_path = "{}/{}/{}".format(config.MODULES_DIR, module_name, "_help.json")
+module_help_path = "{}/{}/{}".format(config.MODULES_DIR, module_name, "help.json")
 
 # Get help data
 if os.path.isfile(module_help_path):

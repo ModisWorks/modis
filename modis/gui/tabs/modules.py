@@ -158,13 +158,13 @@ class Frame(tk.Frame):
 
             # Find the help path
             _dir = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-            help_path = "{}/modules/{}/{}".format(_dir, module_name, "_help.json")
+            help_path = "{}/modules/{}/{}".format(_dir, module_name, "help.json")
             if os.path.isfile(help_path):
                 # Load the text
                 help.add_help_text(self.help_frame, help_path)
             else:
                 # Default message
-                tk.Label(self.help_frame, text="No _help.json file found for '{}'".format(module_name)).grid(row=0, column=0, sticky="W E N S")
+                tk.Label(self.help_frame, text="No help.json file found for '{}'".format(module_name)).grid(row=0, column=0, sticky="W E N S")
 
             # Grid elements
             if module_ui is not None:

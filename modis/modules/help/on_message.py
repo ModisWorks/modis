@@ -1,8 +1,8 @@
 import discord
 
-from modis import data
+from modis import main
+from modis.tools import data
 from . import api_help, ui_embed
-from ..._client import client
 
 
 async def on_message(message):
@@ -18,12 +18,10 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    data = data.get_data()
-
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Commands section
-        prefix = data["discord"]["servers"][server.id]["prefix"]
+        prefix = data.cache["servers"][server.id]["prefix"]
         if content.startswith(prefix):
             # Parse message
             package = content.split(" ")
@@ -38,7 +36,7 @@ async def on_message(message):
                     datapacks = api_help.get_help_datapacks(arg, prefix)
                     # Create embed UI
                     if datapacks:
-                        await client.send_typing(channel)
+                        await main.client.send_typing(channel)
                         embed = ui_embed.success(channel, arg, datapacks)
                         try:
                             await embed.send()
@@ -50,7 +48,7 @@ async def on_message(message):
                     datapacks = api_help.get_help_commands(prefix)
                     # Create embed UI
                     if datapacks:
-                        await client.send_typing(channel)
+                        await main.client.send_typing(channel)
                         embed = ui_embed.success(channel, arg, datapacks)
                         try:
                             await embed.send()

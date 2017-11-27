@@ -1,6 +1,6 @@
-from . import _data
 from modis.tools import embed
 
+from . import _data
 
 def success(channel, image, hex_str):
     """

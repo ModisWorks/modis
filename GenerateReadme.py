@@ -64,7 +64,7 @@ readme = add_ul(readme, module_names)
 for module_name in module_list:
     if len(module_name) > 0 and module_name[0] != "!" and module_name[0] != "_":
         module_dir = "{}/{}".format(config.MODULES_DIR, module_name)
-        module_help_path = "{}/{}".format(module_dir, "_help.json")
+        module_help_path = "{}/{}".format(module_dir, "help.json")
 
         if os.path.isfile(module_help_path):
             datepacks = help.get_help_datapacks(module_help_path, "!")
