@@ -1,10 +1,9 @@
 import logging
-
 import discord
 
-from modis import datatools
+from modis import main
+from modis.tools import data
 from . import _data, api_manager, ui_embed
-from ..._client import client
 
 logger = logging.getLogger(__name__)
 
@@ -22,16 +21,14 @@ async def on_message(message):
     channel = message.channel
     content = message.content
 
-    data = data.get_data()
-
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
-        prefix = data["discord"]["servers"][server.id]["prefix"]
+        prefix = data.cache["servers"][server.id]["prefix"]
         # Check for mentions reply to mentions
         if channel.server.me in message.mentions:
-            await client.send_typing(channel)
+            await main.client.send_typing(channel)
             response = "The current server prefix is `{0}`. Type `{0}help` for help.".format(prefix)
-            await client.send_message(channel, response)
+            await main.client.send_message(channel, response)
 
         # Commands section
         if content.startswith(prefix):
@@ -51,7 +48,7 @@ async def on_message(message):
                     is_admin = True
 
             if not is_admin:
-                await client.send_typing(channel)
+                await main.client.send_typing(channel)
                 reason = "You must have a role that has the permission 'Administrator'"
                 embed = ui_embed.error(channel, "Insufficient Permissions", reason)
                 await embed.send()
@@ -59,11 +56,11 @@ async def on_message(message):
 
             if command == "prefix" and args:
                 new_prefix = arg.replace(" ", "").strip()
-                data["discord"]["servers"][server.id]["prefix"] = new_prefix
+                data.cache["servers"][server.id]["prefix"] = new_prefix
                 # Write the data
-                data.write_data(data)
+                data.write()
 
-                await client.send_typing(channel)
+                await main.client.send_typing(channel)
                 embed = ui_embed.modify_prefix(channel, new_prefix)
                 await embed.send()
 
@@ -71,9 +68,9 @@ async def on_message(message):
                 try:
                     warn_max = int(arg)
                     if warn_max > 0:
-                        data["discord"]["servers"][server.id][_data.modulename]["warnings_max"] = warn_max
-                        datatools.write_data(data)
-                        await client.send_typing(channel)
+                        data.cache["servers"][server.id][_data.modulename]["warnings_max"] = warn_max
+                        data.write()
+                        await main.client.send_typing(channel)
                         embed = ui_embed.warning_max_changed(channel, warn_max)
                         await embed.send()
                     else:

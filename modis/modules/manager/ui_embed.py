@@ -1,7 +1,7 @@
 import discord
 
-from .._tools import ui_embed
-from ._data import *
+from modis.tools import embed
+from . import _data
 
 
 def modify_module(channel, module_name, module_state):
@@ -14,7 +14,7 @@ def modify_module(channel, module_name, module_state):
         module_state (bool): The current state of the module
 
     Returns:
-        embed: The created embed
+        gui (embed.UI): The embed UI object
     """
 
     # Create embed UI object
@@ -22,7 +22,7 @@ def modify_module(channel, module_name, module_state):
         channel,
         "{} updated".format(module_name),
         "{} is now {}".format(module_name, "activated" if module_state else "deactivated"),
-        modulename=modulename
+        modulename=_data.modulename
     )
 
     return gui
@@ -37,7 +37,7 @@ def modify_prefix(channel, new_prefix):
         new_prefix (str): The value of the new prefix
 
     Returns:
-        embed: The created embed
+        gui (embed.UI): The embed UI object
     """
 
     # Create embed UI object
@@ -45,7 +45,7 @@ def modify_prefix(channel, new_prefix):
         channel,
         "Prefix updated",
         "Modis prefix is now `{}`".format(new_prefix),
-        modulename=modulename
+        modulename=_data.modulename
     )
 
     return gui
@@ -62,7 +62,7 @@ def user_warning(channel, user, warnings, max_warnings):
         max_warnings (str): The maximum warnings for the user
 
     Returns:
-        ui (ui_embed.UI): The embed UI object
+        gui (embed.UI): The embed UI object
     """
 
     username = user.name
@@ -77,11 +77,11 @@ def user_warning(channel, user, warnings, max_warnings):
         result_text = "you are being banned because you have more than the maximum warnings"
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embed.UI(
         channel,
         "Warning {}".format(username),
         "You now have {} {}, {}".format(warning_text, username, result_text),
-        modulename=modulename
+        modulename=_data.modulename
     )
 
     return gui
@@ -96,7 +96,7 @@ def user_ban(channel, user):
         user (discord.User): The user to ban
 
     Returns:
-        ui (ui_embed.UI): The embed UI object
+        gui (embed.UI): The embed UI object
     """
 
     username = user.name
@@ -105,11 +105,11 @@ def user_ban(channel, user):
             username = user.nick
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embed.UI(
         channel,
         "Banned {}".format(username),
         "{} has been banned from this server".format(username),
-        modulename=modulename
+        modulename=_data.modulename
     )
 
     return gui
@@ -124,16 +124,16 @@ def warning_max_changed(channel, max_warnings):
         max_warnings (int): The new maximum warnings
 
     Returns:
-        ui (ui_embed.UI): The embed UI object
+        gui (embed.UI): The embed UI object
     """
 
     # Create embed UI object
-    gui = ui_embed.UI(
+    gui = embed.UI(
         channel,
         "Maximum Warnings Changed",
         "Users must now have {} warnings to be banned "
         "(this won't ban existing users with warnings)".format(max_warnings),
-        modulename=modulename
+        modulename=_data.modulename
     )
 
     return gui
@@ -149,7 +149,7 @@ def error(channel, title, description):
         description (str): The description for the error
 
     Returns:
-        ui (embed.UI): The embed UI object
+        gui (embed.UI): The embed UI object
     """
 
     # Create embed UI object
@@ -157,7 +157,7 @@ def error(channel, title, description):
         channel,
         title,
         description,
-        modulename=modulename
+        modulename=_data.modulename
     )
 
     return gui
