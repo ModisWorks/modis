@@ -29,7 +29,7 @@ module_help_path = "{}/{}/{}".format(config.MODULES_DIR, module_name, "help.json
 
 # Get help data
 if os.path.isfile(module_help_path):
-    datapacks = help.get_help_datapacks(module_help_path, "!")
+    datapacks = help.get_datapack(module_help_path, "!")
     moduledoc = add_md(moduledoc, module_name, 1)
 
     for d in datapacks:

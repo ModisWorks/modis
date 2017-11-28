@@ -7,7 +7,7 @@ from modis.tools import config
 logger = logging.getLogger(__name__)
 
 
-def get_help_data(module_name):
+def get(module_name):
     """Gets a dict from a help.json
 
     Args:
@@ -20,13 +20,16 @@ def get_help_data(module_name):
     try:
         with open("{}/{}/_help.json".format(config.MODULES_DIR, module_name), 'r') as file:
             return json.load(file, object_pairs_hook=OrderedDict)
+    except FileNotFoundError:
+        logger.warning("No help data for " + module_name)
+        return {}
     except Exception as e:
-        logger.error("Could not load file for {} module".format(module_name))
+        logger.error("Could not load file for " + module_name)
         logger.exception(e)
         return {}
 
 
-def get_help_datapacks(filepath, prefix="!"):
+def get_datapack(filepath, prefix="!"):
     """
     Load help text from a file and give it as datapacks
 
@@ -38,7 +41,7 @@ def get_help_datapacks(filepath, prefix="!"):
         datapacks (list): The datapacks from the file
     """
 
-    help_contents = get_help_data(filepath)
+    help_contents = get(filepath)
 
     datapacks = []
 

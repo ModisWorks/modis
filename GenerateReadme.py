@@ -63,28 +63,38 @@ readme = add_md(readme, "Latest release: [v{0}{1}]({2}/{0})".format(
 
 # About
 readme = add_md(readme, "About Modis", 2)
-readme = add_md(readme, "Modis is a Discord bot that runs with a GUI and is "
-                        "designed to be as modular as possible so that anyone "
-                        "with some basic Python knowledge can quickly and "
-                        "easily create new modules that run on the bot.")
+readme = add_md(readme, "Modis is an highly modular, open-source Discord bot "
+                        "that runs with a console GUI. Our goal is to make "
+                        "Modis as easy to host as possible, so that any "
+                        "Discord user can host their own bot. Modis is also "
+                        "designed to be very easy to develop for; it's "
+                        "modularised in a way that makes it very easy to "
+                        "understand for anyone familiar with the discord.py "
+                        "Python library.\n\n"
+                        "We hope that this bot introduces more novices to the "
+                        "painful world of software development and networking, "
+                        "and provides seasoned devs with something to "
+                        "procrastinate their deadline on. Have fun!")
 
 # Module list
 readme = add_md(readme, "Current Modules", 2)
 readme = add_md(readme, "There are currently {} available modules:".format(len(module_names)))
 module_list = []
 for m in module_names:
-    datapack = help.get_help_data(m)
+    datapack = help.get(m)
     if "About" in datapack.keys():
         info = "`{}` - {}".format(m, datapack["About"])
     else:
         info = "`{}`".format(m)
     module_list.append(info)
 readme = add_ul(readme, [m for m in module_list])
-readme = add_md(readme, "More detailed information about each module can be "
-                        "found in the [docs](https://infraxion.github.io/modis"
-                        "/documentation/#modules).")
+readme = add_md(readme, "More detailed information about each module and how "
+                        "to use them can be found in the [docs](https://"
+                        "infraxion.github.io/modis/documentation/#modules).")
 
 # Write file
-newreadme_path = "{}/README.md".format(config.ROOT_DIR)
+print(readme)
+newreadme_path = "{}/../README.md".format(config.ROOT_DIR)
+print(newreadme_path)
 with open(newreadme_path, 'w') as file:
     file.write(readme)

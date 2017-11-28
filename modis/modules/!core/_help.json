@@ -1,4 +1,4 @@
 {
-  "About": "Handles the core functions of Modis.",
+  "About": "Manages all the behind the scenes stuff that runs the internal APIs the modules use.",
   "Creator": "Infraxion"
 }

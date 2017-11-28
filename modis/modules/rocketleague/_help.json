@@ -11,6 +11,6 @@
       "description": "Displays the stats for the given user on the specified platform"
     }
   ],
-  "About": "rocketleague lets you look up player's Rocket League stats.",
+  "About": "Looks up your Rocket League rank and stats; currently supported for Steam, XBox, and PS4 players.",
   "Creator": "Infraxion"
 }

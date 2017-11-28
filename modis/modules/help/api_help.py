@@ -22,7 +22,7 @@ def get_help_datapacks(module_name, server_prefix):
         module_help_path = "{}/{}".format(module_dir, "help.json")
 
         if os.path.isfile(module_help_path):
-            return help.get_help_datapacks(module_help_path, server_prefix)
+            return help.get_datapack(module_help_path, server_prefix)
         else:
             return [("Help", "{} does not have a help.json file".format(module_name), False)]
     else:
