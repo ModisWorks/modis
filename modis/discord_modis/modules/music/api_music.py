@@ -131,6 +131,13 @@ def parse_query(query, ilogger):
             if scclient is None:
                 ilogger.error("Could not queue from SoundCloud API, using link")
                 return [[query, query]]
+        elif "spotify" in p.netloc:
+            if spclient is None:
+                ilogger.error("Could not resolve song from Spotify API, No Key?")
+                return []
+            else:
+                url_to_uri = ("spotify"+p.path).replace("/",":")
+                return parse_query(url_to_uri, ilogger)
             try:
                 result = scclient.get('/resolve', url=query)
 
@@ -165,29 +172,27 @@ def parse_query(query, ilogger):
     if len(args) == 0:
         ilogger.error("No query given")
         return []
-
-    if args[0].lower() in ["sp", "spotify"] and spclient is not None:
+    #--------Spotify Patch--------
+    uri = query.split(":")
+    if uri[0].lower() in ["spotify"] and spclient is not None:
         if spclient is None:
             ilogger.error("Host does not support Spotify")
             return []
 
         try:
-            #--------Spotify Patch--------
-            uri = query.split(':')
-            if len(uri) > 2 and uri[1] in ['album', 'artist', 'track', 'user']:
+            if len(uri) > 2 and uri[1] in ["album", "artist", "track", "user"]:
                 query_type = uri[1].lower()
                 query_search = ' '.join(uri[2:])
             else:
-                ilogger.error("Error malformed Spotify URI")
+                ilogger.error("Error malformed Spotify URI/URL")
                 return []
-            query_type = query_type.replace('user', 'playlist')
+            query_type.replace('user', 'playlist')
             spotify_tracks = get_sp_tracks(query_type, query_search)
             ilogger.info("Queueing Spotify {} URI: {}".format(query_type, query_search))
             ilogger.info("Queued Yotube search: {}".format(spotify_tracks))
-            print(spotify_tracks)
             return get_ytvideos(spotify_tracks, ilogger)
-            #This sends the track name and artist found with the spotifyAPI to youtube
-            #--------Spotify Patch--------
+    #This sends the track name and artist found with the spotifyAPI to youtube
+    #--------Spotify Patch--------
         except Exception as e:
             logger.exception(e)
             ilogger.error("Error queueing from Spotify")
@@ -251,14 +256,12 @@ def get_ytvideos(query, ilogger):
 
     queue = []
     querylist = []
-    print(query)
     #--------Spotify Patch--------
     if isinstance(query, list) == True:
         querylist = query
     else:
         querylist.append(query)
     for tracks in querylist:
-        print(querylist)
     #--------Spotify Patch--------
     # Search YouTube
         search_result = ytdiscoveryapi.search().list(
