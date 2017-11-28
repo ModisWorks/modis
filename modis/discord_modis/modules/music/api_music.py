@@ -503,22 +503,6 @@ def parse_source(info):
     return "Unknown"
 
 
-def get_subtitles(info):
-    try:
-        if "subtitles" in info and "en" in info["subtitles"]:
-            for s_format in info["subtitles"]["en"]:
-                if "ext" in s_format and "url" in s_format and s_format["ext"] in ["ttml"]:
-                    sub_raw = requests.get(s_format["url"]).text
-                    root = ElementTree.fromstring(sub_raw)
-
-                    return sub_raw
-
-        return None
-    except Exception as e:
-        logger.exception(e)
-        return None
-
-
 build_yt_api()
 build_sc_api()
 build_spotify_api()
