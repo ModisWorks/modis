@@ -131,13 +131,6 @@ def parse_query(query, ilogger):
             if scclient is None:
                 ilogger.error("Could not queue from SoundCloud API, using link")
                 return [[query, query]]
-        elif "spotify" in p.netloc:
-            if spclient is None:
-                ilogger.error("Could not resolve song from Spotify API, No Key?")
-                return []
-            else:
-                url_to_uri = ("spotify"+p.path).replace("/",":")
-                return parse_query(url_to_uri, ilogger)
             try:
                 result = scclient.get('/resolve', url=query)
 
@@ -164,6 +157,13 @@ def parse_query(query, ilogger):
                 logger.exception(e)
                 ilogger.error("Could not queue from SoundCloud API, using link")
                 return [[query, query]]
+        elif "spotify" in p.netloc:
+            if spclient is None:
+                ilogger.error("Could not resolve song from Spotify API, No Key?")
+                return []
+            else:
+                url_to_uri = ("spotify"+p.path).replace("/",":")
+                return parse_query(url_to_uri, ilogger)
         else:
             ilogger.debug("Using url: {}".format(query))
             return [[query, query]]
@@ -186,11 +186,12 @@ def parse_query(query, ilogger):
             else:
                 ilogger.error("Error malformed Spotify URI/URL")
                 return []
-            query_type.replace('user', 'playlist')
+
+            query_type = query_type.replace('user', 'playlist')
             spotify_tracks = get_sp_tracks(query_type, query_search)
-            ilogger.info("Queueing Spotify {} URI: {}".format(query_type, query_search))
-            ilogger.info("Queued Yotube search: {}".format(spotify_tracks))
-            return get_ytvideos(spotify_tracks, ilogger)
+            logger.debug("Queueing Yotube search: {}".format(spotify_tracks))
+            ilogger.info("Queued Spotify {} URI: {}".format(query_type, query_search))
+            return get_ytvideos_from_list(spotify_tracks)
     #This sends the track name and artist found with the spotifyAPI to youtube
     #--------Spotify Patch--------
         except Exception as e:
@@ -227,7 +228,7 @@ def parse_query(query, ilogger):
         try:
             query_search = ' '.join(args[1:])
             ilogger.info("Queued Youtube search: {}".format(query_search))
-            return get_ytvideos(query_search, ilogger)
+            return get_ytvideos(query_search)
         except Exception as e:
             logger.exception(e)
             ilogger.error("Could not queue YouTube search")
@@ -235,60 +236,71 @@ def parse_query(query, ilogger):
 
     if ytdiscoveryapi is not None:
         ilogger.info("Queued YouTube search: {}".format(query))
-        return get_ytvideos(query, ilogger)
+        return get_ytvideos(query)
     else:
         ilogger.error("Host does not support YouTube".format(query))
         return []
 
 
-def get_ytvideos(query, ilogger):
+def get_ytvideos_from_list(queries):
     """
     Gets either a list of videos from a playlist or a single video, using the
     first result of a YouTube search
 
     Args:
-        query (str): The YouTube search query
-        ilogger (logging.logger): The logger to log API calls to
+        queries (list): A list of queries to make
 
     Returns:
         queue (list): The items obtained from the YouTube search
     """
 
     queue = []
-    querylist = []
-    #--------Spotify Patch--------
-    if isinstance(query, list) == True:
-        querylist = query
-    else:
-        querylist.append(query)
-    for tracks in querylist:
-    #--------Spotify Patch--------
+    for query in queries:
+        results = get_ytvideos(query)
+        if len(results) > 0:
+            queue.append(results[0])
+
+    return queue
+
+
+def get_ytvideos(query):
+    """
+    Gets either a list of videos from a playlist or a single video, using the
+    first result of a YouTube search
+
+    Args:
+        query (str): The YouTube search query
+
+    Returns:
+        queue (list): The items obtained from the YouTube search
+    """
+
+    queue = []
     # Search YouTube
-        search_result = ytdiscoveryapi.search().list(
-                q=tracks,
-                part="id,snippet",
-                maxResults=1,
-                type="video,playlist"
-        ).execute()
+    search_result = ytdiscoveryapi.search().list(
+            q=query,
+            part="id,snippet",
+            maxResults=1,
+            type="video,playlist"
+    ).execute()
 
-        if not search_result["items"]:
-            return []
+    if not search_result["items"]:
+        return []
 
-        # Get video/playlist title
-        title = search_result["items"][0]["snippet"]["title"]
-        ilogger.info("Queueing {}".format(title))
+    # Get video/playlist title
+    title = search_result["items"][0]["snippet"]["title"]
 
-        # Queue video if video
-        if search_result["items"][0]["id"]["kind"] == "youtube#video":
-            # Get ID of video
-            videoid = search_result["items"][0]["id"]["videoId"]
+    # Queue video if video
+    if search_result["items"][0]["id"]["kind"] == "youtube#video":
+        # Get ID of video
+        videoid = search_result["items"][0]["id"]["videoId"]
 
-            # Append video to queue
-            queue.append(["https://www.youtube.com/watch?v={}".format(videoid), title])
+        # Append video to queue
+        queue.append(["https://www.youtube.com/watch?v={}".format(videoid), title])
 
-        # Queue playlist if playlist
-        elif search_result["items"][0]["id"]["kind"] == "youtube#playlist":
-            queue = get_queue_from_playlist(search_result["items"][0]["id"]["playlistId"])
+    # Queue playlist if playlist
+    elif search_result["items"][0]["id"]["kind"] == "youtube#playlist":
+        queue = get_queue_from_playlist(search_result["items"][0]["id"]["playlistId"])
     return queue
 
 
