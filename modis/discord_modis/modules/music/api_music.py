@@ -1,9 +1,7 @@
 import logging
-import xml.etree.ElementTree as ElementTree
 from urllib.parse import urlparse
 
 import googleapiclient.discovery
-import requests
 import soundcloud
 import spotipy
 from soundcloud.resource import Resource, ResourceList
