@@ -60,7 +60,6 @@ def get_py(filenames):
     return imports
 
 
-# TODO implement getting filepaths I'm too tired to do it atm
 def get_file(filenames):
     """Get a dictionary with file paths organised by file name.
 
@@ -79,12 +78,10 @@ def get_file(filenames):
     # Get paths for each file
     for module_name in get_modules():
         for file in os.listdir("{}/{}".format(config.MODULES_DIR, module_name)):
-            file = file[:-3]
             if file not in filenames:
                 # Requested file does not exist in module
                 continue
-            import_name = ".modules.{}.{}".format(module_name, file)
-            imported_file = importlib.import_module(import_name, "modis")
-            files[file].append(imported_file)
+            file_path = "{}/{}/{}".format(config.MODULES_DIR, module_name, file)
+            files[file].append(file_path)
 
     return files

@@ -154,26 +154,69 @@ class Frame(tk.Frame):
             super(Frame.ModuleFrame, self).__init__(parent, padding=8)
 
             # Add elements
-            self.help_frame = ttk.LabelFrame(self, padding=8, text="Help")
-
-            # Find the help path
-            _dir = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-            help_path = "{}/modules/{}/{}".format(_dir, module_name, "help.json")
-            if os.path.isfile(help_path):
-                # Load the text
-                help.add_help_text(self.help_frame, help_path)
-            else:
-                # Default message
-                tk.Label(self.help_frame, text="No help.json file found for '{}'".format(module_name)).grid(row=0, column=0, sticky="W E N S")
+            help_frame = ttk.LabelFrame(self, padding=8, text="Help")
+            self.add_help_text(help_frame, module_name)
 
             # Grid elements
             if module_ui is not None:
                 module_ui.ModuleUIFrame(self).grid(row=0, column=0, sticky="W E N S")
-                self.help_frame.grid(row=1, column=0, sticky="W E N S")
+            help_frame.grid(row=1, column=0, sticky="W E N S")
 
             # Configure stretch ratios
-                self.help_frame.columnconfigure(0, weight=1)
-                self.help_frame.rowconfigure(0, weight=1)
+            help_frame.columnconfigure(0, weight=1)
+            help_frame.rowconfigure(0, weight=1)
 
             self.columnconfigure(0, weight=1)
             self.rowconfigure(1, weight=1)
+
+        def add_help_text(self, parent, module_name, prefix="!"):
+            """Load help text from a file and add it to the parent.
+
+            Args:
+                parent: A tk or ttk object.
+                module_name (str): The module to load help text from.
+                prefix (str): The prefix to use for commands.
+            """
+
+            import tkinter as tk
+            import tkinter.ttk as ttk
+
+            # Add elements
+            text = tk.Text(parent, wrap='word', font=("Helvetica", 10))
+            text.tag_config("heading", font=("Helvetica", 14))
+            text.tag_config("command", font=("Courier", 10))
+            text.tag_config("param", font=("Courier", 10))
+            text.tag_config("desc")
+            help_contents = help.get_help_data(module_name)
+            for d in help_contents:
+                text.insert('end', d + '\n', "heading")
+
+                if "commands" not in d.lower():
+                    text.insert('end', help_contents[d] + '\n\n', "desc")
+                    continue
+
+                for c in help_contents[d]:
+                    if "name" not in c:
+                        continue
+
+                    command = prefix + c["name"]
+                    text.insert('end', command, ("command", "desc"))
+                    if "params" in c:
+                        for param in c["params"]:
+                            text.insert('end', " [{}]".format(param), ("param", "desc"))
+                    text.insert('end', ": ")
+                    if "desc" in c:
+                        text.insert('end', c["desc"], "desc")
+
+                    text.insert('end', '\n')
+
+                text.insert('end', '\n')
+
+            yscrollbar = ttk.Scrollbar(parent, orient="vertical", command=text.yview)
+            text['yscrollcommand'] = yscrollbar.set
+
+            # Grid elements
+            text.grid(row=0, column=0, sticky="W E N S")
+            yscrollbar.grid(column=1, row=0, sticky="N S")
+
+            text.config(state=tk.DISABLED)
