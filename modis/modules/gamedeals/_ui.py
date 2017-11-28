@@ -51,7 +51,7 @@ class ModuleUIFrame(ttk.Frame):
         if "reddit_api_client_secret" in data.cache["keys"]:
             self.reddit_api_client_secret.set(data.cache["keys"]["reddit_api_client_secret"])
 
-    # TODO fix this
+    # TODO fix this thing
     def update_keys(self):
         """Updates the Google API key with the text value"""
         # from ...main import add_api_key

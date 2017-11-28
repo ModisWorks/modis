@@ -44,7 +44,7 @@ class ModuleUIFrame(ttk.Frame):
         if "soundcloud_client_id" in data.cache["keys"]:
             self.soundcloud_client_id.set(data.cache["keys"]["soundcloud_client_id"])
 
-    # TODO fix this
+    # TODO fix this thing
     def update_keys(self):
         """Updates the Google API key with the text value"""
         # from ...main import add_api_key
