@@ -20,15 +20,18 @@ client = None
 def start(loop):
     """Start the Discord client and log Modis into Discord."""
 
+    logger.info("----------------NEW INSTANCE----------------")
+
     import discord
     import asyncio
 
-    from modis.tools import config
-    from modis.tools import data
-    from modis.tools import moduledb
+    from modis.tools import config, data, moduledb, version
 
     # Update data.json cache
     data.get()
+
+    # Check the current version
+    logger.info(version.get_str())
 
     # Create client
     logger.debug("Creating Discord client")

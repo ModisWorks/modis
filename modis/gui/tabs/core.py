@@ -113,16 +113,14 @@ class Frame(tk.Frame):
             log_panel.tag_config('DEBUG', foreground="dark grey")
 
             # Vertical scrollbar
-            scrollbar = ttk.Scrollbar(self, orient="vertical",
-                                      command=log_panel.yview)
-            scrollbar.grid(column=1, row=0, sticky="N S")
-            log_panel['yscrollcommand'] = scrollbar.set
+            yscrollbar = ttk.Scrollbar(self, orient="vertical", command=log_panel.yview)
+            yscrollbar.grid(column=1, row=0, sticky="N S")
+            log_panel['yscrollcommand'] = yscrollbar.set
 
             # Horizontal scrollbar
-            scrollbar = ttk.Scrollbar(self, orient="horizontal",
-                                      command=log_panel.xview)
-            scrollbar.grid(column=0, row=1, sticky="W E")
-            log_panel['xscrollcommand'] = scrollbar.set
+            xscrollbar = ttk.Scrollbar(self, orient="horizontal", command=log_panel.xview)
+            xscrollbar.grid(column=0, row=1, sticky="W E")
+            log_panel['xscrollcommand'] = xscrollbar.set
 
             # Add log panel as a handler to root logger
             # Get logger

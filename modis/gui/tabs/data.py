@@ -47,17 +47,17 @@ class Frame(tk.Frame):
             self.update()
 
             # Vertical scrollbar
-            scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
-            self.tree['yscrollcommand'] = scrollbar.set
+            yscrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+            self.tree['yscrollcommand'] = yscrollbar.set
 
             # Horizontal scrollbar
-            scrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
-            self.tree['xscrollcommand'] = scrollbar.set
+            xscrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
+            self.tree['xscrollcommand'] = xscrollbar.set
 
             # Grid elements
             self.tree.grid(column=0, row=0, sticky="W E N S")
-            scrollbar.grid(column=1, row=0, sticky="N S")
-            scrollbar.grid(column=0, row=1, sticky="W E")
+            yscrollbar.grid(column=1, row=0, sticky="N S")
+            xscrollbar.grid(column=0, row=1, sticky="W E")
 
             # Configure stretch ratios
             self.columnconfigure(0, weight=1)

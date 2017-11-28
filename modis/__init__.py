@@ -11,14 +11,15 @@ developers will be more than happy to help you.
 Have fun!
 """
 
+# Update data.json cache
+from modis.tools import data
+data.get()
+
 
 def cmd(data_dir=None):
     """Start Modis in command line."""
 
-    # Update data
-    from modis.tools import data
-    data.get()
-
+    # TODO switch to configtools
     # Set the data dir to the one provided
     if data_dir:
         set_dir(data_dir)
@@ -30,15 +31,9 @@ def cmd(data_dir=None):
     log.init_print(logger)
     log.init_file(logger)
 
-    logger.info("----------------NEW INSTANCE----------------")
-
     # Import packages
     import asyncio
     from modis import main
-    from modis.tools import version
-
-    # Check the current version
-    logger.info(version.get_str())
 
     # Start Modis for command line
     logger.info("Starting Modis")
@@ -50,10 +45,7 @@ def cmd(data_dir=None):
 def gui(data_dir=None):
     """Start Modis with GUI."""
 
-    # Update data
-    from modis.tools import data
-    data.get()
-
+    # TODO switch to configtools
     # Set the data dir to the one provided
     if data_dir:
         set_dir(data_dir)
@@ -65,16 +57,10 @@ def gui(data_dir=None):
     log.init_print(logger)
     log.init_file(logger)
 
-    logger.info("----------------NEW INSTANCE----------------")
-
     # Import packages
-    import os
     import tkinter as tk
     from modis.gui import window
-    from modis.tools import version
-
-    # Check the current version
-    logger.info(version.get_str())
+    from modis.tools import config
 
     # Start Modis for GUI
     logger.info("Starting GUI")
@@ -84,8 +70,7 @@ def gui(data_dir=None):
     root.minsize(width=800, height=400)
     root.geometry("800x600")
     root.title("Modis Control Panel")
-    file_dir = os.path.dirname(os.path.realpath(__file__))
-    root.iconbitmap(r"{}/assets/modis.ico".format(file_dir))
+    root.iconbitmap(r"{}/assets/modis.ico".format(config.ROOT_DIR))
 
     # Setup the notebook
     main = window.RootFrame(root)
