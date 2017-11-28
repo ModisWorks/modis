@@ -1,6 +1,6 @@
-from collections import OrderedDict
 import json
 import logging
+from collections import OrderedDict
 
 from modis.tools import config
 
@@ -8,10 +8,10 @@ logger = logging.getLogger(__name__)
 
 
 def get(module_name):
-    """Gets a dict from a help.json
+    """Get a dict from a _help.json
 
     Args:
-        module_name (str): The name of the module to get help.json for.
+        module_name (str): The name of the module to get help for.
 
     Returns:
         data (OrderedDict): The dict of the help.json
@@ -29,24 +29,23 @@ def get(module_name):
         return {}
 
 
-def get_datapack(filepath, prefix="!"):
-    """
-    Load help text from a file and give it as datapacks
+def get_formatted(module_name, prefix="!"):
+    """Load help text from a _help.json and format into datapacks.
 
     Args:
-        filepath (str): The file to load help text from
-        prefix (str): The prefix to use for commands
+        module_name (str): The name of the module to get help for.
+        prefix (str): The prefix to use for commands.
 
     Returns:
-        datapacks (list): The datapacks from the file
+        datapacks (list): The formatted data.
     """
 
-    help_contents = get(filepath)
+    help_contents = get(module_name)
 
     datapacks = []
 
     # Add the content
-    for d in help_contents:
+    for d in help_contents.keys():
         heading = d
         content = ""
 

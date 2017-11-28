@@ -25,19 +25,15 @@ def add_md(text, s, level=0):
 
 # Get module
 module_name = input("Module name: ")
-module_help_path = "{}/{}/{}".format(config.MODULES_DIR, module_name, "help.json")
+module_help_path = "{}/{}/{}".format(config.MODULES_DIR, module_name, "_help.json")
 
 # Get help data
-if os.path.isfile(module_help_path):
-    datapacks = help.get_datapack(module_help_path, "!")
+datapacks = help.get_formatted(module_name, "!")
+if datapacks:
     moduledoc = add_md(moduledoc, module_name, 1)
-
     for d in datapacks:
         moduledoc = add_md(moduledoc, d[0], 2)
         moduledoc = add_md(moduledoc, d[1])
-else:
-    print(module_help_path, "is not a file")
-
-newreadme_path = "{}/{}.md".format(config.ROOT_DIR, module_name)
-with open(newreadme_path, 'w') as file:
-    file.write(moduledoc)
+    newreadme_path = "{}/../{}.md".format(config.ROOT_DIR, module_name)
+    with open(newreadme_path, 'w') as file:
+        file.write(moduledoc)

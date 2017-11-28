@@ -16,7 +16,7 @@ There are currently 10 available modules:
 - `bethebot` - Modis can't really have conversations with your server members, but you can fake it by taking control!
 - `gamedeals` - Posts current hot posts above an upvote threshold of a particular subreddit. It's set to /r/gamedeals by default so you can make sure you don't miss any sales!
 - `help` - Modis is a big bot, so this module helps to alleviate the learning cliff by allowing easy access to command definitions inside Discord.
-- `hex` - Displays hex colours if it sees them in your messages. Handy for graphic designers and programmers.
+- `hex` - Visually displays hex colours if it sees them in your messages. Handy for graphic designers and programmers.
 - `manager` - Provides essential server management tools for server owners, such as activating and deactivating modules, changing the command prefix, and various moderation tools.
 - `music` - Modis' flagship module - a music player featuring a live-updating GUI with a progress bar, queue display, and more. The GUI also has working media buttons for easy control without needing to know any commands. The player supports songs and playlists for YouTube, Spotify, and SoundCloud, and can play most online audio sources.
 - `replies` - Allows server owners to easily set the bot to reply to specific phrases.
