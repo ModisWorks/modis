@@ -126,5 +126,6 @@
   ],
   "Documentation": "To see all commands, go to the Music Module Documentation at https://infraxion.github.io/modis/documentation/modules/music/",
   "About": "music plays videos and playlists from YouTube, and music files stored on the internet.",
-  "Creators": "Infraxion and YtnomSnrub"
+  "Creators": "Infraxion and YtnomSnrub",
+  "Contributors": "- Disputes: Support for playback from Spotify"
 }
