@@ -126,5 +126,6 @@
   ],
   "Documentation": "To see all commands, go to the Music Module Documentation at https://infraxion.github.io/modis/documentation/modules/music/",
   "About": "Modis' flagship module - a music player featuring a live-updating GUI with a progress bar, queue display, and more. The GUI also has working media buttons for easy control without needing to know any commands. The player supports songs and playlists for YouTube, Spotify, and SoundCloud, and can play most online audio sources.",
-  "Creators": "Infraxion and YtnomSnrub"
+  "Creators": "Infraxion and YtnomSnrub",
+  "Contributors": "Disputes: Support for playback from Spotify"
 }

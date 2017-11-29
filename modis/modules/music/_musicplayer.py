@@ -1117,7 +1117,8 @@ class MusicPlayer:
                 self.nowplayingsourcelog.info(api_music.parse_source(info))
 
                 play_state = "Streaming" if self.is_live else "Playing"
-                await self.set_topic("{} {}".format(play_state, info["title"]))
+                topic_text = "{} {}".format(play_state, info["title"])
+                await self.set_topic(topic_text)
                 self.statuslog.debug(play_state)
         except Exception as e:
             logger.exception(e)
@@ -1140,7 +1141,9 @@ class MusicPlayer:
         self.nowplayingsourcelog.info(api_music.parse_source(info))
 
         play_state = "Streaming" if self.is_live else "Playing"
-        await self.set_topic("{} {}".format(play_state, self.streamer.title))
+        topic_text = "{} {}".format(play_state, info["title"])
+        logger.debug(topic_text)
+        await self.set_topic(topic_text)
         self.statuslog.debug(play_state)
 
     async def setup_streamer(self):
