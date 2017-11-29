@@ -1,7 +1,5 @@
 from modis.tools import embed
 
-from . import _data
-
 
 def success(channel, title, datapacks):
     """
@@ -21,7 +19,7 @@ def success(channel, title, datapacks):
         channel,
         title,
         "",
-        modulename=_data.modulename,
+        modulename="help",
         datapacks=datapacks
     )
 
@@ -45,7 +43,7 @@ def http_exception(channel, title):
         channel,
         "Too much help",
         "{} is too helpful! Try trimming some of the help messages.".format(title),
-        modulename=_data.modulename
+        modulename="help"
     )
 
     return gui

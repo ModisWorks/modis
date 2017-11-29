@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 # def get(module_name):
-#     """Get a dict from a _help.json
+#     """Get a dict from a __info.py
 #
 #     Args:
 #         module_name (str): The name of the module to get help for.
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_formatted(module_name, prefix="!"):
-    """Load help text from a _help.json and format into datapacks.
+    """Load help text from a __info.py and format into datapacks.
 
     Args:
         module_name (str): The name of the module to get help for.
@@ -38,7 +38,7 @@ def get_formatted(module_name, prefix="!"):
     help_contents = {}
     datapacks = []
 
-    info = moduledb.get_import_specific("!info", module_name)
+    info = moduledb.get_import_specific("__info", module_name)
     if not info:
         pass
     if not info.HELP_DATAPACKS:

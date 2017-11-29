@@ -3,7 +3,7 @@ import discord
 
 from modis import main
 from modis.tools import data
-from . import _data, api_manager, ui_embed
+from . import api_manager, ui_embed
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +68,7 @@ async def on_message(message):
                 try:
                     warn_max = int(arg)
                     if warn_max > 0:
-                        data.cache["servers"][server.id][_data.modulename]["warnings_max"] = warn_max
+                        data.cache["servers"][server.id]["manager"]["warnings_max"] = warn_max
                         data.write()
                         await main.client.send_typing(channel)
                         embed = ui_embed.warning_max_changed(channel, warn_max)

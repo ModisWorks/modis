@@ -6,7 +6,7 @@ import discord
 from modis import main
 from modis.tools import data
 
-from . import _data, ui_embed
+from . import ui_embed
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ async def activate_module(channel, module_name, activate):
         module_data = importlib.import_module(import_name, "modis")
 
         # Don't try and deactivate this module (not that it would do anything)
-        if module_data.modulename == _data.modulename:
+        if module_data.modulename == "manager":
             await main.client.send_typing(channel)
             embed = ui_embed.error(channel, "Error", "I'm sorry, Dave. I'm afraid I can't do that.")
             await embed.send()
@@ -81,20 +81,20 @@ async def warn_user(channel, user):
 
     server_id = channel.server.id
 
-    if "warnings_max" not in data.cache["servers"][server_id][_data.modulename]:
-        data.cache["servers"][server_id][_data.modulename]["warnings_max"] = 3
-    if "warnings" not in data.cache["servers"][server_id][_data.modulename]:
-        data.cache["servers"][server_id][_data.modulename]["warnings"] = {}
+    if "warnings_max" not in data.cache["servers"][server_id]["manager"]:
+        data.cache["servers"][server_id]["manager"]["warnings_max"] = 3
+    if "warnings" not in data.cache["servers"][server_id]["manager"]:
+        data.cache["servers"][server_id]["manager"]["warnings"] = {}
 
-    if user.id in data.cache["servers"][server_id][_data.modulename]["warnings"]:
-        data.cache["servers"][server_id][_data.modulename]["warnings"][user.id] += 1
+    if user.id in data.cache["servers"][server_id]["manager"]["warnings"]:
+        data.cache["servers"][server_id]["manager"]["warnings"][user.id] += 1
     else:
-        data.cache["servers"][server_id][_data.modulename]["warnings"][user.id] = 1
+        data.cache["servers"][server_id]["manager"]["warnings"][user.id] = 1
 
     data.write()
 
-    warnings = data.cache["servers"][server_id][_data.modulename]["warnings"][user.id]
-    max_warnings = data.cache["servers"][server_id][_data.modulename]["warnings_max"]
+    warnings = data.cache["servers"][server_id]["manager"]["warnings"][user.id]
+    max_warnings = data.cache["servers"][server_id]["manager"]["warnings_max"]
 
     await main.client.send_typing(channel)
     embed = ui_embed.user_warning(channel, user, warnings, max_warnings)
@@ -124,9 +124,9 @@ async def ban_user(channel, user):
         return
 
     # Set the user's warnings to 0
-    if "warnings" in data.cache["servers"][server_id][_data.modulename]:
-        if user.id in data.cache["servers"][server_id][_data.modulename]["warnings"]:
-            data.cache["servers"][server_id][_data.modulename]["warnings"][user.id] = 0
+    if "warnings" in data.cache["servers"][server_id]["manager"]:
+        if user.id in data.cache["servers"][server_id]["manager"]["warnings"]:
+            data.cache["servers"][server_id]["manager"]["warnings"][user.id] = 0
             data.write()
 
     await main.client.send_typing(channel)

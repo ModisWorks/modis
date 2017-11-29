@@ -1,7 +1,5 @@
 from modis.tools import embed
 
-from . import _data
-
 
 def success(channel, post):
     """Creates an embed UI containing the Reddit posts
@@ -22,7 +20,7 @@ def success(channel, post):
         channel,
         "Link",
         post[1],
-        modulename=_data.modulename,
+        modulename="gamedeals",
         colour=0xFF8800,
         thumbnail=post[1],
         datapacks=datapacks
@@ -45,7 +43,7 @@ def no_results(channel):
         channel,
         "No results",
         ":c",
-        modulename=_data.modulename,
+        modulename="gamedeals",
         colour=0xFF8800
     )
 

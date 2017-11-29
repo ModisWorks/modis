@@ -80,7 +80,7 @@ readme = add_md(readme, "There are currently {} available modules:".format(len(m
 
 module_list = []
 for module_name in module_names:
-    info = moduledb.get_import_specific("!info", module_name)
+    info = moduledb.get_import_specific("__info", module_name)
     if not info:
         module_list.append("`{}`".format(module_name))
         continue

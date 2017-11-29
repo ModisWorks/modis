@@ -9,6 +9,8 @@ COMMANDS = {
         "level": 0
     }
 }
+DATA_SERVER = {}
+DATA_GLOBAL = {}
 
 HELP_DATAPACKS = {
     "Commands": [{
@@ -17,5 +19,4 @@ HELP_DATAPACKS = {
         "description": "Displays a block image from the hex value given"
     }]
 }
-
 HELP_MARKDOWN = """"""

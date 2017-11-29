@@ -9,6 +9,8 @@ COMMANDS = {
         "level": 0
     }
 }
+DATA_SERVER = {}
+DATA_GLOBAL = {}
 
 HELP_DATAPACKS = {
     "Commands": [{
@@ -16,5 +18,4 @@ HELP_DATAPACKS = {
         "description": "Gets the top game deals from Reddit"
     }]
 }
-
 HELP_MARKDOWN = """"""

@@ -24,6 +24,8 @@ COMMANDS = {
         "level": 0
     }
 }
+DATA_SERVER = {}
+DATA_GLOBAL = {}
 
 HELP_DATAPACKS = {
     "Commands": [{
@@ -52,5 +54,4 @@ HELP_DATAPACKS = {
         "description": "Updates the prefix for the server"
     }]
 }
-
 HELP_MARKDOWN = """"""

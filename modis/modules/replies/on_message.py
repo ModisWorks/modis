@@ -1,8 +1,6 @@
 from modis import main
 from modis.tools import data
 
-from . import _data
-
 
 async def on_message(message):
     """The on_message event handler for this module
@@ -24,8 +22,8 @@ async def on_message(message):
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Retrieve replies from server data
-        normal_replies = data.cache["servers"][server.id][_data.modulename]["normal"]
-        tts_replies = data.cache["servers"][server.id][_data.modulename]["tts"]
+        normal_replies = data.cache["servers"][server.id]["replies"]["normal"]
+        tts_replies = data.cache["servers"][server.id]["replies"]["tts"]
 
         # Check normal replies
         for r in normal_replies.keys():

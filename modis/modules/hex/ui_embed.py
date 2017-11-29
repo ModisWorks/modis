@@ -1,6 +1,5 @@
 from modis.tools import embed
 
-from . import _data
 
 def success(channel, image, hex_str):
     """
@@ -22,7 +21,7 @@ def success(channel, image, hex_str):
         channel,
         "",
         "#{}".format(hex_str),
-        modulename=_data.modulename,
+        modulename="hex",
         colour=hex_number,
         thumbnail=image,
     )
@@ -46,7 +45,7 @@ def fail_api(channel):
         "Invalid value",
         "Hex values must be 3 or 6 characters long, " +
         "and must start with '#' or '0x'.",
-        modulename=_data.modulename,
+        modulename="hex",
         colour=0x555555,
     )
 

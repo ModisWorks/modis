@@ -1,7 +1,6 @@
 import discord
 
 from modis.tools import embed
-from . import _data
 
 
 def modify_module(channel, module_name, module_state):
@@ -22,7 +21,7 @@ def modify_module(channel, module_name, module_state):
         channel,
         "{} updated".format(module_name),
         "{} is now {}".format(module_name, "activated" if module_state else "deactivated"),
-        modulename=_data.modulename
+        modulename="manager"
     )
 
     return gui
@@ -45,7 +44,7 @@ def modify_prefix(channel, new_prefix):
         channel,
         "Prefix updated",
         "Modis prefix is now `{}`".format(new_prefix),
-        modulename=_data.modulename
+        modulename="manager"
     )
 
     return gui
@@ -81,7 +80,7 @@ def user_warning(channel, user, warnings, max_warnings):
         channel,
         "Warning {}".format(username),
         "You now have {} {}, {}".format(warning_text, username, result_text),
-        modulename=_data.modulename
+        modulename="manager"
     )
 
     return gui
@@ -109,7 +108,7 @@ def user_ban(channel, user):
         channel,
         "Banned {}".format(username),
         "{} has been banned from this server".format(username),
-        modulename=_data.modulename
+        modulename="manager"
     )
 
     return gui
@@ -133,7 +132,7 @@ def warning_max_changed(channel, max_warnings):
         "Maximum Warnings Changed",
         "Users must now have {} warnings to be banned "
         "(this won't ban existing users with warnings)".format(max_warnings),
-        modulename=_data.modulename
+        modulename="manager"
     )
 
     return gui
@@ -157,7 +156,7 @@ def error(channel, title, description):
         channel,
         title,
         description,
-        modulename=_data.modulename
+        modulename="manager"
     )
 
     return gui
