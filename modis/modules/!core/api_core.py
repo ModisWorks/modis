@@ -62,6 +62,6 @@ def cmd_db_update():
 
     logger.debug("Updating command database")
 
-    cmd_event_handlers = moduledb.get_py(["commands"])["commands"]
+    cmd_event_handlers = moduledb.get_imports(["commands"])["commands"]
 
     _data.cmd_db = cmd_event_handlers

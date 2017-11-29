@@ -2,10 +2,7 @@ NAME = "help"
 CONTRIBUTORS = {
     "@YtnomSnrub": "Original module"
 }
-BLURB = """
-Modis is a big bot, so this module helps to alleviate the learning cliff by 
-allowing easy access to command definitions inside Discord.
-"""
+BLURB = "Modis is a big bot, so this module helps to alleviate the learning cliff by allowing easy access to command definitions inside Discord."
 
 COMMANDS = {
     "help": {

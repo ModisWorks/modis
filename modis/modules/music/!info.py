@@ -4,13 +4,7 @@ CONTRIBUTORS = {
     "@YtnomSnrub": "Extended playback controls, GUI enhancements, SoundCloud support, stability",
     "@Disputes": "Spotify support"
 }
-BLURB = """
-Modis' flagship module - a music player featuring a live-updating GUI with a 
-progress bar, queue display, and more. The GUI also has working media buttons 
-for easy control without needing to know any commands. The player supports 
-songs and playlists for YouTube, Spotify, and SoundCloud, and can play most 
-online audio sources.
-"""
+BLURB = "Modis' flagship module - a music player featuring a live-updating GUI with a progress bar, queue display, and more. The GUI also has working media buttons for easy control without needing to know any commands. The player supports songs and playlists for YouTube, Spotify, and SoundCloud, and can play most online audio sources."
 
 COMMANDS = {
     "play": {

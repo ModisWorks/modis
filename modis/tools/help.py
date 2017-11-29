@@ -1,32 +1,27 @@
-import json
 import logging
-from collections import OrderedDict
 
-from modis.tools import config
+from modis.tools import moduledb
 
 logger = logging.getLogger(__name__)
 
 
-def get(module_name):
-    """Get a dict from a _help.json
-
-    Args:
-        module_name (str): The name of the module to get help for.
-
-    Returns:
-        data (OrderedDict): The dict of the help.json
-    """
-
-    try:
-        with open("{}/{}/_help.json".format(config.MODULES_DIR, module_name), 'r') as file:
-            return json.load(file, object_pairs_hook=OrderedDict)
-    except FileNotFoundError:
-        logger.warning("No help data for " + module_name)
-        return {}
-    except Exception as e:
-        logger.error("Could not load file for " + module_name)
-        logger.exception(e)
-        return {}
+# def get(module_name):
+#     """Get a dict from a _help.json
+#
+#     Args:
+#         module_name (str): The name of the module to get help for.
+#
+#     Returns:
+#         data (OrderedDict): The dict of the help.json
+#     """
+#
+#     info = moduledb.get_import_specific("!info", module_name)
+#
+#     if not info:
+#         return {}
+#     if not info.HELP_DATAPACKS:
+#         return {}
+#     return info.HELP_DATAPACKS
 
 
 def get_formatted(module_name, prefix="!"):
@@ -40,9 +35,16 @@ def get_formatted(module_name, prefix="!"):
         datapacks (list): The formatted data.
     """
 
-    help_contents = get(module_name)
-
+    help_contents = {}
     datapacks = []
+
+    info = moduledb.get_import_specific("!info", module_name)
+    if not info:
+        pass
+    if not info.HELP_DATAPACKS:
+        pass
+    else:
+        help_contents = info.HELP_DATAPACKS
 
     # Add the content
     for d in help_contents.keys():

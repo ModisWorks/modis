@@ -2,12 +2,10 @@ NAME = "tableflip"
 CONTRIBUTORS = {
     "@Infraxion": "Original module"
 }
-BLURB = """
-The best module.
-"""
+BLURB = "The best module."
 
 COMMANDS = {}
 
-COMMANDS_HELP = {}
+HELP_DATAPACKS = {}
 
-CUSTOM_HELP = """"""
+HELP_MARKDOWN = """"""

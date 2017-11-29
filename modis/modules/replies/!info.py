@@ -2,12 +2,10 @@ NAME = "replies"
 CONTRIBUTORS = {
     "@Infraxion": "Original module"
 }
-BLURB = """Allows server owners to easily set the bot to reply to specific 
-phrases.
-"""
+BLURB = "Allows server owners to easily set the bot to reply to specific phrases."
 
 COMMANDS = {}
 
-COMMANDS_HELP = {}
+HELP_DATAPACKS = {}
 
-CUSTOM_HELP = """"""
+HELP_MARKDOWN = """"""

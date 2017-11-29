@@ -3,10 +3,7 @@ CONTRIBUTORS = {
     "@Infraxion": "Original module",
     "@YtnomSnrub": "PS4 & XBox support"
 }
-BLURB = """
-Looks up your Rocket League rank and stats; currently supported for Steam, 
-XBox, and PS4 players.
-"""
+BLURB = "Looks up your Rocket League rank and stats; currently supported for Steam, XBox, and PS4 players."
 
 COMMANDS = {
     "rlstats": {

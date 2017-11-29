@@ -1,11 +1,9 @@
 NAME = "core"
 CONTRIBUTORS = {
-    "@YtnomSnrub": "Original module"
+    "@YtnomSnrub": "Original module",
+    "@Infraxion": "Commands and permissions API"
 }
-BLURB = """
-Manages all the behind the scenes stuff that runs the internal APIs the 
-modules use.
-"""
+BLURB = "Manages all the behind the scenes stuff that runs the internal APIs the modules use."
 
 COMMANDS = {}
 

@@ -2,10 +2,7 @@ NAME = "hex"
 CONTRIBUTORS = {
     "@YtnomSnrub": "Original module"
 }
-BLURB = """
-Visually displays hex colours if it sees them in your messages. Handy for 
-graphic designers and programmers.
-"""
+BLURB = "Visually displays hex colours if it sees them in your messages. Handy for graphic designers and programmers."
 
 COMMANDS = {
     "hex": {

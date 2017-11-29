@@ -3,10 +3,7 @@ CONTRIBUTORS = {
     "@Infraxion": "Original module",
     "@YtnomSnrub": "Making the module actually work"
 }
-BLURB = """
-Modis can't really have conversations with your server members, but you can 
-fake it by taking control!
-"""
+BLURB = "Modis can't really have conversations with your server members, but you can fake it by taking control!"
 
 COMMANDS = {}
 

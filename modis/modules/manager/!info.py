@@ -2,11 +2,7 @@ NAME = "manager"
 CONTRIBUTORS = {
     "@YtnomSnrub": "Original module"
 }
-BLURB = """
-Provides essential server management tools for server owners, such as 
-activating and deactivating modules, changing the command prefix, and various 
-moderation tools.
-"""
+BLURB = "Provides essential server management tools for server owners, such as activating and deactivating modules, changing the command prefix, and various moderation tools."
 
 COMMANDS = {
     "activate": {

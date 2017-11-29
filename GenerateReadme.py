@@ -1,6 +1,6 @@
 """Generate a README.md file for Modis"""
 
-from modis.tools import config, moduledb, version, help
+from modis.tools import config, moduledb, version
 
 
 def add_md(text, s, level=0):
@@ -48,10 +48,7 @@ def add_ul(text, ul):
     return text
 
 
-# Init
 readme = ""
-module_names = moduledb.get_modules()
-module_files = moduledb.get_file(["_help.json"])["_help.json"]
 
 # Title
 readme = add_md(readme, "MODIS", 1)
@@ -77,17 +74,22 @@ readme = add_md(readme, "Modis is an highly modular, open-source Discord bot "
                         "procrastinate their deadline on. Have fun!")
 
 # Module list
+module_names = moduledb.get_names()
 readme = add_md(readme, "Current Modules", 2)
 readme = add_md(readme, "There are currently {} available modules:".format(len(module_names)))
+
 module_list = []
-for m in module_names:
-    datapack = help.get(m)
-    if "About" in datapack.keys():
-        info = "`{}` - {}".format(m, datapack["About"])
-    else:
-        info = "`{}`".format(m)
-    module_list.append(info)
-readme = add_ul(readme, [m for m in module_list])
+for module_name in module_names:
+    info = moduledb.get_import_specific("!info", module_name)
+    if not info:
+        module_list.append("`{}`".format(module_name))
+        continue
+    if not info.BLURB:
+        module_list.append("`{}`".format(module_name))
+        continue
+    module_list.append("`{}` - {}".format(module_name, info.BLURB))
+readme = add_ul(readme, module_list)
+
 readme = add_md(readme, "More detailed information about each module and how "
                         "to use them can be found in the [docs](https://"
                         "infraxion.github.io/modis/documentation/#modules).")
@@ -95,6 +97,5 @@ readme = add_md(readme, "More detailed information about each module and how "
 # Write file
 print(readme)
 newreadme_path = "{}/../README.md".format(config.ROOT_DIR)
-print(newreadme_path)
 with open(newreadme_path, 'w') as file:
     file.write(readme)
