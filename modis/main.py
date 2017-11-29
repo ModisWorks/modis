@@ -57,6 +57,8 @@ def start(loop):
     except Exception as e:
         logger.exception(e)
         logger.critical("Could not connect to Discord")
+        statuslog = logging.getLogger("globalstatus")
+        statuslog.info("0")
     else:
         logger.debug("Running the bot")
         try:
@@ -86,6 +88,8 @@ def start(loop):
                 logger.exception(e)
 
             logger.critical("Bot stopped\n")
+            statuslog = logging.getLogger("globalstatus")
+            statuslog.info("0")
             client.loop.close()
 
 

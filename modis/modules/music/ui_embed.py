@@ -36,7 +36,7 @@ def topic_update(channel, topic_channel):
             "Topic channel updated",
             channel_message,
             modulename="music",
-            colour=_data.modulecolor_info
+            colour=_data.MODULECOLOUR_INFO
     )
 
     return gui
@@ -61,7 +61,7 @@ def error_message(channel, err_title, err_message):
             err_title,
             err_message,
             modulename="music",
-            colour=_data.modulecolor_error
+            colour=_data.MODULECOLOUR_ERROR
     )
 
     return gui

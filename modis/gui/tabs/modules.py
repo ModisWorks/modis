@@ -187,7 +187,7 @@ class Frame(tk.Frame):
             text.tag_config("command", font=("Courier", 10))
             text.tag_config("param", font=("Courier", 10))
             text.tag_config("desc")
-            help_contents = help.get(module_name)
+            help_contents = help.get_raw(module_name)
             for d in help_contents:
                 text.insert('end', d + '\n', "heading")
 

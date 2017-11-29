@@ -67,36 +67,52 @@ class StatusBar(ttk.Frame):
 
         super(StatusBar, self).__init__(parent)
 
-        # Add element - label
+        # Add elements
         self.status = tk.StringVar()
-        self.statusbar = ttk.Label(self, textvariable=self.status, padding=2,
-                                   anchor="center")
+        self.statusbar = ttk.Label(self, textvariable=self.status, padding=2, anchor="center")
+        statuslog = logging.getLogger("globalstatus")
+        statuslog.setLevel("INFO")
+        statushandler = self.StatusLogHandler(self.statusbar, self.status)
+        statuslog.addHandler(statushandler)
+
+        # Grid elements
         self.statusbar.grid(column=0, row=0, sticky="W E")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
 
         # Set default status
-        self.set(0)
+        statuslog.info("0")
 
-    def set(self, status):
-        """Set the status.
+    class StatusLogHandler(logging.Handler):
+        def __init__(self, statusbar, stringvar):
+            """Update the global status via a log handler
 
-        Args:
-            status (int): 0-=offline, 1=starting, 2=online
-        """
+            Args:
+                statusbar (ttk.Label): The statusbar to manage
+                stringvar (tk.StringVar): The status text variable
+            """
 
-        text = ""
-        colour = "#FFFFFF"
-        if status == 0:
-            text = "OFFLINE"
-            colour = "#FF4444"
-        elif status == 1:
-            text = "STARTING"
-            colour = "#FFAA00"
-        elif status == 2:
-            text = "ONLINE"
-            colour = "#AAFF00"
+            logging.Handler.__init__(self)
 
-        self.status.set(text)
-        self.statusbar.config(background=colour)
+            self.statusbar = statusbar
+            self.stringvar = stringvar
+            self.text = ""
+            self.colour = "#FFFFFF"
+
+        def flush(self):
+            self.stringvar.set(self.text)
+            self.statusbar.config(background=self.colour)
+
+        def emit(self, record):
+            record = self.format(record)
+            if record == "0":
+                self.text = "OFFLINE"
+                self.colour = "#FF4444"
+            elif record == "1":
+                self.text = "STARTING"
+                self.colour = "#FFAA00"
+            elif record == "2":
+                self.text = "ONLINE"
+                self.colour = "#AAFF00"
+            self.flush()

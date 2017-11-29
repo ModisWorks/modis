@@ -5,23 +5,23 @@ from modis.tools import moduledb
 logger = logging.getLogger(__name__)
 
 
-# def get(module_name):
-#     """Get a dict from a __info.py
-#
-#     Args:
-#         module_name (str): The name of the module to get help for.
-#
-#     Returns:
-#         data (OrderedDict): The dict of the help.json
-#     """
-#
-#     info = moduledb.get_import_specific("!info", module_name)
-#
-#     if not info:
-#         return {}
-#     if not info.HELP_DATAPACKS:
-#         return {}
-#     return info.HELP_DATAPACKS
+def get_raw(module_name):
+    """Get a dict from a __info.py
+
+    Args:
+        module_name (str): The name of the module to get help for.
+
+    Returns:
+        data (OrderedDict): The dict of the help.json
+    """
+
+    info = moduledb.get_import_specific("__info", module_name)
+
+    if not info:
+        return {}
+    if not info.HELP_DATAPACKS:
+        return {}
+    return info.HELP_DATAPACKS
 
 
 def get_formatted(module_name, prefix="!"):

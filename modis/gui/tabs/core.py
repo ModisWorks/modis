@@ -70,6 +70,8 @@ class Frame(tk.Frame):
 
             # Start Modis
             logger.debug("Starting Modis")
+            statuslog = logging.getLogger("globalstatus")
+            statuslog.info("1")
             from modis import main
 
             loop = asyncio.new_event_loop()
@@ -86,6 +88,8 @@ class Frame(tk.Frame):
 
             # Stop Modis
             logger.info("Stopping Modis")
+            statuslog = logging.getLogger("globalstatus")
+            statuslog.info("0")
             from modis.main import client
             asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
 
