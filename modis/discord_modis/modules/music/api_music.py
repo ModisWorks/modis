@@ -188,7 +188,7 @@ def parse_query(query, ilogger):
                 return []
 
             query_type = query_type.replace('user', 'playlist')
-            spotify_tracks = get_sp_tracks(query_type, query_search)
+            spotify_tracks = get_sp_results(query_type, query_search)
             logger.debug("Queueing Yotube search: {}".format(spotify_tracks))
             ilogger.info("Queued Spotify {} URI: {}".format(query_type, query_search))
             return get_ytvideos_from_list(spotify_tracks)
@@ -254,16 +254,10 @@ def get_ytvideos_from_list(queries):
         queue (list): The items obtained from the YouTube search
     """
     queue = []
-    if isinstance(queries, str) == True:
-        results = get_ytvideos(queries)
+    for query in queries:
+        results = get_ytvideos(query)
         if len(results) > 0:
-            queue.append(results[0])
-    else:
-        for query in queries:
-            results = get_ytvideos(query)
-            if len(results) > 0:
-                queue.append(results[0])
-
+            queue.append(results[0])			
     return queue
 
 
@@ -401,45 +395,63 @@ def get_sc_tracks(result):
     return None
 
 #--------Spotify Patch--------
+def sp_nextpage(results, query_type, query):
+    while results['next']:
+        nextpage = spclient.next(results)
+        return get_sp_tracks(nextpage, query_type, query)
+    return (query)
 
-def get_sp_tracks(query_type, query_search):
+def get_sp_tracks(results, query_type, query):
+
     if query_type == 'track':
-        results = spclient.track(query_search) # looks up the URI on spotify
         song_name = results['name'] # gather the name of the song by looking for the tag ['name']
         song_artist = results['artists'][0]['name'] # same as before, might only return the first artist, unsure
-        query = ("{} by {}".format(song_name,song_artist)) # joins both results
-        return(query) # sends query back to parse_query
+        query.append = ("{} by {}".format(song_name,song_artist)) # joins both results
+
     elif query_type == 'artist':
-        listofsongs = []
-        results = spclient.artist_top_tracks(query_search)
         for tracks in results['tracks'][:10]: # finds all tracks in the album
              song_name = tracks['name']
              song_artist = tracks['artists'][0]['name']
-             query = ("{} by {}".format(song_name,song_artist))
-             listofsongs.append(query)
-        return(listofsongs)
+             song = ("{} by {}".format(song_name,song_artist))
+             query.append(song)
+        return sp_nextpage(results, query_type, query)
+
     elif query_type == 'album':
-        listofsongs = []
-        results = spclient.album_tracks(query_search)
         for tracks in results['items']: # finds all tracks in the album
              song_name = tracks['name']
              song_artist = tracks['artists'][0]['name']
-             query = ("{} by {}".format(song_name,song_artist))
-             listofsongs.append(query)
-        return(listofsongs)
+             song = ("{} by {}".format(song_name,song_artist))
+             query.append(song)
+        return sp_nextpage(results, query_type, query)
+
     elif query_type == 'playlist':
-        listofsongs = []
-        get_username = query_search.split(" ")[0]
-        get_playlist = query_search.split(" ")[2]
-        results = spclient.user_playlist_tracks(get_username, get_playlist)
         for tracks in results['items']: # finds all tracks in the album
              song_name = tracks['track']['name']
              song_artist = tracks['track']['artists'][0]['name']
-             query = ("{} by {}".format(song_name,song_artist))
-             listofsongs.append(query)
-        return(listofsongs)
+             song = ("{} by {}".format(song_name,song_artist))
+             query.append(song)
+        return sp_nextpage(results, query_type, query)
 
-    return []
+
+
+def get_sp_results(query_type, query_search):
+    query = []
+    if query_type == 'track':
+        results = spclient.track(query_search) 
+
+    elif query_type == 'artist':
+        results = spclient.artist_top_tracks(query_search)
+
+    elif query_type == 'album':
+        results = spclient.album_tracks(query_search)
+
+    elif query_type == 'playlist':
+        get_username = query_search.split(" ")[0]
+        get_playlist = query_search.split(" ")[2]
+        results = spclient.user_playlist_tracks(get_username, get_playlist)
+
+    return get_sp_tracks(results, query_type, query)
+
 
 #--------Spotify Patch--------
 
