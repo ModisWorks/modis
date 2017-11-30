@@ -253,12 +253,16 @@ def get_ytvideos_from_list(queries):
     Returns:
         queue (list): The items obtained from the YouTube search
     """
-
     queue = []
-    for query in queries:
-        results = get_ytvideos(query)
+    if isinstance(queries, str) == True:
+        results = get_ytvideos(queries)
         if len(results) > 0:
             queue.append(results[0])
+    else:
+        for query in queries:
+            results = get_ytvideos(query)
+            if len(results) > 0:
+                queue.append(results[0])
 
     return queue
 
