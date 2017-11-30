@@ -835,14 +835,17 @@ class MusicPlayer:
                 self.statuslog.error("Play index argument must be a number")
                 return
 
-        if not self.vready:
-            self.parse_query(query, indexnum, stop_current, shuffle)
-        else:
-            parse_thread = threading.Thread(
-                target=self.parse_query,
-                args=[query, indexnum, stop_current, shuffle])
-            # Run threads
-            parse_thread.start()
+        def song_found(song):
+            self._url_insert(song, indexnum, stop_current)
+
+        # parse_thread = threading.Thread(
+        #     target=self.parse_query,
+        #     args=[query, indexnum, stop_current, shuffle])
+        parse_thread = threading.Thread(
+            target=api_music.parse_query,
+            args=[query, self.statuslog, song_found, shuffle])
+        # Run threads
+        parse_thread.start()
 
     def parse_query(self, query, index, stop_current, shuffle):
         """
@@ -880,6 +883,36 @@ class MusicPlayer:
                     self.queue = self.queue[:index] + yt_videos + self.queue[index:]
                 else:
                     self.queue = yt_videos
+
+            self.update_queue()
+
+            if stop_current:
+                if self.streamer:
+                    self.streamer.stop()
+        except Exception as e:
+            logger.exception(e)
+
+    def _url_insert(self, song, index, stop_current):
+        if index is not None and len(self.queue) > 0:
+            if index < 0 or index >= len(self.queue):
+                if len(self.queue) == 1:
+                    self.statuslog.error("Play index must be 1 (1 song in queue)")
+                    return
+                else:
+                    self.statuslog.error("Play index must be between 1 and {}".format(len(self.queue)))
+                    return
+
+        if song is None:
+            return
+
+        try:
+            if index is None:
+                self.queue.append(song)
+            else:
+                if len(self.queue) > 0:
+                    self.queue = self.queue[:index] + [song] + self.queue[index:]
+                else:
+                    self.queue = [song]
 
             self.update_queue()
 
