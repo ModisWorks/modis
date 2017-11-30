@@ -406,8 +406,7 @@ def get_sp_tracks(results, query_type, query):
     if query_type == 'track':
         song_name = results['name'] # gather the name of the song by looking for the tag ['name']
         song_artist = results['artists'][0]['name'] # same as before, might only return the first artist, unsure
-        song = ("{} by {}".format(song_name,song_artist)) # joins both results
-        query = [song] # joins both results
+        query = ["{} by {}".format(song_name,song_artist)] # joins both results
         return (query)
     elif query_type == 'artist':
         for tracks in results['tracks'][:10]: # finds all tracks in the album
