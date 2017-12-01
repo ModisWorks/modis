@@ -275,7 +275,7 @@ def _func_list(song_func, songs, index, shuffle):
         func_index = None
         if index is not None:
             func_index = i + index
-        song_func(songs, func_index)
+        song_func(songs[i], func_index)
 
 
 def get_ytvideos_from_list(queries, song_func, index):
