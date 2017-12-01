@@ -46,7 +46,7 @@ async def on_message(message):
             if command in ['play', 'playnext', 'playnow', 'playshuffle', 'insert',
                            'pause', 'resume', 'skip', 'remove',
                            'rewind', 'restart', 'shuffle', 'volume',
-                           'stop', 'destroy', 'front', 'movehere',
+                           'stop', 'destroy', 'front', 'movehere', 'reconnect', 'movevoice',
                            'settopic', 'cleartopic', 'notopic', 'loop']:
                 try:
                     await client.delete_message(message)
@@ -120,3 +120,6 @@ async def on_message(message):
 
             elif command == 'front' or command == 'movehere':
                 await _data.cache[server.id].movehere(channel)
+
+            elif command == 'reconnect' or command == 'movevoice':
+                await _data.cache[server.id].movevoice(author)

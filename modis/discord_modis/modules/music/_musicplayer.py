@@ -620,6 +620,38 @@ class MusicPlayer:
 
         self.statuslog.info("Moved to front")
 
+    async def movevoice(self, author):
+        """
+        Moves the voice client to a new channel, based on the author's channel
+
+        Args:
+            author (discord.Member): The member to move to
+        """
+
+        if self.state != "ready":
+            self.logger.error("Attempt to move voice from wrong state")
+            return
+
+        self.logger.debug("movevoice command")
+
+        # Disconnect
+        if self.vclient:
+            try:
+                await self.vclient.disconnect()
+            except Exception as e:
+                logger.exception(e)
+
+        # Reconnect
+        self.vready = False
+        self.state = 'starting'
+        await self.vsetup(author)
+        if self.vready:
+            self.state = 'ready'
+            self.statuslog.info("Moved to new channel")
+
+            if self.streamer:
+                self.streamer.stop()
+
     async def set_topic_channel(self, channel):
         """Set the topic channel for this server"""
         data = datatools.get_data()
@@ -1037,9 +1069,12 @@ class MusicPlayer:
     def play_empty(self):
         """Play blank audio to let Discord know we're still here"""
         if self.vclient:
-            if self.streamer:
-                self.streamer.volume = 0
-            self.vclient.play_audio("\n".encode(), encode=False)
+            try:
+                if self.streamer:
+                    self.streamer.volume = 0
+                self.vclient.play_audio("\n".encode(), encode=False)
+            except:
+                pass
 
     def download_next_song(self, song):
         """Downloads the next song and starts playing it"""

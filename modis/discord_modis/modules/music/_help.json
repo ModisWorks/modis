@@ -120,8 +120,12 @@
       "description": "Stops Modis from updating this channel's topic with the currently playing song"
     },
     {
-      "name": "front",
+      "name": "movehere",
       "description": "Moves the music player to the front of the channel the command was sent from"
+    },
+    {
+      "name": "movevoice",
+      "description": "Moves Modis to the voice channel that the sender is in"
     }
   ],
   "Documentation": "To see all commands, go to the Music Module Documentation at https://infraxion.github.io/modis/documentation/modules/music/",
