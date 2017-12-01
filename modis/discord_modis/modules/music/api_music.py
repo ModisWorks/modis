@@ -129,10 +129,7 @@ def parse_query(query, ilogger, song_func, index, shuffle):
 
             if "list" in yturl_parts:
                 playlist_tracks = get_queue_from_playlist(yturl_parts["list"])
-                if shuffle:
-                    random.shuffle(playlist_tracks)
-                for i in range(0, len(playlist_tracks)):
-                    song_func(playlist_tracks[i], index + i)
+                _func_list(song_func, playlist_tracks, index, shuffle)
                 ilogger.info("Queued YouTube playlist from link")
                 return
             elif "v" in yturl_parts:
@@ -161,10 +158,7 @@ def parse_query(query, ilogger, song_func, index, shuffle):
                             track_list.append(t)
 
                 if track_list is not None and len(track_list) > 0:
-                    if shuffle:
-                        random.shuffle(track_list)
-                    for i in range(0, len(track_list)):
-                        song_func(track_list[i], index + i)
+                    _func_list(song_func, track_list, index, shuffle)
                     ilogger.info("Queued SoundCloud songs from link")
                     return
                 else:
@@ -239,10 +233,7 @@ def parse_query(query, ilogger, song_func, index, shuffle):
             query_type = query_type.replace('song', 'track')
             ilogger.info("Queueing SoundCloud {}: {}".format(query_type, query_search))
             soundcloud_tracks = search_sc_tracks(query_type, query_search)
-            if shuffle:
-                random.shuffle(soundcloud_tracks)
-            for i in range(0, len(soundcloud_tracks)):
-                song_func(soundcloud_tracks[i], index + i)
+            _func_list(song_func, soundcloud_tracks, index, shuffle)
             ilogger.info("Queued SoundCloud {}: {}".format(query_type, query_search))
             return
         except Exception as e:
@@ -258,11 +249,7 @@ def parse_query(query, ilogger, song_func, index, shuffle):
             query_search = ' '.join(args[1:])
             ilogger.info("Queued Youtube search: {}".format(query_search))
             yt_songs = get_ytvideos(query_search)
-            if shuffle:
-                random.shuffle(yt_songs)
-            for i in range(0, len(yt_songs)):
-                song_func(yt_songs[i], index + i)
-
+            _func_list(song_func, yt_songs, index, shuffle)
             return
         except Exception as e:
             logger.exception(e)
@@ -273,15 +260,22 @@ def parse_query(query, ilogger, song_func, index, shuffle):
         ilogger.info("Queued YouTube search: {}".format(query))
 
         yt_songs = get_ytvideos(query)
-        if shuffle:
-            random.shuffle(yt_songs)
-        for i in range(0, len(yt_songs)):
-            song_func(yt_songs[i], index + i)
-
+        _func_list(song_func, yt_songs, index, shuffle)
         return
     else:
         ilogger.error("Host does not support YouTube".format(query))
         return
+
+
+def _func_list(song_func, songs, index, shuffle):
+    if shuffle:
+        random.shuffle(songs)
+
+    for i in range(0, len(songs)):
+        func_index = None
+        if index is not None:
+            func_index = i + index
+        song_func(songs, func_index)
 
 
 def get_ytvideos_from_list(queries, song_func, index):
