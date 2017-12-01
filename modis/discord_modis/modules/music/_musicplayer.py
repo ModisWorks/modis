@@ -50,6 +50,7 @@ def _match_func(info_dict):
 file_format = "%(title)s"
 
 ytdl_formats = [
+    "bestaudio[filesize<20M]",
     "worstaudio",
     "worst",
 ]
