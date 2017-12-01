@@ -22,8 +22,8 @@ async def on_message(message):
     # Only reply to server messages and don't reply to myself
     if server is not None and author != channel.server.me:
         # Retrieve replies from server data
-        normal_replies = data.cache["servers"][server.id]["replies"]["normal"]
-        tts_replies = data.cache["servers"][server.id]["replies"]["tts"]
+        normal_replies = data.cache["servers"][server.id]["modules"]["replies"]["normal"]
+        tts_replies = data.cache["servers"][server.id]["modules"]["replies"]["tts"]
 
         # Check normal replies
         for r in normal_replies.keys():

@@ -148,14 +148,14 @@ class MusicPlayer:
         self.topic = ""
         self.topicchannel = None
         # Set topic channel
-        if "topic_id" in data.cache["servers"][self.server_id]["music"]:
-            topic_id = data.cache["servers"][self.server_id]["music"]["topic_id"]
+        if "topic_id" in data.cache["servers"][self.server_id]["modules"]["music"]:
+            topic_id = data.cache["servers"][self.server_id]["modules"]["music"]["topic_id"]
             if topic_id is not None and topic_id != "":
                 logger.debug("Topic channel id: {}".format(topic_id))
                 self.topicchannel = main.client.get_channel(topic_id)
         # Get volume
-        if "volume" in data.cache["servers"][self.server_id]["music"]:
-            self.volume = data.cache["servers"][self.server_id]["music"]["volume"]
+        if "volume" in data.cache["servers"][self.server_id]["modules"]["music"]:
+            self.volume = data.cache["servers"][self.server_id]["modules"]["music"]["volume"]
         else:
             self.write_volume()
 
@@ -625,7 +625,7 @@ class MusicPlayer:
 
     async def set_topic_channel(self, channel):
         """Set the topic channel for this server"""
-        data.cache["servers"][self.server_id]["music"]["topic_id"] = channel.id
+        data.cache["servers"][self.server_id]["modules"]["music"]["topic_id"] = channel.id
         data.write()
 
         self.topicchannel = channel
@@ -646,7 +646,7 @@ class MusicPlayer:
         self.topicchannel = None
         logger.debug("Clearing topic channel")
 
-        data.cache["servers"][self.server_id]["music"]["topic_id"] = ""
+        data.cache["servers"][self.server_id]["modules"]["music"]["topic_id"] = ""
         data.write()
 
         await main.client.send_typing(channel)

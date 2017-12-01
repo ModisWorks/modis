@@ -71,8 +71,8 @@ COMMANDS = {
     }
 }
 DATA_SERVER = {
-    "activated": True,
-    "topic_id": ""
+    "topic_id": "",
+    "volume": 20
 }
 DATA_GLOBAL = {}
 

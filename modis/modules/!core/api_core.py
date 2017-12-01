@@ -20,9 +20,20 @@ def server_update(server_id):
     if server_id not in data.cache["servers"]:
         logger.debug("Adding new server to data.json")
         data.cache["servers"][server_id] = config.SERVER_TEMPLATE
-        data.write()
 
-    # TODO add module subdata
+        # Register slots for per-server module specific data
+        module_names = moduledb.get_names()
+        for module_name in module_names:
+            info = moduledb.get_import_specific("__info", module_name)
+            try:
+                if info.DATA_SERVER:
+                    data.cache["servers"][server_id]["modules"][module_name] = info.DATA_SERVER
+            except AttributeError:
+                logger.debug("Server data slot not requested for " + module_name)
+
+        print(data)
+
+        data.write()
 
 
 def server_remove(server_id):
@@ -62,6 +73,7 @@ def cmd_db_update():
 
     logger.debug("Updating command database")
 
-    cmd_event_handlers = moduledb.get_imports(["commands"])["commands"]
+    cmd_names = moduledb.get_imports(["__info"])["__info"]
+    cmd_eh = None
 
-    _data.cmd_db = cmd_event_handlers
+    _data.cmd_db = cmd_names

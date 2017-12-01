@@ -60,7 +60,8 @@ ROOT_TEMPLATE = {
 SERVER_TEMPLATE = {
     "prefix": "!",
     "activation": {},
-    "commands": {}
+    "commands": {},
+    "modules": {}
 }
 
 # Logging

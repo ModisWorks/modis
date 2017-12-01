@@ -11,7 +11,7 @@ import logging
 import os
 from collections import OrderedDict
 
-from modis.tools.config import DATAFILE, ROOT_TEMPLATE
+from modis.tools import config
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ def create(template):
 
     cache = template
 
-    with open(DATAFILE, 'w') as file:
+    with open(config.DATAFILE, 'w') as file:
         json.dump(cache, file, indent=2)
 
 
@@ -44,21 +44,20 @@ def get():
 
     global cache
 
-    if not os.path.exists(DATAFILE):
+    if not os.path.exists(config.DATAFILE):
         logger.warning("data.json not found. An empty one was created.")
-        create(ROOT_TEMPLATE)
+        create(config.ROOT_TEMPLATE)
         return cache
 
-    with open(DATAFILE, 'r') as file:
+    with open(config.DATAFILE, 'r') as file:
         cache = json.load(file)
+
     # Check if the data is in the right format
     if not _is_valid(cache):
         logger.warning("data.json in old format. Old data.json has been renamed to data.json.old")
-        # Delete the old one
-        os.remove(DATAFILE + ".old")
-        # Rename the current one
-        os.rename(DATAFILE, DATAFILE + ".old")
-        create(ROOT_TEMPLATE)
+        os.remove(config.DATAFILE + ".old")
+        os.rename(config.DATAFILE, config.DATAFILE + ".old")
+        create(config.ROOT_TEMPLATE)
     return cache
 
 
@@ -73,24 +72,24 @@ def write(new_data=None):
 
     global cache
 
-    if not os.path.exists(DATAFILE):
-        logging.CRITICAL("data.json not found. An empty one was created.")
-        create(ROOT_TEMPLATE)
+    if not os.path.exists(config.DATAFILE):
+        logger.warning("data.json not found. An empty one was created.")
+        create(config.ROOT_TEMPLATE)
         return
 
     if new_data:
         cache = new_data
     cache = _sort(cache)
 
-    with open(DATAFILE, 'w') as file:
+    with open(config.DATAFILE, 'w') as file:
         json.dump(cache, file, indent=2)
 
 
 def _is_valid(_data):
-    """Check if the current data is in the right format
+    """Check if the current data is in the right format.
 
     Args:
-        _data (dict): The current data.json contents
+        _data (dict): The current data.json contents.
     """
 
     if "keys" not in _data:

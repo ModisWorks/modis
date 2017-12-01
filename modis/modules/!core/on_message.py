@@ -34,3 +34,7 @@ async def on_message(message):
         else:
             break
     query = " ".join(package)
+
+    for m in _data.cmd_db:
+        if root in m.COMMANDS.keys():
+            print("received")

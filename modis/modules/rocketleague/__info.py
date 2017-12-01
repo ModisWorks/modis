@@ -15,6 +15,8 @@ COMMANDS = {
         }
     }
 }
+DATA_SERVER = {}
+DATA_GLOBAL = {}
 
 HELP_DATAPACKS = {
     "Commands": [{
@@ -27,5 +29,4 @@ HELP_DATAPACKS = {
         "description": "Displays the stats for the given user on the specified platform"
     }]
 }
-
 HELP_MARKDOWN = """"""
