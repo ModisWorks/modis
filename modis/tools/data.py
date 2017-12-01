@@ -51,7 +51,15 @@ def get():
 
     with open(DATAFILE, 'r') as file:
         cache = json.load(file)
-        return cache
+    # Check if the data is in the right format
+    if not _is_valid(cache):
+        logger.warning("data.json in old format. Old data.json has been renamed to data.json.old")
+        # Delete the old one
+        os.remove(DATAFILE + ".old")
+        # Rename the current one
+        os.rename(DATAFILE, DATAFILE + ".old")
+        create(ROOT_TEMPLATE)
+    return cache
 
 
 def write(new_data=None):
@@ -76,6 +84,20 @@ def write(new_data=None):
 
     with open(DATAFILE, 'w') as file:
         json.dump(cache, file, indent=2)
+
+
+def _is_valid(_data):
+    """Check if the current data is in the right format
+
+    Args:
+        _data (dict): The current data.json contents
+    """
+
+    if "keys" not in _data:
+        return False
+    if "discord_token" not in _data["keys"]:
+        return False
+    return True
 
 
 def _sort(_dict):
