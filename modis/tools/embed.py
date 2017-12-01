@@ -30,6 +30,7 @@ class UI:
         self.thumbnail = thumbnail
         self.image = image
         self.datapacks = datapacks
+        self.datapack_lines = {}
 
         self.built_embed = self.build()
         self.sent_embed = None
@@ -64,12 +65,11 @@ class UI:
             url="https://musicbyango.com/modis/",
             icon_url="http://musicbyango.com/modis/dp/modis64t.png")
 
-        for pack in self.datapacks:
-            embed.add_field(
-                name=pack[0],
-                value=pack[1],
-                inline=pack[2]
-            )
+        self.datapack_lines = {}
+        for i in range(0, len(self.datapacks)):
+            pack = self.datapacks[i]
+            embed.add_field(name=pack[0], value=pack[1], inline=pack[2])
+            self.datapack_lines[pack[0]] = i
 
         return embed
 
@@ -96,6 +96,28 @@ class UI:
             pass
 
         self.sent_embed = None
+
+    def update_field(self, title, data):
+        """Updates a particular field's data
+
+        Args:
+            title (str): The title of the field to update
+            data (str): The new value to set for this datapack
+        """
+
+        if title in self.datapack_lines:
+            self.update_data(self.datapack_lines[title], data)
+        else:
+            logger.warning("No field with title '{}'".format(title))
+
+    def update_colour(self, new_colour):
+        """Updates the embed's colour
+
+        Args:
+            new_colour (discord.Colour): The new colour for the embed
+        """
+
+        self.built_embed.colour = new_colour
 
     def update_data(self, index, data):
         """Updates a particular datapack's data
