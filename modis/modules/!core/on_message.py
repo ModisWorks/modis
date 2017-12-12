@@ -28,7 +28,7 @@ async def on_message(message):
     package = message.content.split(" ")
     root = package.pop(0)[len(prefix):]
     aux = []
-    for arg in package[1:]:
+    for arg in package:
         if not arg.startswith("-"):
             break
         aux.append(package.pop(0)[1:])
