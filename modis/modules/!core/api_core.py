@@ -59,7 +59,9 @@ def server_clean():
 
     logger.debug("Cleaning servers")
 
-    for server_id in data.cache["servers"]:
+    serverlist = list(data.cache["servers"].keys())
+
+    for server_id in serverlist:
         exists = False
         for server_obj in main.client.servers:
             if server_obj.id == server_id:

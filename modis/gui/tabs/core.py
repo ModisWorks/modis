@@ -3,9 +3,11 @@ import logging
 import threading
 import tkinter as tk
 import tkinter.ttk as ttk
+from tkinter import filedialog
 import webbrowser
+import json
 
-from modis.tools import data
+from modis.tools import data, config
 
 logger = logging.getLogger(__name__)
 
@@ -78,14 +80,14 @@ class Frame(tk.Frame):
             invite_link.bind("<Button-1>", hyperlink_invite)
 
             # Grid elements
-            logo.grid(column=0, row=0, rowspan=3, padx=4, pady=4, sticky="W N")
+            logo.grid(column=0, row=0, rowspan=3, padx=4, pady=4, sticky="W")
 
-            name.grid(column=1, row=0, padx=4, pady=4, sticky="W N")
-            website.grid(column=1, row=1, padx=4, pady=0, sticky="W N")
-            discord.grid(column=1, row=2, padx=4, pady=0, sticky="W N")
+            name.grid(column=1, row=0, padx=4, pady=4, sticky="W")
+            website.grid(column=1, row=1, padx=4, pady=0, sticky="W")
+            discord.grid(column=1, row=2, padx=4, pady=0, sticky="W")
 
-            clientid_entry.grid(column=0, columnspan=2, row=3, padx=4, pady=4, sticky="W E N")
-            invite_link.grid(column=0, columnspan=2, row=4, padx=4, pady=0, sticky="W N")
+            clientid_entry.grid(column=0, columnspan=2, row=3, padx=4, pady=4, sticky="W E")
+            invite_link.grid(column=0, columnspan=2, row=4, padx=4, pady=0, sticky="W")
 
             # Configure stretch ratios
             self.columnconfigure(0, weight=0)
@@ -109,25 +111,69 @@ class Frame(tk.Frame):
             super(Frame.Control, self).__init__(parent, padding=8, text="Control")
 
             # Variables
-            self.state = "off"
-            self.button_text = tk.StringVar(value="Start Modis")
+            self.datapath = tk.StringVar(value=config.DATAFILE)
+
             self.token = tk.StringVar(value=data.cache["keys"]["discord_token"])
 
+            self.state = "off"
+            self.button_text = tk.StringVar(value="Start Modis")
+
             # Add elements
+            datapath_label = ttk.Label(self, text="Data file path:")
+            datapath_entry = ttk.Entry(self, textvariable=self.datapath, state="readonly")
+            datapath_button = ttk.Button(self, command=self.set_data_location, text="Change")
+
             token_label = ttk.Label(self, text="Discord bot token:")
-            token_entry = ttk.Entry(self, textvariable=self.token)
-            start_button = ttk.Button(self, command=lambda: self.toggle(), textvariable=self.button_text)
+            token_entry = ttk.Entry(self, textvariable=self.token, show="*")
+
+            start_button = ttk.Button(self, command=self.toggle, textvariable=self.button_text)
 
             # Grid elements
-            token_label.grid(column=0, row=0, padx=4, pady=4, sticky="E S")
-            token_entry.grid(column=1, row=0, padx=4, pady=4, sticky="W E S")
-            start_button.grid(column=2, row=0, padx=4, pady=4, sticky="E S")
+            datapath_label.grid(column=0, row=0, padx=4, pady=4, stick="E")
+            datapath_entry.grid(column=1, row=0, padx=4, pady=4, sticky="W E")
+            datapath_button.grid(column=2, row=0, padx=4, pady=4, sticky="E")
+
+            token_label.grid(column=0, row=1, padx=4, pady=4, sticky="E")
+            token_entry.grid(column=1, columnspan=2, row=1, padx=4, pady=4, sticky="W E")
+
+            start_button.grid(column=2, columnspan=3, row=3, padx=4, pady=4, sticky="E")
 
             # Configure stretch ratios
             self.columnconfigure(0, weight=0)
             self.columnconfigure(1, weight=1)
             self.columnconfigure(2, weight=0)
             self.rowconfigure(0, weight=0)
+            self.rowconfigure(1, weight=0)
+            self.rowconfigure(2, weight=1)
+            self.rowconfigure(3, weight=0)
+
+        def set_data_location(self):
+            try:
+                self.datapath.set(filedialog.askopenfile().name)
+            except AttributeError:
+                logger.warning("Data file not changed")
+                return
+
+            old = config.DATAFILE
+            config.DATAFILE = self.datapath.get()
+
+            try:
+                data.get()
+            except json.decoder.JSONDecodeError:
+                logger.error("Chosen file is not a valid json; reverting changes")
+                self.datapath.set(old)
+                config.DATAFILE = old
+                data.get()
+                return
+
+            if not data.is_valid(data.cache):
+                logger.error("Chosen file is not a valid Modis data file; reverting changes")
+                self.datapath.set(old)
+                config.DATAFILE = old
+                data.get()
+                return
+
+            logger.warning("data file changed to " + config.DATAFILE)
 
         def toggle(self):
             """Toggle Modis on or off."""
@@ -143,7 +189,7 @@ class Frame(tk.Frame):
             self.button_text.set("Stop Modis")
             self.state = "on"
 
-            logger.debug("Starting Modis")
+            logger.warning("Starting Modis")
             statuslog = logging.getLogger("globalstatus")
             statuslog.info("1")
 
@@ -163,7 +209,7 @@ class Frame(tk.Frame):
             self.state = "off"
 
             # Stop Modis
-            logger.info("Stopping Modis")
+            logger.warning("Stopping Modis")
             statuslog = logging.getLogger("globalstatus")
             statuslog.info("0")
             from modis.main import client

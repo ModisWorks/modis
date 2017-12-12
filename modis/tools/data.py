@@ -53,7 +53,7 @@ def get():
         cache = json.load(file)
 
     # Check if the data is in the right format
-    if not _is_valid(cache):
+    if not is_valid(cache):
         logger.warning("data.json in old format. Old data.json has been renamed to data.json.old")
         os.remove(config.DATAFILE + ".old")
         os.rename(config.DATAFILE, config.DATAFILE + ".old")
@@ -85,7 +85,7 @@ def write(new_data=None):
         json.dump(cache, file, indent=2)
 
 
-def _is_valid(_data):
+def is_valid(_data):
     """Check if the current data is in the right format.
 
     Args:
