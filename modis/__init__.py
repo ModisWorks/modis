@@ -60,7 +60,6 @@ def gui(data_dir=None):
     # Import packages
     import tkinter as tk
     from modis.gui import window
-    from modis.tools import config
 
     # Start Modis for GUI
     logger.info("Starting GUI")
@@ -70,7 +69,7 @@ def gui(data_dir=None):
     root.minsize(width=800, height=400)
     root.geometry("800x600")
     root.title("Modis Control Panel")
-    root.iconbitmap(r"{}/assets/modis.ico".format(config.ROOT_DIR))
+    root.iconbitmap(__file__[:-11] + "assets/modis.ico")
 
     # Setup the notebook
     main = window.RootFrame(root)

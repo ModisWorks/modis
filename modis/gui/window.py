@@ -20,7 +20,6 @@ class RootFrame(ttk.Frame):
 
         # Define window close action
         def on_closing():
-            """Called when the window closes"""
             try:
                 from modis import main
                 if main.client and main.client.loop:
@@ -34,6 +33,26 @@ class RootFrame(ttk.Frame):
             import sys
             sys.exit(0)
         parent.protocol("WM_DELETE_WINDOW", on_closing)
+
+        # Configure styles
+        s = ttk.Style()
+        s.configure(
+            "TNotebook",
+            tabmargins=[0, 0, -1, 0],
+            tabposition="wn"
+        )
+        s.configure(
+            "TNotebook.Tab",
+            padding=8,
+            width=10
+        )
+        s.map(
+            "TNotebook.Tab",
+            expand=[
+                ("selected", [0, 0, 1, 0]),
+                ("active", [0, 0, 1, 0])
+            ]
+        )
 
         # Add elements
         statusbar = StatusBar(self)
@@ -58,11 +77,10 @@ class StatusBar(ttk.Frame):
     """The status bar at the bottom of the UI."""
 
     def __init__(self, parent):
-        """
-        Create the status bar.
+        """reate the status bar.
 
         Args:
-            parent: A tk or ttk object
+            parent: A tk or ttk object.
         """
 
         super(StatusBar, self).__init__(parent)
@@ -89,8 +107,8 @@ class StatusBar(ttk.Frame):
             """Update the global status via a log handler
 
             Args:
-                statusbar (ttk.Label): The statusbar to manage
-                stringvar (tk.StringVar): The status text variable
+                statusbar (ttk.Label): The statusbar to manage.
+                stringvar (tk.StringVar): The status text variable.
             """
 
             logging.Handler.__init__(self)
@@ -100,19 +118,20 @@ class StatusBar(ttk.Frame):
             self.text = ""
             self.colour = "#FFFFFF"
 
-        def flush(self):
-            self.stringvar.set(self.text)
-            self.statusbar.config(background=self.colour)
-
         def emit(self, record):
             record = self.format(record)
             if record == "0":
                 self.text = "OFFLINE"
-                self.colour = "#FF4444"
+                self.colour = "#FFAA00"
             elif record == "1":
                 self.text = "STARTING"
-                self.colour = "#FFAA00"
+                self.colour = "#00AAFF"
             elif record == "2":
                 self.text = "ONLINE"
                 self.colour = "#AAFF00"
-            self.flush()
+            elif record == "3":
+                self.text = "ERROR"
+                self.colour = "#FF00AA"
+
+            self.stringvar.set(self.text)
+            self.statusbar.config(background=self.colour)
