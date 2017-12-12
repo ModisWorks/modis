@@ -1,4 +1,8 @@
+import logging
+
 from . import api_hexconvert, ui_embed
+
+logger = logging.getLogger(__name__)
 
 
 async def on_command(root, aux, query, msgobj):

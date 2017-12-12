@@ -1,4 +1,8 @@
+import logging
+
 from . import api_reddit, ui_embed
+
+logger = logging.getLogger(__name__)
 
 
 async def on_command(root, aux, query, msgobj):

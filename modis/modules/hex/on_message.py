@@ -1,7 +1,11 @@
+import logging
+
 from modis import main
 from modis.tools import data
 
 from . import api_hexconvert, ui_embed
+
+logger = logging.getLogger(__name__)
 
 
 async def on_message(message):

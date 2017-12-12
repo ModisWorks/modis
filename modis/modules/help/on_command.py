@@ -1,7 +1,10 @@
+import logging
 import discord
 
 from modis.tools import data
 from . import api_help, ui_embed
+
+logger = logging.getLogger(__name__)
 
 
 async def on_command(root, aux, query, msgobj):
