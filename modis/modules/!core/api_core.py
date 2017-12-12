@@ -73,7 +73,10 @@ def cmd_db_update():
 
     logger.debug("Updating command database")
 
-    cmd_names = moduledb.get_imports(["__info"])["__info"]
-    cmd_eh = None
-
-    _data.cmd_db = cmd_names
+    cmd_db = moduledb.get_imports(["__info", "on_command"])
+    for module_name in cmd_db.keys():
+        _data.cmd_db[module_name] = {}
+        if "on_command" in cmd_db[module_name].keys():
+            _data.cmd_db[module_name]["eh"] = cmd_db[module_name]["on_command"].on_command
+        if "__info" in cmd_db[module_name].keys():
+            _data.cmd_db[module_name]["cmd"] = cmd_db[module_name]["__info"].COMMANDS

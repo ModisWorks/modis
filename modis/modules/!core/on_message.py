@@ -1,6 +1,8 @@
 import logging
 
+from modis import main
 from modis.tools import data
+
 from . import _data
 
 logger = logging.getLogger(__name__)
@@ -22,19 +24,19 @@ async def on_message(message):
     if not message.content.startswith(prefix):
         return
 
-    logger.debug("Cmd call s: {} c: {}".format(message.server, message.channel))
-
     # Parse message
     package = message.content.split(" ")
     root = package.pop(0)[len(prefix):]
     aux = []
     for arg in package[1:]:
-        if arg.startswith("-"):
-            aux.append(package.pop(0))
-        else:
+        if not arg.startswith("-"):
             break
+        aux.append(package.pop(0)[1:])
     query = " ".join(package)
 
-    for m in _data.cmd_db:
-        if root in m.COMMANDS.keys():
-            print("received")
+    for module_name in _data.cmd_db.keys():
+        if root not in _data.cmd_db[module_name]["cmd"].keys():
+            continue
+
+        await main.client.send_typing(message.channel)
+        await _data.cmd_db[module_name]["eh"](root, aux, query, message)

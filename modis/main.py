@@ -13,6 +13,7 @@ client.
 import logging
 
 logger = logging.getLogger(__name__)
+statuslog = logging.getLogger("globalstatus")
 
 client = None
 
@@ -41,7 +42,7 @@ def start(loop):
 
     # Import event handlers
     logger.debug("Importing event handlers")
-    eh_lib = moduledb.get_imports(config.EH_TYPES)
+    eh_lib = moduledb.get_by_eh(config.EH_TYPES)
 
     # Register event handlers
     logger.debug("Registering event handlers")
@@ -57,7 +58,6 @@ def start(loop):
     except Exception as e:
         logger.exception(e)
         logger.critical("Could not connect to Discord")
-        statuslog = logging.getLogger("globalstatus")
         statuslog.info("0")
     else:
         logger.debug("Running the bot")
@@ -88,7 +88,6 @@ def start(loop):
                 logger.exception(e)
 
             logger.critical("Bot stopped\n")
-            statuslog = logging.getLogger("globalstatus")
             statuslog.info("0")
             client.loop.close()
 
@@ -112,7 +111,8 @@ def _eh_create(eh_type, eh_lib):
                 module_event_handler_func = getattr(eh_module, eh_type)
                 await module_event_handler_func(*args, **kwargs)
             except Exception as e:
-                logger.error("An error occured in '{}'".format(eh_module))
+                logger.warning("An error occured in " + eh_module.__name__)
                 logger.exception(e)
+                statuslog.info("3")
     func.__name__ = eh_type
     return func

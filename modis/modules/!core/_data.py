@@ -1,1 +1,1 @@
-cmd_db = []
+cmd_db = {}

@@ -22,19 +22,6 @@ def get_help_datapacks(module_name, server_prefix):
     else:
         return [("Help", module_name + "does not have any help data.")]
 
-    # _dir = os.path.realpath(
-    #     os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    # module_dir = "{}/../{}".format(_dir, module_name, "help.json")
-    # if os.path.isdir(module_dir):
-    #     module_help_path = "{}/{}".format(module_dir, "help.json")
-    #
-    #     if os.path.isfile(module_help_path):
-    #         return help.get_formatted(module_help_path, server_prefix)
-    #     else:
-    #         return [("Help", "{} does not have a help.json file".format(module_name), False)]
-    # else:
-    #     return [("Help", "No module found called {}".format(module_name), False)]
-
 
 def get_help_commands(server_prefix):
     """
