@@ -4,7 +4,7 @@ import os
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from modis.tools import help, config
+from modis.tools import help, config, moduledb
 
 logger = logging.getLogger(__name__)
 
@@ -21,123 +21,50 @@ class Frame(tk.Frame):
 
         super(Frame, self).__init__(parent)
 
-        # Setup styles
-        style = ttk.Style()
-        style.configure("Module.TFrame", background="white")
-
-        self.module_buttons = {}
-        self.current_button = None
+        # Configure styles
+        s = ttk.Style()
+        s.configure(
+            "modis2.TNotebook",
+            tabmargins=[0, 0, -1, 0],
+            tabposition="wn"
+        )
+        s.configure(
+            "modis2.TNotebook.Tab",
+            padding=2,
+            width=15
+        )
+        s.map(
+            "modis2.TNotebook.Tab",
+            expand=[
+                ("selected", [0, 0, 1, 0]),
+                ("active", [0, 0, 1, 0])
+            ]
+        )
 
         # Add elements
-        self.module_list = ttk.Frame(self, width=150, style="Module.TFrame")
-        self.header = tk.Label(self.module_list, text="Modules", bg="white", fg="#484848")
-        self.module_selection = ttk.Frame(self.module_list, style="Module.TFrame")
-        self.module_ui = ttk.Frame(self)
+        self.nav = ttk.Notebook(self, style="modis2.TNotebook")
 
         # Grid elements
-        self.module_list.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
-        self.header.grid(column=0, row=0, padx=0, pady=0, sticky="W E N")
-        self.module_selection.grid(column=0, row=1, padx=0, pady=0, sticky="W E N S")
-        self.module_ui.grid(column=1, row=0, padx=0, pady=0, sticky="W E N S")
+        self.nav.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
 
         # Configure stretch ratios
-        self.module_list.columnconfigure(0, weight=1)
-        self.module_list.rowconfigure(0, weight=0)
-        self.module_list.rowconfigure(1, weight=1)
-        self.module_selection.columnconfigure(0, weight=1)
-        self.module_ui.columnconfigure(0, weight=1)
-        self.module_ui.rowconfigure(0, weight=1)
-
-        self.columnconfigure(0, minsize=150)
-        self.columnconfigure(1, weight=1)
+        self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
         self.scan()
 
-    def add(self, module_name, module_ui):
-        """Adds a module to the list.
-
-        Args:
-            module_name (str): The name of the module.
-            module_ui (import): The function to call to create the module's UI.
-        """
-
-        m_button = tk.Label(self.module_selection, text=module_name, bg="white", anchor="w")
-        m_button.grid(column=0, row=len(self.module_selection.winfo_children()), padx=0, pady=0, sticky="W E N S")
-
-        self.module_buttons[module_name] = m_button
-        m_button.bind("<Button-1>", lambda e: self.select(module_name, module_ui))
-
     def scan(self):
-        # Iterate through modules
-        for module_name in os.listdir(config.MODULES_DIR):
-            module_dir = "{}/{}".format(config.MODULES_DIR, module_name)
+        modules = moduledb.get_imports(["__ui"])
 
-            if not os.path.isdir(module_dir):
-                continue
-            if module_name.startswith("_"):
-                continue
-
-            files = os.listdir(module_dir)
-            if "_ui.py" in files:
-                logger.debug("Importing UI for {} module".format(module_name))
-                import_name = ".modules.{}.{}".format(module_name, "_ui")
-                self.add(module_name, importlib.import_module(import_name, "modis"))
+        for module_name in modules.keys():
+            if "__ui" not in modules[module_name].keys():
+                logger.debug("No module UI for " + module_name)
+                module_ui = None
             else:
-                logger.debug("No UI for {} module".format(module_name))
-                self.add(module_name, None)
-
-    def select(self, module_name, module_ui):
-        """Called when a module is selected.
-
-        Args:
-            module_name (str): The name of the module
-            module_ui (import): The function to call to create the module's UI
-        """
-
-        if self.current_button == self.module_buttons[module_name]:
-            return
-
-        self.module_buttons[module_name].config(bg="#cacaca")
-        if self.current_button is not None:
-            self.current_button.config(bg="white")
-        self.current_button = self.module_buttons[module_name]
-
-        self.destroy()
-
-        try:
-            # Create the UI
-            module_ui_frame = self.ModuleFrame(self.module_ui, module_name, module_ui)
-            module_ui_frame.grid(column=0, row=0, sticky="W E N S")
-        except Exception as e:
-            logger.error("Could not load UI for {}".format(module_name))
-            logger.exception(e)
-            # Create a error UI
-            tk.Label(self.module_ui, text="Could not load UI for {}".format(module_name)).grid(
-                column=0, row=0, padx=0, pady=0, sticky="W E N S")
-
-    def clear(self):
-        """Clears all modules from the list."""
-
-        for child in self.module_selection.winfo_children():
-            child.destroy()
-
-        self.destroy()
-
-        tk.Label(self.module_ui, text="Start Modis and select a module").grid(
-            column=0, row=0, padx=0, pady=0, sticky="W E N S")
-
-        if self.current_button is not None:
-            self.current_button.config(bg="white")
-
-        self.module_buttons = {}
-        self.current_button = None
-
-    def destroy(self):
-        """Clears everything in the UI."""
-
-        for child in self.module_ui.winfo_children():
-            child.destroy()
+                logger.debug("Module UI found for " + module_name)
+                module_ui = modules[module_name]["__ui"].ModuleUIFrame
+            module_frame = self.ModuleFrame(self.nav, module_name, module_ui)
+            self.nav.add(module_frame, text=module_name)
 
     class ModuleFrame(ttk.Frame):
         """The base frame for a module's UI."""
@@ -148,75 +75,143 @@ class Frame(tk.Frame):
             Args:
                 parent: A tk or ttk object.
                 module_name (str): The name of the module.
-                module_ui (import): The _ui.py file to add for the module.
+                module_frame (import): The __ui.py file to add for the module.
             """
 
             super(Frame.ModuleFrame, self).__init__(parent, padding=8)
-
             # Add elements
-            help_frame = ttk.LabelFrame(self, padding=8, text="Help")
-            self.add_help_text(help_frame, module_name)
+            if module_ui:
+                module_frame = module_ui(self)
+                module_frame.grid(row=0, column=0, sticky="W E N S")
+            help_frame = self.HelpFrame(self, module_name)
+            log_frame = self.LogFrame(self, module_name)
 
             # Grid elements
-            if module_ui is not None:
-                module_ui.ModuleUIFrame(self).grid(row=0, column=0, sticky="W E N S")
-            help_frame.grid(row=1, column=0, sticky="W E N S")
+
+            log_frame.grid(row=0, rowspan=2, column=1, padx=8, pady=8, sticky="W E N S")
+            help_frame.grid(row=1, column=0, padx=8, pady=8, sticky="W E N S")
 
             # Configure stretch ratios
-            help_frame.columnconfigure(0, weight=1)
-            help_frame.rowconfigure(0, weight=1)
-
             self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=1)
+            self.rowconfigure(0, weight=0)
             self.rowconfigure(1, weight=1)
 
-        def add_help_text(self, parent, module_name, prefix="!"):
-            """Load help text from a file and add it to the parent.
+        class LogFrame(ttk.Labelframe):
+            """The text box showing the logging output"""
 
-            Args:
-                parent: A tk or ttk object.
-                module_name (str): The module to load help text from.
-                prefix (str): The prefix to use for commands.
-            """
+            def __init__(self, parent, module_name):
+                """Create the frame.
 
-            import tkinter as tk
-            import tkinter.ttk as ttk
+                Args:
+                    parent: A tk or ttk object.
+                """
 
-            # Add elements
-            text = tk.Text(parent, wrap='word', font=("Helvetica", 10))
-            text.tag_config("heading", font=("Helvetica", 14))
-            text.tag_config("command", font=("Courier", 10))
-            text.tag_config("param", font=("Courier", 10))
-            text.tag_config("desc")
-            help_contents = help.get_raw(module_name)
-            for d in help_contents:
-                text.insert('end', d + '\n', "heading")
+                super(Frame.ModuleFrame.LogFrame, self).__init__(parent, padding=8, text="Log")
 
-                if "commands" not in d.lower():
-                    text.insert('end', help_contents[d] + '\n\n', "desc")
-                    continue
+                # Add elements
+                log_panel = tk.Text(self, wrap="none")
 
-                for c in help_contents[d]:
-                    if "name" not in c:
+                formatter = logging.Formatter(
+                    "{levelname:8} {name} - {message}", style="{")
+                handler = self.PanelHandler(log_panel)
+                handler.setFormatter(formatter)
+
+                root_logger = logging.getLogger("modis.modules." + module_name)
+                root_logger.addHandler(handler)
+
+                log_panel.configure(background="#202020")
+                log_panel.tag_config('CRITICAL', foreground="#FF00AA")
+                log_panel.tag_config('ERROR', foreground="#FFAA00")
+                log_panel.tag_config('WARNING', foreground="#00AAFF")
+                log_panel.tag_config('INFO', foreground="#AAAAAA")
+                log_panel.tag_config('DEBUG', foreground="#444444")
+
+                yscrollbar = ttk.Scrollbar(self, orient="vertical", command=log_panel.yview)
+                xscrollbar = ttk.Scrollbar(self, orient="horizontal", command=log_panel.xview)
+                log_panel['yscrollcommand'] = yscrollbar.set
+                log_panel['xscrollcommand'] = xscrollbar.set
+
+                # Grid elements
+                log_panel.grid(column=0, row=0, sticky="W E N S")
+                yscrollbar.grid(column=1, row=0, sticky="N S")
+                xscrollbar.grid(column=0, row=1, sticky="W E")
+
+                # Configure stretch ratios
+                self.columnconfigure(0, weight=1)
+                self.rowconfigure(0, weight=1)
+
+            class PanelHandler(logging.Handler):
+                def __init__(self, text_widget):
+                    logging.Handler.__init__(self)
+
+                    self.text_widget = text_widget
+                    self.text_widget.config(state=tk.DISABLED)
+
+                def emit(self, record):
+                    msg = self.format(record)
+                    msg_level = logging.Formatter("{levelname}",
+                                                  style="{").format(record)
+                    # Remove '.modis' from start of logs
+                    msg = msg[:9] + msg[23:]
+                    # Exceptions
+                    if msg_level.startswith("ERROR"):
+                        msg_level = "ERROR"
+
+                    self.text_widget.config(state=tk.NORMAL)
+                    self.text_widget.insert("end", msg + "\n", msg_level)
+                    self.text_widget.config(state=tk.DISABLED)
+                    self.text_widget.see("end")
+
+        class HelpFrame(ttk.LabelFrame):
+            def __init__(self, parent, module_name):
+                super(Frame.ModuleFrame.HelpFrame, self).__init__(parent, padding=8, text="Help")
+
+                # Add elements
+                help_panel = tk.Text(self)
+
+                help_panel.tag_config("heading", font=("Helvetica", 14))
+                help_panel.tag_config("command", font=("Courier", 10))
+                help_panel.tag_config("param", font=("Courier", 10))
+                help_panel.tag_config("desc")
+
+                yscrollbar = ttk.Scrollbar(self, orient="vertical", command=help_panel.yview)
+                xscrollbar = ttk.Scrollbar(self, orient="horizontal", command=help_panel.xview)
+                help_panel['yscrollcommand'] = yscrollbar.set
+                help_panel['xscrollcommand'] = xscrollbar.set
+
+                # Grid elements
+                help_panel.grid(column=0, row=0, sticky="W E N S")
+                yscrollbar.grid(column=1, row=0, sticky="N S")
+                xscrollbar.grid(column=0, row=1, sticky="W E")
+
+                # Configure stretch ratios
+                self.columnconfigure(0, weight=1)
+                self.rowconfigure(0, weight=1)
+
+                help_contents = help.get_raw(module_name)
+                for d in help_contents:
+                    help_panel.insert('end', d + '\n', "heading")
+
+                    if "commands" not in d.lower():
+                        help_panel.insert('end', help_contents[d] + '\n\n', "desc")
                         continue
 
-                    command = prefix + c["name"]
-                    text.insert('end', command, ("command", "desc"))
-                    if "params" in c:
-                        for param in c["params"]:
-                            text.insert('end', " [{}]".format(param), ("param", "desc"))
-                    text.insert('end', ": ")
-                    if "desc" in c:
-                        text.insert('end', c["desc"], "desc")
+                    for c in help_contents[d]:
+                        if "name" not in c:
+                            continue
 
-                    text.insert('end', '\n')
+                        command = "!" + c["name"]
+                        help_panel.insert('end', command, ("command", "desc"))
+                        if "params" in c:
+                            for param in c["params"]:
+                                help_panel.insert('end', " [{}]".format(param), ("param", "desc"))
+                        help_panel.insert('end', ": ")
+                        if "desc" in c:
+                            help_panel.insert('end', c["desc"], "desc")
 
-                text.insert('end', '\n')
+                        help_panel.insert('end', '\n')
 
-            yscrollbar = ttk.Scrollbar(parent, orient="vertical", command=text.yview)
-            text['yscrollcommand'] = yscrollbar.set
+                    help_panel.insert('end', '\n')
 
-            # Grid elements
-            text.grid(row=0, column=0, sticky="W E N S")
-            yscrollbar.grid(column=1, row=0, sticky="N S")
-
-            text.config(state=tk.DISABLED)
+                help_panel.config(state=tk.DISABLED)

@@ -37,17 +37,17 @@ class RootFrame(ttk.Frame):
         # Configure styles
         s = ttk.Style()
         s.configure(
-            "TNotebook",
+            "modis1.TNotebook",
             tabmargins=[0, 0, -1, 0],
             tabposition="wn"
         )
         s.configure(
-            "TNotebook.Tab",
+            "modis1.TNotebook.Tab",
             padding=8,
             width=10
         )
         s.map(
-            "TNotebook.Tab",
+            "modis1.TNotebook.Tab",
             expand=[
                 ("selected", [0, 0, 1, 0]),
                 ("active", [0, 0, 1, 0])
@@ -57,7 +57,7 @@ class RootFrame(ttk.Frame):
         # Add elements
         statusbar = StatusBar(self)
 
-        nav = ttk.Notebook(self)
+        nav = ttk.Notebook(self, style="modis1.TNotebook")
         from modis.gui.tabs import core, config, data, modules
         nav.add(core.Frame(nav), text="Global")
         nav.add(config.Frame(nav), text="Config")

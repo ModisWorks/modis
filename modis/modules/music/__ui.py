@@ -16,7 +16,7 @@ class ModuleUIFrame(ttk.Frame):
             parent: A tk or ttk object
         """
 
-        super(ModuleUIFrame, self).__init__(parent)
+        super(ModuleUIFrame, self).__init__(parent, padding=8)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
