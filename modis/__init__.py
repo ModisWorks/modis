@@ -17,7 +17,11 @@ data.get()
 
 
 def cmd(data_dir=None):
-    """Start Modis in command line."""
+    """Start Modis in command line.
+
+    Args:
+        data_dir (str): The data.json filepath.
+    """
 
     # TODO switch to configtools
     # Set the data dir to the one provided
@@ -43,7 +47,11 @@ def cmd(data_dir=None):
 
 
 def gui(data_dir=None):
-    """Start Modis with GUI."""
+    """Start Modis with GUI.
+
+    Args:
+        data_dir: The data.json filepath.
+    """
 
     # TODO switch to configtools
     # Set the data dir to the one provided

@@ -12,7 +12,7 @@ from modis.tools import data, config
 logger = logging.getLogger(__name__)
 
 
-class Frame(tk.Frame):
+class Frame(ttk.Frame):
     """A tab containing the core controls of the bot"""
 
     def __init__(self, parent):
@@ -22,7 +22,7 @@ class Frame(tk.Frame):
             parent: A tk or ttk object.
         """
 
-        super(Frame, self).__init__(parent)
+        super(Frame, self).__init__(parent, padding=8)
 
         # Add elements
         info = self.Info(self)

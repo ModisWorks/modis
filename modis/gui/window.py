@@ -58,10 +58,9 @@ class RootFrame(ttk.Frame):
         statusbar = StatusBar(self)
 
         nav = ttk.Notebook(self, style="modis1.TNotebook")
-        from modis.gui.tabs import core, config, data, modules
+        from modis.gui.tabs import core, config, modules
         nav.add(core.Frame(nav), text="Global")
         nav.add(config.Frame(nav), text="Config")
-        nav.add(data.Frame(nav), text="Data")
         nav.add(modules.Frame(nav), text="Modules")
 
         # Grid elements
