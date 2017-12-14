@@ -15,7 +15,7 @@ def get_help_datapacks(module_name, server_prefix):
         datapacks (list): The help datapacks for the module
     """
 
-    datapacks = help.get_formatted(module_name, server_prefix)
+    datapacks = help.get_md(module_name, server_prefix)
 
     if datapacks:
         return datapacks

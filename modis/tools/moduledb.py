@@ -1,3 +1,8 @@
+"""
+This tool handles all the module management functions in Modis, including
+scanning the module database and importing module files.
+"""
+
 import importlib
 import logging
 import os
@@ -14,10 +19,7 @@ def get_names():
         module_names (list): List of strings of module names.
     """
 
-    logger.debug("Retrieving list of modules")
-
     module_names = []
-
     for module_folder in os.listdir(config.MODULES_DIR):
         if not os.path.isdir("{}/{}".format(config.MODULES_DIR, module_folder)):
             # Is a file, not a folder
@@ -25,39 +27,9 @@ def get_names():
         if module_folder.startswith("_"):
             # Module is manually deactivated
             continue
-
         module_names.append(module_folder)
 
     return module_names
-
-
-def get_by_eh(eh_names):
-    """Get a dictionary with imported Python module files organised by event handler.
-
-    Args:
-        eh_names (list): The names to scan.
-
-    Returns:
-        imports (dict): The imported files.
-    """
-
-    # Setup imports dict
-    imports = {}
-    for eh in eh_names:
-        imports[eh] = []
-
-    # Import requested files for each module
-    for module_name in get_names():
-        for file in os.listdir("{}/{}".format(config.MODULES_DIR, module_name)):
-            file = file[:-3]
-            if file not in eh_names:
-                # Requested file does not exist in module
-                continue
-            import_name = ".modules.{}.{}".format(module_name, file)
-            imported_file = importlib.import_module(import_name, "modis")
-            imports[file].append(imported_file)
-
-    return imports
 
 
 def get_imports(filenames):
@@ -88,6 +60,38 @@ def get_imports(filenames):
     return imports
 
 
+# TODO Deprecate
+def get_by_eh(eh_names):
+    """Get a dictionary with imported Python module files organised by event
+    handler.
+
+    Args:
+        eh_names (list): The names to scan.
+
+    Returns:
+        imports (dict): The imported files.
+    """
+
+    # Setup imports dict
+    imports = {}
+    for eh in eh_names:
+        imports[eh] = []
+
+    # Import requested files for each module
+    for module_name in get_names():
+        for file in os.listdir("{}/{}".format(config.MODULES_DIR, module_name)):
+            file = file[:-3]
+            if file not in eh_names:
+                # File does not exist
+                continue
+            import_name = ".modules.{}.{}".format(module_name, file)
+            imported_file = importlib.import_module(import_name, "modis")
+            imports[file].append(imported_file)
+
+    return imports
+
+
+# TODO Deprecate
 def get_import_specific(eh_name, module_name):
     """Get a specific import from a module.
 
@@ -99,16 +103,17 @@ def get_import_specific(eh_name, module_name):
         imports (file): The imported file.
     """
 
-    # Import requested files for each module
     if module_name not in os.listdir(config.MODULES_DIR):
+        # Module does not exist
         return
     if eh_name + ".py" not in os.listdir("{}/{}".format(config.MODULES_DIR, module_name)):
+        # File does not exist
         return
     import_name = ".modules.{}.{}".format(module_name, eh_name)
     return importlib.import_module(import_name, "modis")
 
 
-# UNUSED
+# TODO Deprecate (unused)
 def get_path(filenames):
     """Get a dictionary with file paths organised by file name.
 

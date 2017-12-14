@@ -1,3 +1,8 @@
+"""
+This tool is Modis' embed API. It allows Modis modules to easily create
+fancy looking GUIs in the Discord client.
+"""
+
 import logging
 
 import discord
@@ -6,11 +11,16 @@ from modis import main
 
 logger = logging.getLogger(__name__)
 
+URL = "https://musicbyango.com/modis/"
+ICON = "http://musicbyango.com/modis/dp/modis64t.png"
+
 
 class UI:
+    """Enables easy management of Discord embeds."""
+
     def __init__(self, channel, title, description, modulename="Modis",
                  colour=0xAAFF00, thumbnail=None, image=None, datapacks=()):
-        """Initialises variables and builds GUI
+        """Initialise variables and build the embed.
 
         Args:
             channel (discord.Channel): Channel to lock UI to
@@ -36,23 +46,22 @@ class UI:
         self.sent_embed = None
 
     def build(self):
-        """Builds Discord embed GUI
+        """Build the embed.
 
         Returns:
-            discord.Embed: Built GUI
+            discord.Embed: The built embed.
         """
 
-        if self.colour:
-            embed = discord.Embed(
-                title=self.title,
-                type='rich',
-                description=self.description,
-                colour=self.colour)
-        else:
-            embed = discord.Embed(
-                title=self.title,
-                type='rich',
-                description=self.description)
+        embed = discord.Embed(
+            title=self.title,
+            type='rich',
+            description=self.description,
+            colour=self.colour)
+
+        embed.set_author(
+            name="Modis",
+            url=URL,
+            icon_url=ICON)
 
         if self.thumbnail:
             embed.set_thumbnail(url=self.thumbnail)
@@ -60,49 +69,45 @@ class UI:
         if self.image:
             embed.set_image(url=self.image)
 
-        embed.set_author(
-            name="Modis",
-            url="https://musicbyango.com/modis/",
-            icon_url="http://musicbyango.com/modis/dp/modis64t.png")
-
         self.datapack_lines = {}
-        for i in range(0, len(self.datapacks)):
-            pack = self.datapacks[i]
+        for pack in self.datapacks:
             embed.add_field(name=pack[0], value=pack[1], inline=pack[2])
-            self.datapack_lines[pack[0]] = i
+            self.datapack_lines[pack[0]] = pack
 
         return embed
 
     async def send(self):
-        """Send new GUI"""
+        """Send the embed message."""
 
         await main.client.send_typing(self.channel)
         self.sent_embed = await main.client.send_message(self.channel, embed=self.built_embed)
 
     async def usend(self):
-        """Edit existing GUI if available, else send new GUI"""
+        """Update the existing embed."""
 
         try:
             await main.client.edit_message(self.sent_embed, embed=self.built_embed)
-        except:
-            pass
+        except Exception as e:
+            # TODO Add exceptions
+            logger.exception(e)
 
     async def delete(self):
-        """Deletes the existing GUI if available"""
+        """Delete the existing embed."""
 
         try:
             await main.client.delete_message(self.sent_embed)
-        except:
-            pass
+        except Exception as e:
+            # TODO Add exceptions
+            logger.exception(e)
 
         self.sent_embed = None
 
     def update_field(self, title, data):
-        """Updates a particular field's data
+        """Update a particular field's data.
 
         Args:
-            title (str): The title of the field to update
-            data (str): The new value to set for this datapack
+            title (str): The title of the field to update.
+            data (str): The new value to set for this datapack.
         """
 
         if title in self.datapack_lines:
@@ -111,20 +116,20 @@ class UI:
             logger.warning("No field with title '{}'".format(title))
 
     def update_colour(self, new_colour):
-        """Updates the embed's colour
+        """Update the embed's colour.
 
         Args:
-            new_colour (discord.Colour): The new colour for the embed
+            new_colour (discord.Colour): The new colour for the embed.
         """
 
         self.built_embed.colour = new_colour
 
     def update_data(self, index, data):
-        """Updates a particular datapack's data
+        """Update a particular datapack's data.
 
         Args:
-            index (int): The index of the datapack
-            data (str): The new value to set for this datapack
+            index (int): The index of the datapack.
+            data (str): The new value to set for this datapack.
         """
 
         datapack = self.built_embed.to_dict()["fields"][index]

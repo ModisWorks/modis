@@ -16,61 +16,60 @@ from modis.tools import data
 data.get()
 
 
-def cmd(data_dir=None):
+def cmd(data_filepath=None):
     """Start Modis in command line.
 
     Args:
-        data_dir (str): The data.json filepath.
+        data_filepath (str): The data.json filepath.
     """
 
     # TODO switch to configtools
-    # Set the data dir to the one provided
-    if data_dir:
-        set_dir(data_dir)
+    # Set data.json filepath
+    if data_filepath:
+        set_dir(data_filepath)
 
-    # Setup the logger
+    # TODO move to logtools
+    # Setup logger
     import logging
     from modis.tools import log
     logger = logging.getLogger(__name__)
     log.init_print(logger)
     log.init_file(logger)
+    logger.info("Starting Modis")
 
-    # Import packages
+    # Start Modis
     import asyncio
     from modis import main
 
-    # Start Modis for command line
-    logger.info("Starting Modis")
     loop = asyncio.get_event_loop()
     asyncio.set_event_loop(loop)
     main.start(loop)
 
 
-def gui(data_dir=None):
+def gui(data_filepath=None):
     """Start Modis with GUI.
 
     Args:
-        data_dir: The data.json filepath.
+        data_filepath: The data.json filepath.
     """
 
     # TODO switch to configtools
-    # Set the data dir to the one provided
-    if data_dir:
-        set_dir(data_dir)
+    # Set data.json filepath
+    if data_filepath:
+        set_dir(data_filepath)
 
+    # TODO move to logtools
     # Setup the logger
     import logging
     from modis.tools import log
     logger = logging.getLogger(__name__)
     log.init_print(logger)
     log.init_file(logger)
+    logger.info("Starting Modis console GUI")
 
-    # Import packages
+    # Start Modis console GUI
     import tkinter as tk
     from modis.gui import window
-
-    # Start Modis for GUI
-    logger.info("Starting GUI")
 
     # Setup the root window
     root = tk.Tk()
@@ -79,8 +78,10 @@ def gui(data_dir=None):
     root.title("Modis Control Panel")
     root.iconbitmap(__file__[:-11] + "assets/modis.ico")
 
-    # Setup the notebook
+    # Add elements
     main = window.RootFrame(root)
+
+    # Grid elements
     main.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
 
     # Configure stretch ratios
@@ -89,7 +90,7 @@ def gui(data_dir=None):
     main.columnconfigure(0, weight=1)
     main.rowconfigure(0, weight=1)
 
-    # Run the window UI
+    # Run the root window
     root.mainloop()
 
 

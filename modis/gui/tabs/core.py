@@ -166,13 +166,6 @@ class Frame(ttk.Frame):
                 data.get()
                 return
 
-            if not data.is_valid(data.cache):
-                logger.error("Chosen file is not a valid Modis data file; reverting changes")
-                self.datapath.set(old)
-                config.DATAFILE = old
-                data.get()
-                return
-
             logger.warning("data file changed to " + config.DATAFILE)
 
         def toggle(self):
@@ -208,12 +201,28 @@ class Frame(ttk.Frame):
             self.button_text.set("Start Modis")
             self.state = "off"
 
-            # Stop Modis
             logger.warning("Stopping Modis")
             statuslog = logging.getLogger("globalstatus")
             statuslog.info("0")
+
             from modis.main import client
-            asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
+
+            # Logout
+            try:
+                asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
+            except AttributeError:
+                # Client object no longer exists
+                return
+
+            # Cancel all pending tasks
+            try:
+                pending = asyncio.Task.all_tasks(loop=client.loop)
+                gathered = asyncio.gather(*pending, loop=client.loop)
+                gathered.cancel()
+                client.loop.run_until_complete(gathered)
+                gathered.exception()
+            except Exception as e:
+                logger.exception(e)
 
     class Log(ttk.Labelframe):
         """The text box showing the logging output"""

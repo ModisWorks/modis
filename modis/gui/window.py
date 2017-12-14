@@ -24,7 +24,11 @@ class RootFrame(ttk.Frame):
                 from modis import main
                 if main.client and main.client.loop:
                     asyncio.run_coroutine_threadsafe(main.client.logout(), main.client.loop)
+            except AttributeError:
+                # Client no longer exists
+                pass
             except RuntimeError:
+                # TODO work out what causes this one
                 pass
             except Exception as e:
                 logger.exception(e)

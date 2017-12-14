@@ -6,6 +6,10 @@ access global variables.
 
 import os as _os
 
+# About
+VERSION = "0.4.0"
+NICKNAME = "CHOPIN"
+
 # Directory
 ROOT_DIR = _os.path.dirname(_os.path.dirname(_os.path.realpath(__file__)))
 MODULES_DIR = ROOT_DIR + "/modules"

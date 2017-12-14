@@ -4,10 +4,8 @@ This is the hub from which Modis runs all its modules.
 start() is called by __init__.py if Modis is running in command line, or by the
 start button in the GUI if Modis is running in GUI.
 
-_eh_get() scans the modules folder and returns a dictionary of all the event
-handlers in all the modules. _eh_create() then combines all event handlers of
-the same type into one, so that they can be registered into the discord.py
-client.
+_eh_create() combines multiple event handlers of the same type into one single
+function, so that they can be registered into the discord.py client.
 """
 
 import logging
@@ -21,7 +19,7 @@ client = None
 def start(loop):
     """Start the Discord client and log Modis into Discord."""
 
-    logger.info("----------------NEW INSTANCE----------------")
+    logger.info("Loading Modis...")
 
     import discord
     import asyncio
@@ -32,7 +30,7 @@ def start(loop):
     data.get()
 
     # Check the current version
-    logger.info(version.get_str())
+    logger.info(version.infostr())
 
     # Create client
     logger.debug("Creating Discord client")
@@ -49,47 +47,56 @@ def start(loop):
     for eh in eh_lib.keys():
         client.event(_eh_create(eh, eh_lib))
 
-    # Run the client loop
-    logger.info("Connecting to Discord")
-    # TODO clean up this massive exception stack
+    # Start the bot
+    logger.info("Connecting to Discord...")
     try:
+        # Login to Discord
         token = data.cache["keys"]["discord_token"]
         client.loop.run_until_complete(client.login(token))
     except Exception as e:
-        logger.exception(e)
+        # Login failed
         logger.critical("Could not connect to Discord")
-        statuslog.info("0")
+        logger.exception(e)
+        statuslog.info("3")
     else:
-        logger.debug("Running the bot")
+        # Connection lost
+        logger.error("Connection to discord lost")
+        statuslog.info("3")
         try:
+            # Try to reconnect
+            logger.info("Reconnecting...")
             client.loop.run_until_complete(client.connect())
         except KeyboardInterrupt:
+            # Reconnect cancelled
+            logger.warning("Reconnect cancelled")
             client.loop.run_until_complete(client.logout())
+
+            # Cancel all pending tasks
             pending = asyncio.Task.all_tasks(loop=client.loop)
             gathered = asyncio.gather(*pending, loop=client.loop)
             try:
                 gathered.cancel()
                 client.loop.run_until_complete(gathered)
-
-                # we want to retrieve any exceptions to make sure that
-                # they don't nag us about it being un-retrieved.
                 gathered.exception()
             except Exception as e:
                 logger.exception(e)
         except Exception as e:
+            # Reconnect failed
+            logger.error("Reconnect failed")
             logger.exception(e)
             pending = asyncio.Task.all_tasks(loop=client.loop)
             gathered = asyncio.gather(*pending, loop=client.loop)
             gathered.exception()
-        finally:
-            try:
-                client.loop.run_until_complete(client.logout())
-            except Exception as e:
-                logger.exception(e)
+    finally:
+        # Bot shutdown
+        try:
+            client.loop.run_until_complete(client.logout())
+        except Exception as e:
+            logger.exception(e)
 
-            logger.critical("Bot stopped\n")
-            statuslog.info("0")
-            client.loop.close()
+        logger.critical("Bot stopped")
+        statuslog.info("0")
+        client.loop.close()
 
 
 def _eh_create(eh_type, eh_lib):
@@ -97,8 +104,8 @@ def _eh_create(eh_type, eh_lib):
     into one.
 
     Args:
-        eh_type (str):
-        eh_lib (dict):
+        eh_type (str): The event handler type to be bundled.
+        eh_lib (dict): The library of event handlers to pull from.
 
     Returns:
         func (function): A combined event handler function consisting of all the
@@ -111,8 +118,7 @@ def _eh_create(eh_type, eh_lib):
                 module_event_handler_func = getattr(eh_module, eh_type)
                 await module_event_handler_func(*args, **kwargs)
             except Exception as e:
-                logger.warning("An error occured in " + eh_module.__name__)
+                logger.warning("An uncaught error occured in " + eh_module.__name__)
                 logger.exception(e)
-                statuslog.info("3")
     func.__name__ = eh_type
     return func

@@ -7,13 +7,30 @@ version currently being used.
 import logging
 import requests
 
+from modis.tools import config
+
 logger = logging.getLogger(__name__)
 
-VERSION = "0.4.0"
-NICKNAME = "CHOPIN"
+
+def infostr():
+    """
+    Get the version comparison info.
+
+    Returns:
+        version_str (str): A friendly response detailing the current version
+    """
+
+    latest = _get()
+    state = _compare(latest)
+    if state == -1:
+        return "A new version of Modis is available (v{})".format(latest)
+    elif state == 0:
+        return "You are running the latest version of Modis (v{})".format(config.VERSION)
+    elif state == 1:
+        return "You are running a preview version of Modis (v{} pre-release)".format(config.VERSION)
 
 
-def get():
+def _get():
     """Compare the current version to the latest on GitHub.
 
     Returns:
@@ -40,7 +57,7 @@ def get():
         return []
 
 
-def compare(release_version):
+def _compare(release_version):
     """Compare the current version to the latest on GitHub.
 
     Args:
@@ -50,7 +67,7 @@ def compare(release_version):
         comparison (int): -1=behind, 0=latest, 1=ahead
     """
 
-    current_version = VERSION.split('.')
+    current_version = config.VERSION.split('.')
 
     for vi in range(len(release_version)):
         if len(current_version) > vi:
@@ -62,21 +79,3 @@ def compare(release_version):
             return -1
 
     return 0
-
-
-def get_str():
-    """
-    Get the version comparison info.
-
-    Returns:
-        version_str (str): A friendly response detailing the current version
-    """
-
-    latest = get()
-    state = compare(latest)
-    if state == -1:
-        return "A new version of Modis is available (v{})".format(latest)
-    elif state == 0:
-        return "You are running the latest version of Modis (v{})".format(VERSION)
-    elif state == 1:
-        return "You are running a preview version of Modis (v{} pre-release)".format(VERSION)

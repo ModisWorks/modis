@@ -18,47 +18,28 @@ logger = logging.getLogger(__name__)
 cache = {}
 
 
-def create(template):
-    """Create a new data.json file from the template.
-
-    Args:
-        template (dict): The template dict to create data.json with.
-    """
-
-    global cache
-
-    cache = template
-
-    with open(config.DATAFILE, 'w') as file:
-        json.dump(cache, file, indent=2)
-
-
 def get():
-    """Read the data.json file.
+    """Read the data.json file and updates the cache"""
 
-    Returns:
-        data (dict): data.json parsed into a dict.
-    """
-
-    logger.debug("Getting data.json")
+    logger.debug("Reading data")
 
     global cache
 
     if not os.path.exists(config.DATAFILE):
-        logger.warning("data.json not found. An empty one was created.")
-        create(config.ROOT_TEMPLATE)
-        return cache
+        # data.json does not exist
+        logger.warning("data.json file not found. An empty one will be created.")
+        _create(config.ROOT_TEMPLATE)
+        return
 
     with open(config.DATAFILE, 'r') as file:
         cache = json.load(file)
 
-    # Check if the data is in the right format
-    if not is_valid(cache):
-        logger.warning("data.json in old format. Old data.json has been renamed to data.json.old")
+    if not _validate(cache):
+        # data.json is not a valid current Modis data file
+        logger.warning("data.json file is outdated or invalid. A new one will be created and the old file will be renamed to data.json.old")
         os.remove(config.DATAFILE + ".old")
         os.rename(config.DATAFILE, config.DATAFILE + ".old")
-        create(config.ROOT_TEMPLATE)
-    return cache
+        _create(config.ROOT_TEMPLATE)
 
 
 def write(new_data=None):
@@ -68,13 +49,14 @@ def write(new_data=None):
         new_data (dict): The updated data.json dict.
     """
 
-    logger.debug("Writing data.json")
+    logger.debug("Writing data")
 
     global cache
 
     if not os.path.exists(config.DATAFILE):
-        logger.warning("data.json not found. An empty one was created.")
-        create(config.ROOT_TEMPLATE)
+        # data.json does not exist
+        logger.warning("data.json file not found. An empty one will be created.")
+        _create(config.ROOT_TEMPLATE)
         return
 
     if new_data:
@@ -85,16 +67,33 @@ def write(new_data=None):
         json.dump(cache, file, indent=2)
 
 
-def is_valid(_data):
+def _create(template):
+    """Create a new data.json file from the template.
+
+    Args:
+        template (dict): The template dict to create data.json with.
+    """
+
+    logger.info("Creating new data.json")
+
+    global cache
+
+    cache = template
+
+    with open(config.DATAFILE, 'w') as file:
+        json.dump(cache, file, indent=2)
+
+
+def _validate(_dict):
     """Check if the current data is in the right format.
 
     Args:
-        _data (dict): The current data.json contents.
+        _dict (dict): The data dictionary to validate.
     """
 
-    if "keys" not in _data:
+    if "keys" not in _dict:
         return False
-    if "discord_token" not in _data["keys"]:
+    if "discord_token" not in _dict["keys"]:
         return False
     return True
 

@@ -6,14 +6,28 @@ Modis uses the logging package for logging. To create a new logger first import
 logging, then define a logger with "logger = logging.getLogger(__name__)".
 """
 
+import os
+import time
 import logging
 import sys
 
+from modis.tools import config
+from modis.tools import data
+
+logger = logging.getLogger(__name__)
+
 
 class UnicodeStreamHandler(logging.StreamHandler):
-    """A handler for Modis' logging and Unicode characters"""
+    """A logging handler that supports Unicode characters."""
 
     def __init__(self, stream, stream_err):
+        """Create a new Unicode stream handler.
+
+        Args:
+            stream: The stream to attatch the handler to.
+            stream_err: The error stream to attatch the handler to.
+        """
+
         super(UnicodeStreamHandler, self).__init__(stream)
 
         if not stream_err:
@@ -21,19 +35,29 @@ class UnicodeStreamHandler(logging.StreamHandler):
         self.stream_err = stream_err
 
     def emit(self, record):
-        try:
-            msg = self.format(record)
-            level = getattr(record, "levelname")
+        """Send a formatted record into the logger output
 
+        Args:
+            record: The record to emit.
+        """
+
+        try:
+            # Retrieve information from record
+            msg = self.format(record)
+            level = record.levelname
+
+            # Set the stream based on the record's urgency level
             stream = self.stream
             if level in ["WARNING", "CRITICAL", "ERROR"]:
                 stream = self.stream_err
 
+            # Write to the stream
             try:
                 stream.write(msg)
             except (UnicodeError, UnicodeEncodeError):
                 stream.write(msg.encode("UTF-8"))
 
+            # Exit
             stream.write(self.terminator)
             self.flush()
         except (KeyboardInterrupt, SystemExit):
@@ -42,17 +66,12 @@ class UnicodeStreamHandler(logging.StreamHandler):
             self.handleError(record)
 
 
-def init_print(logger):
-    """Adds a print handler to a logger
+def init_print(target_logger):
+    """Adds a print handler to a logger.
 
     Args:
-        logger (logging.logger): The logger to add the print handler to.
+        target_logger (logging.logger): The logger to add the print handler to.
     """
-
-    import os
-
-    from modis.tools import config
-    from modis.tools import data
 
     # Create logging directory
     if not os.path.isdir(config.LOGS_DIR):
@@ -62,7 +81,7 @@ def init_print(logger):
     if "log_level" not in data.cache:
         data.cache["log_level"] = "INFO"
         data.write()
-    logger.setLevel(data.cache["log_level"])
+    target_logger.setLevel(data.cache["log_level"])
 
     # Setup format
     formatter = logging.Formatter(config.LOG_FORMAT, style="{")
@@ -72,21 +91,15 @@ def init_print(logger):
     handler.setFormatter(formatter)
 
     # Add handler
-    logger.addHandler(handler)
+    target_logger.addHandler(handler)
 
 
-def init_file(logger):
-    """Adds a file handler to a logger
+def init_file(target_logger):
+    """Adds a file handler to a logger.
 
     Args:
-        logger (logging.logger): The logger to add the file handler to.
+        target_logger (logging.logger): The logger to add the file handler to.
     """
-
-    import os
-    import time
-
-    from modis.tools import config
-    from modis.tools import data
 
     # Create logging directory
     if not os.path.isdir(config.LOGS_DIR):
@@ -96,7 +109,7 @@ def init_file(logger):
     if "log_level" not in data.cache:
         data.cache["log_level"] = "INFO"
         data.write()
-    logger.setLevel(data.cache["log_level"])
+    target_logger.setLevel(data.cache["log_level"])
 
     # Setup format
     formatter = logging.Formatter(config.LOG_FORMAT, style="{")
@@ -106,4 +119,4 @@ def init_file(logger):
     handler.setFormatter(formatter)
 
     # Add handler
-    logger.addHandler(handler)
+    target_logger.addHandler(handler)
