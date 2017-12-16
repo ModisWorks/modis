@@ -123,6 +123,8 @@ class Frame(ttk.Frame):
             super(Frame.Control, self).__init__(parent, padding=8, text="Control")
 
             # Variables
+            self.thread = None
+
             self.datapath = tk.StringVar(value=config.DATAFILE)
 
             self.token = tk.StringVar(value=data.cache["keys"]["discord_token"])
@@ -220,8 +222,8 @@ class Frame(ttk.Frame):
             from modis import main
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            thread = threading.Thread(target=main.start, args=[loop])
-            thread.start()
+            self.thread = threading.Thread(target=main.start, args=[loop])
+            self.thread.start()
 
         def stop(self):
             """Stop Modis and log out of Discord."""
@@ -240,17 +242,24 @@ class Frame(ttk.Frame):
                 asyncio.run_coroutine_threadsafe(client.logout(), client.loop)
             except AttributeError:
                 # Client object no longer exists
+                pass
+
+            try:
+                self.thread.stop()
+            except AttributeError:
+                # Thread no longer exists
                 return
 
             # Cancel all pending tasks
-            try:
-                pending = asyncio.Task.all_tasks(loop=client.loop)
-                gathered = asyncio.gather(*pending, loop=client.loop)
-                gathered.cancel()
-                client.loop.run_until_complete(gathered)
-                gathered.exception()
-            except Exception as e:
-                logger.exception(e)
+            # TODO Fix this
+            # try:
+            #     pending = asyncio.Task.all_tasks(loop=client.loop)
+            #     gathered = asyncio.gather(*pending, loop=client.loop)
+            #     gathered.cancel()
+            #     client.loop.run_until_complete(gathered)
+            #     gathered.exception()
+            # except Exception as e:
+            #     logger.exception(e)
 
     class Log(ttk.Labelframe):
         """The text box showing the logging output"""

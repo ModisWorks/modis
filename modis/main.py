@@ -48,27 +48,26 @@ def start(loop):
         client.event(_eh_create(eh, eh_lib))
 
     # Start the bot
-    logger.info("Connecting to Discord...")
+    logger.info("Logging in to Discord...")
     try:
         # Login to Discord
         token = data.cache["keys"]["discord_token"]
         client.loop.run_until_complete(client.login(token))
     except Exception as e:
         # Login failed
-        logger.critical("Could not connect to Discord")
+        logger.info("Could not connect to Discord")
         logger.exception(e)
         statuslog.info("3")
     else:
         # Connection lost
-        logger.error("Connection to discord lost")
-        statuslog.info("3")
+        logger.debug("Login sucessful")
         try:
             # Try to reconnect
-            logger.info("Reconnecting...")
+            logger.debug("Connecting to Discord...")
             client.loop.run_until_complete(client.connect())
         except KeyboardInterrupt:
             # Reconnect cancelled
-            logger.warning("Reconnect cancelled")
+            logger.warning("Connection cancelled")
             client.loop.run_until_complete(client.logout())
 
             # Cancel all pending tasks
@@ -82,13 +81,14 @@ def start(loop):
                 logger.exception(e)
         except Exception as e:
             # Reconnect failed
-            logger.error("Reconnect failed")
+            logger.error("Connection failed")
             logger.exception(e)
             pending = asyncio.Task.all_tasks(loop=client.loop)
             gathered = asyncio.gather(*pending, loop=client.loop)
             gathered.exception()
     finally:
         # Bot shutdown
+        logger.info("Logging out of Discord")
         try:
             client.loop.run_until_complete(client.logout())
         except Exception as e:
