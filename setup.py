@@ -11,7 +11,7 @@ from os import path
 # Always prefer setuptools over distutils
 from setuptools import find_packages, setup
 
-from modis import datatools
+from modis.tools import version
 
 here = path.abspath(path.dirname(__file__))
 
@@ -25,7 +25,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version=datatools.version,
+    version=version.VERSION,
 
     description='A modular Discord bot',
     long_description=long_description,

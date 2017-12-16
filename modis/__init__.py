@@ -1,138 +1,110 @@
-"""Initialises Modis."""
+"""
+WELCOME TO MODIS
 
-from __future__ import unicode_literals
+These docstrings will guide you through how Modis' internals work, and get you
+started with developing for Modis.
 
-import logging
-import os
-import sys
-import time
+For more help, go to our website at https://infraxion.github.io/modis/ or join
+our discord (click "connect" in the Discord embed on the website) where other
+developers will be more than happy to help you.
 
-from modis import datatools
+Have fun!
+"""
 
-working_dir = os.getcwd()
-file_dir = os.path.dirname(os.path.realpath(__file__))
-logs_dir = "{}/logs/".format(working_dir)
-if not os.path.isdir(logs_dir):
-    os.mkdir(logs_dir)
-
-logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
-if datatools.has_data():
-    data = datatools.get_data()
-    if "log_level" in data:
-        logger.setLevel(data["log_level"])
-
-formatter = logging.Formatter("{asctime} {levelname:8} {name} - {message}", style="{")
-printhandler = logging.StreamHandler(sys.stdout)
-printhandler.setFormatter(formatter)
-filehandler = logging.FileHandler("{}/{}.log".format(logs_dir, time.time()))
-filehandler.setFormatter(formatter)
-
-logger.addHandler(printhandler)
-logger.addHandler(filehandler)
-
-logger.info("----------------NEW INSTANCE----------------")
-logger.info("Loading Modis")
-
-datatools.log_data()
+# Update data.json cache
+from modis.tools import data
+data.get()
 
 
-def console(discord_token, discord_client_id):
-    """
-    Start Modis in console format.
+def cmd(data_filepath=None):
+    """Start Modis in command line.
 
     Args:
-        discord_token (str): The bot token for your Discord application
-        discord_client_id: The bot's client ID
+        data_filepath (str): The data.json filepath.
     """
 
-    state, response = datatools.get_compare_version()
+    # TODO switch to configtools
+    # Set data.json filepath
+    if data_filepath:
+        set_dir(data_filepath)
 
-    logger.info("Starting Modis in console")
-    logger.info(response)
+    # TODO move to logtools
+    # Setup logger
+    import logging
+    from modis.tools import log
+    logger = logging.getLogger(__name__)
+    log.init_print(logger)
+    log.init_file(logger)
+    logger.info("Starting Modis")
 
-    import threading
+    # Start Modis
     import asyncio
+    from modis import main
 
-    logger.debug("Loading packages")
-    from modis.discord_modis import main as discord_modis_console
-    from modis.reddit_modis import main as reddit_modis_console
-    from modis.facebook_modis import main as facebook_modis_console
-
-    # Create threads
-    logger.debug("Initiating threads")
     loop = asyncio.get_event_loop()
-    discord_thread = threading.Thread(
-        target=discord_modis_console.start,
-        args=[discord_token, discord_client_id, loop])
-    reddit_thread = threading.Thread(
-        target=reddit_modis_console.start, args=[])
-    facebook_thread = threading.Thread(
-        target=facebook_modis_console.start, args=[])
-
-    # Run threads
-    logger.debug("Starting threads")
-    discord_thread.start()
-    reddit_thread.start()
-    facebook_thread.start()
-
-    logger.debug("Root startup completed")
+    asyncio.set_event_loop(loop)
+    main.start(loop)
 
 
-def gui(discord_token, discord_client_id):
-    """
-    Start Modis in gui format.
+def gui(data_filepath=None):
+    """Start Modis with GUI.
 
     Args:
-        discord_token (str): The bot token for your Discord application
-        discord_client_id: The bot's client ID
+        data_filepath: The data.json filepath.
     """
 
-    logger.info("Starting Modis in GUI")
+    # TODO switch to configtools
+    # Set data.json filepath
+    if data_filepath:
+        set_dir(data_filepath)
 
+    # TODO move to logtools
+    # Setup the logger
+    import logging
+    from modis.tools import log
+    logger = logging.getLogger(__name__)
+    log.init_print(logger)
+    log.init_file(logger)
+    logger.info("Starting Modis console GUI")
+
+    # Start Modis console GUI
     import tkinter as tk
-
-    logger.debug("Loading packages")
-    from modis.discord_modis import gui as discord_modis_gui
-    from modis.reddit_modis import gui as reddit_modis_gui
-    from modis.facebook_modis import gui as facebook_modis_gui
-
-    logger.debug("Initialising window")
+    from modis.gui import window
 
     # Setup the root window
     root = tk.Tk()
     root.minsize(width=800, height=400)
     root.geometry("800x600")
     root.title("Modis Control Panel")
-    # Icon
-    root.iconbitmap(r"{}/assets/modis.ico".format(file_dir))
+    root.iconbitmap(__file__[:-11] + "assets/modis.ico")
 
-    # Setup the notebook
-    """notebook = ttk.Notebook(root)
-    notebook.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
+    # Add elements
+    main = window.RootFrame(root)
+
+    # Grid elements
+    main.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
 
     # Configure stretch ratios
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
-    notebook.columnconfigure(0, weight=1)
-    notebook.rowconfigure(0, weight=1)
+    main.columnconfigure(0, weight=1)
+    main.rowconfigure(0, weight=1)
 
-    # Add tabs
-    logger.debug("Adding packages to window")
-    notebook.add(
-        discord_modis_gui.Frame(notebook, discord_token, discord_client_id),
-        text="Discord")
-    notebook.add(reddit_modis_gui.Frame(notebook), text="Reddit")
-    notebook.add(facebook_modis_gui.Frame(notebook), text="Facebook")"""
-    discord = discord_modis_gui.Frame(root, discord_token, discord_client_id)
-    discord.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
-    # Configure stretch ratios
-    root.columnconfigure(0, weight=1)
-    root.rowconfigure(0, weight=1)
-    discord.columnconfigure(0, weight=1)
-    discord.rowconfigure(0, weight=1)
-
-    logger.debug("GUI initialised")
-
-    # Run the window UI
+    # Run the root window
     root.mainloop()
+
+
+def set_dir(data_dir=None):
+    """Set the data directory.
+
+    Args:
+        data_dir: The new directory to store data in.
+    """
+
+    import os
+
+    if not os.path.isdir(data_dir):
+        raise NotADirectoryError("Data dir {} does not exist".format(data_dir))
+    else:
+        from modis.tools import config
+        config.WORK_DIR = data_dir

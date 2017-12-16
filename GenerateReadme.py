@@ -1,14 +1,20 @@
 """Generate a README.md file for Modis"""
 
-import os
-
-from modis import datatools, helptools
-
-readme = ""
+from modis.tools import config, moduledb, version
 
 
 def add_md(text, s, level=0):
-    """Adds text to the readme at the given level"""
+    """Appends text to a markdown.
+
+    Args:
+        text (str): The old text.
+        s (str): The text to append.
+        level (int): The markdown level of the appended text.
+
+    Returns:
+        text (str): The updated text
+    """
+
     if level > 0:
         if text != "":
             text += "\n"
@@ -24,7 +30,16 @@ def add_md(text, s, level=0):
 
 
 def add_ul(text, ul):
-    """Adds an unordered list to the readme"""
+    """Appends an unordered list to a markdown.
+
+    Args:
+        text (str): The old text.
+        ul (list): The list to append.
+
+    Returns:
+        text (str): The updated text.
+    """
+
     text += "\n"
     for li in ul:
         text += "- " + li + "\n"
@@ -33,51 +48,54 @@ def add_ul(text, ul):
     return text
 
 
-# Get modules
-filepath = os.path.dirname(os.path.realpath(__file__))
-database_dir = "{}/modis/discord_modis/modules".format(filepath)
-module_list = os.listdir(database_dir)
+readme = ""
 
 # Title
 readme = add_md(readme, "MODIS", 1)
-latest_release = "Latest release: [{1}v{0}]({2}/{0})".format(datatools.version,
-                                                             "Beta " if datatools.version[0] < "1" else "",
-                                                             "https://github.com/Infraxion/modis/releases/tag")
-readme = add_md(readme, latest_release)
+readme = add_md(readme, "Latest release: [v{0}{1}]({2}/{0})".format(
+    version.VERSION,
+    " Beta" if version.VERSION[0] < "1" else "",
+    "https://github.com/Infraxion/modis/releases/tag"
+))
 
 # About
 readme = add_md(readme, "About Modis", 2)
-modis_about = """Modis is a Discord bot that runs with a GUI and is designed to be as modular as possible
-so that anyone with some basic Python knowledge can quickly and easily create new modules that run on the bot."""
-readme = add_md(readme, modis_about)
+readme = add_md(readme, "Modis is an highly modular, open-source Discord bot "
+                        "that runs with a console GUI. Our goal is to make "
+                        "Modis as easy to host as possible, so that any "
+                        "Discord user can host their own bot. Modis is also "
+                        "designed to be very easy to develop for; it's "
+                        "modularised in a way that makes it very easy to "
+                        "understand for anyone familiar with the discord.py "
+                        "Python library.\n\n"
+                        "We hope that this bot introduces more novices to the "
+                        "painful world of software development and networking, "
+                        "and provides seasoned devs with something to "
+                        "procrastinate their deadline on. Have fun!")
 
 # Module list
+module_names = moduledb.get_names()
 readme = add_md(readme, "Current Modules", 2)
-module_names = []
-for module_name in module_list:
-    if len(module_name) > 0 and module_name[0] != "!" and module_name[0] != "_":
-        module_names.append("`{}`".format(module_name))
-readme = add_md(readme, "There are currently {} modules:".format(len(module_names)))
-readme = add_ul(readme, module_names)
+readme = add_md(readme, "There are currently {} available modules:".format(len(module_names)))
 
-for module_name in module_list:
-    if len(module_name) > 0 and module_name[0] != "!" and module_name[0] != "_":
-        module_dir = "{}/{}".format(database_dir, module_name)
-        module_help_path = "{}/{}".format(module_dir, "_help.json")
+module_list = []
+for module_name in module_names:
+    info = moduledb.get_import_specific("__info", module_name)
+    if not info:
+        module_list.append("`{}`".format(module_name))
+        continue
+    if not info.BLURB:
+        module_list.append("`{}`".format(module_name))
+        continue
+    module_list.append("`{}` - {}".format(module_name, info.BLURB))
+readme = add_ul(readme, module_list)
 
-        if os.path.isfile(module_help_path):
-            datepacks = helptools.get_help_datapacks(module_help_path, "!")
-            readme = add_md(readme, module_name, 3)
+readme = add_md(readme, "More detailed information about each module and how "
+                        "to use them can be found in the [docs](https://"
+                        "infraxion.github.io/modis/documentation/#modules).")
 
-            for d in datepacks:
-                if d[0] == "About":
-                    readme = add_md(readme, d[1])
-
-# Commands
-readme = add_md(readme, "Documentation", 2)
-readme = add_md(readme, "More detailed information about each module can be found in the"
-                        "[Documentation](https://infraxion.github.io/modis/documentation/#modules).")
-
-newreadme_path = "{}/README.md".format(filepath)
+# Write file
+print(readme)
+newreadme_path = "{}/../README.md".format(config.ROOT_DIR)
 with open(newreadme_path, 'w') as file:
     file.write(readme)

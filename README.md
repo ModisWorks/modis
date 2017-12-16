@@ -1,55 +1,26 @@
 # MODIS
 
-Latest release: [Beta v0.3.2](https://github.com/Infraxion/modis/releases/tag/0.3.2)
+Latest release: [v0.4.0 Beta](https://github.com/Infraxion/modis/releases/tag/0.4.0)
 
 ## About Modis
 
-Modis is a Discord bot that runs with a GUI and is designed to be as modular as possible
-so that anyone with some basic Python knowledge can quickly and easily create new modules that run on the bot.
+Modis is an highly modular, open-source Discord bot that runs with a console GUI. Our goal is to make Modis as easy to host as possible, so that any Discord user can host their own bot. Modis is also designed to be very easy to develop for; it's modularised in a way that makes it very easy to understand for anyone familiar with the discord.py Python library.
+
+We hope that this bot introduces more novices to the painful world of software development and networking, and provides seasoned devs with something to procrastinate their deadline on. Have fun!
 
 ## Current Modules
 
-There are currently 9 modules:
+There are currently 10 available modules:
 
-- `bethebot`
-- `gamedeals`
-- `help`
-- `hex`
-- `manager`
-- `music`
-- `replies`
-- `rocketleague`
-- `tableflip`
+- `!core` - Manages all the behind the scenes stuff that runs the internal APIs the modules use.
+- `bethebot` - Modis can't really have conversations with your server members, but you can fake it by taking control!
+- `gamedeals` - Posts current hot posts above an upvote threshold of a particular subreddit. It's set to /r/gamedeals by default so you can make sure you don't miss any sales!
+- `help` - Modis is a big bot, so this module helps to alleviate the learning cliff by allowing easy access to command definitions inside Discord.
+- `hex` - Visually displays hex colours if it sees them in your messages. Handy for graphic designers and programmers.
+- `manager` - Provides essential server management tools for server owners, such as activating and deactivating modules, changing the command prefix, and various moderation tools.
+- `music` - Modis' flagship module - a music player featuring a live-updating GUI with a progress bar, queue display, and more. The GUI also has working media buttons for easy control without needing to know any commands. The player supports songs and playlists for YouTube, Spotify, and SoundCloud, and can play most online audio sources.
+- `replies` - Allows server owners to easily set the bot to reply to specific phrases.
+- `rocketleague` - Looks up your Rocket League rank and stats; currently supported for Steam, XBox, and PS4 players.
+- `tableflip` - The best module.
 
-
-### bethebot
-
-bethebot let's the bot's owner send messages as Modis.
-
-### gamedeals
-
-gamedeals uses Reddit to find the best game deals.
-
-### help
-
-help lists the help commands for all modules, as well as the commands for specific modules.
-
-### hex
-
-hex looks for hex values in your messages, and displays a solid block image if it finds a value. hex works with any 3 or 6 digit hex values starting with '#' or '0x'.
-
-### manager
-
-manager allows users to activate and deactivate modules within a server, and change the server prefix for Modis.
-
-### music
-
-music plays videos and playlists from YouTube, and music files stored on the internet.
-
-### rocketleague
-
-rocketleague lets you look up player's Rocket League stats.
-
-## Documentation
-
-More detailed information about each module can be found in the[Documentation](https://infraxion.github.io/modis/documentation/#modules).
+More detailed information about each module and how to use them can be found in the [docs](https://infraxion.github.io/modis/documentation/#modules).
