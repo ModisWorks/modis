@@ -3,7 +3,7 @@ import logging
 import threading
 import tkinter as tk
 import tkinter.ttk as ttk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import webbrowser
 import json
 
@@ -63,7 +63,19 @@ class Frame(ttk.Frame):
                 webbrowser.open_new("https://infraxion.github.io/modis/")
 
             def hyperlink_invite(event):
-                webbrowser.open_new("https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=0".format(self.invite_text.get()))
+                client_id = self.invite_text.get()
+
+                if len(client_id) != 18:
+                    messagebox.showerror(title="Invalid Client ID", message="Client ID should be an 18 digit number.")
+                    return
+
+                try:
+                    int(client_id)
+                except ValueError:
+                    messagebox.showerror(title="Invalid Client ID", message="Client ID should be an 18 digit number.")
+                    return
+
+                webbrowser.open_new("https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=0".format(client_id))
 
             image = tk.PhotoImage(file=__file__[:-16] + "assets/64t.png")
             logo = tk.Label(self, image=image)
@@ -124,7 +136,7 @@ class Frame(ttk.Frame):
             datapath_button = ttk.Button(self, command=self.set_data_location, text="Change")
 
             token_label = ttk.Label(self, text="Discord bot token:")
-            token_entry = ttk.Entry(self, textvariable=self.token, show="*")
+            token_entry = ttk.Entry(self, textvariable=self.token, show="\u25cf")
 
             start_button = ttk.Button(self, command=self.toggle, textvariable=self.button_text)
 
@@ -148,25 +160,41 @@ class Frame(ttk.Frame):
             self.rowconfigure(3, weight=0)
 
         def set_data_location(self):
+            newpath = filedialog.askopenfile()
+            oldpath = config.DATAFILE
+
             try:
-                self.datapath.set(filedialog.askopenfile().name)
+                newpath = newpath.name
             except AttributeError:
+                # Window was closed
                 logger.warning("Data file not changed")
                 return
 
-            old = config.DATAFILE
-            config.DATAFILE = self.datapath.get()
+            if not messagebox.askokcancel(title="Change data file path", message="Change data file to:\n{}".format(newpath)):
+                # User cancelled path change
+                messagebox.showinfo(title="Change data file path", message="Data file not changed.")
+                return
+
+            # Change the path
+            config.DATAFILE = newpath
 
             try:
                 data.get()
             except json.decoder.JSONDecodeError:
+                # Chosen file invalid
                 logger.error("Chosen file is not a valid json; reverting changes")
-                self.datapath.set(old)
-                config.DATAFILE = old
+                messagebox.showerror(title="Change data file path", message="Chosen file is not a valid json.")
+
+                # Try again
+                config.DATAFILE = oldpath
                 data.get()
+                self.set_data_location()
                 return
 
+            # Successful change
+            self.datapath.set(newpath)
             logger.warning("data file changed to " + config.DATAFILE)
+            messagebox.showinfo(title="Change data file path", message="Data file change successful.")
 
         def toggle(self):
             """Toggle Modis on or off."""
