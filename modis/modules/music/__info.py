@@ -170,8 +170,11 @@ HELP_DATAPACKS = {
         "name": "cleartopic",
         "description": "Stops Modis from updating this channel's topic with the currently playing song"
     }, {
-        "name": "front",
+        "name": "movehere",
         "description": "Moves the music player to the front of the channel the command was sent from"
+    }, {
+        "name": "movevoice",
+        "description": "Moves Modis to the voice channel that the sender is in"
     }]
 }
 HELP_MARKDOWN = """"""

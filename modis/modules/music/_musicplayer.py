@@ -51,6 +51,7 @@ def _match_func(info_dict):
 file_format = "%(title)s"
 
 ytdl_formats = [
+    "bestaudio[filesize<20M]",
     "worstaudio",
     "worst",
 ]
@@ -178,20 +179,15 @@ class MusicPlayer:
             await self.set_topic("")
             # Init the music player
             await self.msetup(text_channel)
-            # Queue the song
-            await self.enqueue(query, index, stop_current, shuffle)
             # Connect to voice
             await self.vsetup(author)
 
             # Mark as 'ready' if everything is ok
             self.state = 'ready' if self.mready and self.vready else 'off'
-        else:
-            # Queue the song
-            await self.enqueue(query, index, stop_current, shuffle)
 
         if self.state == 'ready':
-            if self.streamer is None:
-                await self.vplay()
+            # Queue the song
+            await self.enqueue(query, index, stop_current, shuffle)
 
     async def stop(self, log_stop=False):
         """The stop command"""
@@ -623,6 +619,38 @@ class MusicPlayer:
 
         self.statuslog.info("Moved to front")
 
+    async def movevoice(self, author):
+        """
+        Moves the voice client to a new channel, based on the author's channel
+
+        Args:
+            author (discord.Member): The member to move to
+        """
+
+        if self.state != "ready":
+            self.logger.error("Attempt to move voice from wrong state")
+            return
+
+        self.logger.debug("movevoice command")
+
+        # Disconnect
+        if self.vclient:
+            try:
+                await self.vclient.disconnect()
+            except Exception as e:
+                logger.exception(e)
+
+        # Reconnect
+        self.vready = False
+        self.state = 'starting'
+        await self.vsetup(author)
+        if self.vready:
+            self.state = 'ready'
+            self.statuslog.info("Moved to new channel")
+
+            if self.streamer:
+                self.streamer.stop()
+
     async def set_topic_channel(self, channel):
         """Set the topic channel for this server"""
         data.cache["servers"][self.server_id]["modules"]["music"]["topic_id"] = channel.id
@@ -832,14 +860,14 @@ class MusicPlayer:
                 self.statuslog.error("Play index argument must be a number")
                 return
 
-        if not self.vready:
-            self.parse_query(query, indexnum, stop_current, shuffle)
-        else:
-            parse_thread = threading.Thread(
+        # parse_thread = threading.Thread(
+        #     target=self.parse_query,
+        #     args=[query, indexnum, stop_current, shuffle])
+        parse_thread = threading.Thread(
                 target=self.parse_query,
                 args=[query, indexnum, stop_current, shuffle])
-            # Run threads
-            parse_thread.start()
+        # Run threads
+        parse_thread.start()
 
     def parse_query(self, query, index, stop_current, shuffle):
         """
@@ -852,37 +880,45 @@ class MusicPlayer:
             shuffle (bool): Whether to shuffle the added songs
         """
 
-        if index is not None and len(self.queue) > 0:
-            if index < 0 or index >= len(self.queue):
-                if len(self.queue) == 1:
-                    self.statuslog.error("Play index must be 1 (1 song in queue)")
-                    return
-                else:
-                    self.statuslog.error("Play index must be between 1 and {}".format(len(self.queue)))
-                    return
+        def song_found(song, insert_index):
+            """Callback for when a song is found
 
-        try:
-            yt_videos = api_music.parse_query(query, self.statuslog)
-            if shuffle:
-                random.shuffle(yt_videos)
+            Args:
+                song (tuple): Tuple of the form (url, name)
+                insert_index (int): The index to add the song at
+            """
 
-            if len(yt_videos) == 0:
-                self.statuslog.error("No results for: {}".format(query))
-                return
+            self._url_insert(song, insert_index)
 
-            if index is None:
-                self.queue = self.queue + yt_videos
-            else:
-                if len(self.queue) > 0:
-                    self.queue = self.queue[:index] + yt_videos + self.queue[index:]
-                else:
-                    self.queue = yt_videos
-
-            self.update_queue()
-
-            if stop_current:
+            # Start playing if nothing is
+            if self.streamer is None:
+                if self.state == "ready":
+                    logger.info("Starting music")
+                    self.vplay_ts()
+            elif stop_current:
                 if self.streamer:
                     self.streamer.stop()
+
+            # Update the queue every 25 songs
+            if len(self.queue) % 25 == 0:
+                self.update_queue()
+
+        api_music.parse_query(query, self.statuslog, song_found, index, shuffle)
+
+        self.update_queue()
+
+    def _url_insert(self, song, index):
+        if song is None:
+            return
+
+        try:
+            if index is None:
+                self.queue.append(song)
+            else:
+                if len(self.queue) > 0:
+                    self.queue = self.queue[:index] + [song] + self.queue[index:]
+                else:
+                    self.queue = [song]
         except Exception as e:
             logger.exception(e)
 
@@ -1030,9 +1066,12 @@ class MusicPlayer:
     def play_empty(self):
         """Play blank audio to let Discord know we're still here"""
         if self.vclient:
-            if self.streamer:
-                self.streamer.volume = 0
-            self.vclient.play_audio("\n".encode(), encode=False)
+            try:
+                if self.streamer:
+                    self.streamer.volume = 0
+                self.vclient.play_audio("\n".encode(), encode=False)
+            except:
+                pass
 
     def download_next_song(self, song):
         """Downloads the next song and starts playing it"""
@@ -1044,7 +1083,6 @@ class MusicPlayer:
         # Move the songs from the next cache to the current cache
         self.move_next_cache()
 
-        self.state = 'ready'
         self.play_empty()
         # Download the file and create the stream
         with youtube_dl.YoutubeDL(dl_ydl_opts) as ydl:
@@ -1057,6 +1095,7 @@ class MusicPlayer:
                     future.result()
                 except Exception as e:
                     logger.exception(e)
+                    self.state = "ready"
                     self.vafter_ts()
                     return
             except PermissionError:
@@ -1065,12 +1104,16 @@ class MusicPlayer:
             except youtube_dl.utils.DownloadError as e:
                 self.logger.exception(e)
                 self.statuslog.error(e)
+                self.state = "ready"
                 self.vafter_ts()
                 return
             except Exception as e:
                 self.logger.exception(e)
+                self.state = "ready"
                 self.vafter_ts()
                 return
+
+        self.state = "ready"
 
     def download_next_song_cache(self):
         """Downloads the next song in the queue to the cache"""
@@ -1092,7 +1135,6 @@ class MusicPlayer:
         self.current_download_elapsed = 0
 
         self.streamer = self.vclient.create_ffmpeg_player(filepath, after=self.vafter_ts)
-        self.state = "ready"
         await self.setup_streamer()
 
         try:
@@ -1128,8 +1170,6 @@ class MusicPlayer:
         self.current_download_elapsed = 0
 
         self.streamer = await self.vclient.create_ytdl_player(url, ytdl_options=opts, after=self.vafter_ts)
-        self.state = "ready"
-
         await self.setup_streamer()
 
         self.nowplayinglog.debug(self.streamer.title)
@@ -1151,6 +1191,8 @@ class MusicPlayer:
         self.streamer.volume = self.volume / 100
         self.streamer.start()
 
+        self.state = "ready"
+
         self.pause_time = None
         self.vclient_starttime = self.vclient.loop.time()
 
@@ -1158,6 +1200,15 @@ class MusicPlayer:
         self.logger.debug("Caching next song")
         dl_thread = threading.Thread(target=self.download_next_song_cache)
         dl_thread.start()
+
+    def vplay_ts(self):
+        future = asyncio.run_coroutine_threadsafe(self.vplay(), main.client.loop)
+
+        try:
+            future.result()
+        except Exception as e:
+            logger.exception(e)
+            return
 
     async def vplay(self):
         if self.state != 'ready':
