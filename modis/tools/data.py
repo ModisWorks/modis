@@ -33,7 +33,6 @@ def get():
 
     with open(config.DATAFILE, 'r') as file:
         cache = json.load(file)
-
     if not _validate(cache):
         # data.json is not a valid current Modis data file
         logger.warning("data.json file is outdated or invalid. A new one will be created and the old file will be renamed to data.json.old")
@@ -61,10 +60,9 @@ def write(new_data=None):
 
     if new_data:
         cache = new_data
-    cache = _sort(cache)
 
     with open(config.DATAFILE, 'w') as file:
-        json.dump(cache, file, indent=2)
+        json.dump(_sort(cache), file, indent=2)
 
 
 def _create(template):

@@ -108,7 +108,7 @@ class Frame(ttk.Frame):
                 help_panel = tk.Text(self)
 
                 help_panel.configure(background="#202020", wrap="word")
-                help_panel.tag_config("title", font="TkHeadingFont 20 bold italic", foreground="#AAAAAA")
+                help_panel.tag_config("title", font="TkHeadingFont 20 bold", justify="center", foreground="#AAAAAA")
                 help_panel.tag_config("heading", font="TkHeadingFont 14 bold italic", foreground="#AAAAAA")
                 help_panel.tag_config("command", font="TkFixedFont", foreground="#FFAA00")
                 help_panel.tag_config("param", font="TkFixedFont", foreground="#00AAFF")
@@ -129,7 +129,7 @@ class Frame(ttk.Frame):
                 self.rowconfigure(0, weight=1)
 
                 help_contents = help.get_raw(module_name)
-                help_panel.insert("end", "\n    {}\n".format(module_name), "title")
+                help_panel.insert("end", "\n{}\n".format(module_name), "title")
                 for d in help_contents:
                     help_panel.insert("end", "\n\n    {}\n\n".format(d), "heading")
 
