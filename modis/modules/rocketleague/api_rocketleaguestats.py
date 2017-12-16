@@ -1,5 +1,10 @@
+import logging
 import requests
 import json
+
+logger = logging.getLogger(__name__)
+
+LOGO = "https://rocketleague.media.zestyio.com/rocket-league-logos-vr-white.f1cb27a519bdb5b6ed34049a5b86e317.png"
 
 
 def check_rank(player, platform="steam"):
@@ -15,6 +20,7 @@ def check_rank(player, platform="steam"):
     """
 
     # Get player ID and name Rocket League Tracker Network
+    logger.debug("HTML GET")
     webpage = requests.get(
         "https://rocketleague.tracker.network/profile/{}/{}".format(platform, player)
     ).text
@@ -33,6 +39,7 @@ def check_rank(player, platform="steam"):
         return False, ()
 
     # Get player stats from Rocket League Tracker Network
+    logger.debug("HTML POST")
     livedata = json.loads(
         requests.post(
             "https://rocketleague.tracker.network/live/data",
@@ -47,13 +54,20 @@ def check_rank(player, platform="steam"):
             value = str(statpack['Value']['DisplayValue'])
             if statpack['Value']['Percentile']:
                 percentile = str(statpack['Value']['Percentile'])
+                stats.append((field, value, "Top {}%".format(percentile)))
             else:
-                percentile = None
-            stats.append((field, value, percentile))
+                rank = str(statpack['Other']['subtitle'])
+                division = str(statpack['Other']['subtitle2'])
+                winstreak = statpack['Other']['winstreak']
+                if winstreak >= 0:
+                    winstreak = str(winstreak) + " game winning streak"
+                else:
+                    winstreak = str(-winstreak) + " game losing streak"
+                stats.append((field, "{} - MMR {}".format(rank, value), "{}, {}".format(division, winstreak)))
     except (IndexError, KeyError):
         return False, ()
 
-    dp = "https://rocketleague.media.zestyio.com/rocket-league-logos-vr-white.f1cb27a519bdb5b6ed34049a5b86e317.png"
+    dp = LOGO
 
     platform_display = platform
     if platform == "steam":

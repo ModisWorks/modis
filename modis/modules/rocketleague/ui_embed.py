@@ -28,7 +28,7 @@ def success(channel, stats, name, platform, dp):
 
         # Add percentile if it exists
         if stat[2]:
-            stat_value += " *(Top " + stat[2] + "%)*"
+            stat_value += " *({})*".format(stat[2])
 
         datapacks.append((stat_name, stat_value, True))
 
