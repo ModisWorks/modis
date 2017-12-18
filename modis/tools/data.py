@@ -32,12 +32,20 @@ def get():
         return
 
     with open(config.DATAFILE, 'r') as file:
-        cache = json.load(file)
-    if not _validate(cache):
+        try:
+            cache = json.load(file)
+            invalid_datafile = False
+        except:
+            invalid_datafile = True
+    if invalid_datafile or not _validate(cache):
         # data.json is not a valid current Modis data file
         logger.warning("data.json file is outdated or invalid. A new one will be created and the old file will be renamed to data.json.old")
-        os.remove(config.DATAFILE + ".old")
-        os.rename(config.DATAFILE, config.DATAFILE + ".old")
+
+        # Don't overwrite existing files
+        num = 1
+        while os.path.exists(config.DATAFILE + ".old" + str(num)):
+            num += 1
+        os.rename(config.DATAFILE, config.DATAFILE + ".old" + str(num))
         _create(config.ROOT_TEMPLATE)
 
 
