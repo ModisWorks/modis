@@ -81,20 +81,20 @@ async def warn_user(channel, user):
 
     server_id = channel.server.id
 
-    if "warnings_max" not in data.cache["servers"][server_id]["manager"]:
-        data.cache["servers"][server_id]["manager"]["warnings_max"] = 3
-    if "warnings" not in data.cache["servers"][server_id]["manager"]:
-        data.cache["servers"][server_id]["manager"]["warnings"] = {}
+    if "warnings_max" not in data.cache["servers"][server_id]["modules"]["manager"]:
+        data.cache["servers"][server_id]["modules"]["manager"]["warnings_max"] = 3
+    if "warnings" not in data.cache["servers"][server_id]["modules"]["manager"]:
+        data.cache["servers"][server_id]["modules"]["manager"]["warnings"] = {}
 
-    if user.id in data.cache["servers"][server_id]["manager"]["warnings"]:
-        data.cache["servers"][server_id]["manager"]["warnings"][user.id] += 1
+    if user.id in data.cache["servers"][server_id]["modules"]["manager"]["warnings"]:
+        data.cache["servers"][server_id]["modules"]["manager"]["warnings"][user.id] += 1
     else:
-        data.cache["servers"][server_id]["manager"]["warnings"][user.id] = 1
+        data.cache["servers"][server_id]["modules"]["manager"]["warnings"][user.id] = 1
 
     data.write()
 
-    warnings = data.cache["servers"][server_id]["manager"]["warnings"][user.id]
-    max_warnings = data.cache["servers"][server_id]["manager"]["warnings_max"]
+    warnings = data.cache["servers"][server_id]["modules"]["manager"]["warnings"][user.id]
+    max_warnings = data.cache["servers"][server_id]["modules"]["manager"]["warnings_max"]
 
     await main.client.send_typing(channel)
     embed = ui_embed.user_warning(channel, user, warnings, max_warnings)
@@ -124,7 +124,7 @@ async def ban_user(channel, user):
         return
 
     # Set the user's warnings to 0
-    if "warnings" in data.cache["servers"][server_id]["manager"]:
+    if "warnings" in data.cache["servers"][server_id]["modules"]["manager"]:
         if user.id in data.cache["servers"][server_id]["manager"]["warnings"]:
             data.cache["servers"][server_id]["manager"]["warnings"][user.id] = 0
             data.write()

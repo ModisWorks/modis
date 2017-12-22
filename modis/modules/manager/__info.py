@@ -24,7 +24,10 @@ COMMANDS = {
         "level": 0
     }
 }
-DATA_SERVER = {}
+DATA_SERVER = {
+    "warnings_max": 3,
+    "warnings": {},
+}
 DATA_GLOBAL = {}
 
 HELP_DATAPACKS = {
