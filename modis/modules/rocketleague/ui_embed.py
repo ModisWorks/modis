@@ -36,7 +36,8 @@ def success(channel, stats, name, platform, dp):
     gui = embed.UI(
         channel,
         "Rocket League Stats: {}".format(name),
-        "*Stats obtained from [Rocket League Tracker Network](https://rocketleague.tracker.network/)*",
+        "*Stats obtained from [Rocket League Tracker Network]"
+        "(https://rocketleague.tracker.network/)*",
         modulename="rocketleague",
         colour=0x0088FF,
         thumbnail=dp,
@@ -59,8 +60,9 @@ def fail_steamid(channel):
     gui = embed.UI(
         channel,
         "That SteamID doesn't exist.",
-        "You can get your SteamID by going to your profile page and looking at the url, "
-        "or you can set a custom ID by going to edit profile on your profile page.",
+        "You can get your SteamID by going to your profile page and looking at "
+        "the url, or you can set a custom ID by going to edit profile on your "
+        "profile page.",
         modulename="rocketleague",
         colour=0x0088FF
     )
@@ -81,7 +83,7 @@ def fail_api(channel):
     gui = embed.UI(
         channel,
         "Couldn't get stats off RLTrackerNetwork.",
-        "Maybe the API changed, please tell Infraxion.",
+        "Please tell a dev if you're getting this repeatedly.",
         modulename="rocketleague",
         colour=0x0088FF
     )

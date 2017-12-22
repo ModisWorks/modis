@@ -54,6 +54,7 @@ def get_imports(filenames):
                 # Requested file does not exist in module
                 continue
             import_name = ".modules.{}.{}".format(module_name, file)
+            logger.debug("Importing {} from {}".format(file, module_name))
             imported_file = importlib.import_module(import_name, "modis")
             imports[module_name][file] = imported_file
 
