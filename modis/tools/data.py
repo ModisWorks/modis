@@ -35,7 +35,7 @@ def get():
         try:
             cache = json.load(file)
             invalid_datafile = False
-        except:
+        except FileNotFoundError:
             invalid_datafile = True
     if invalid_datafile or not _validate(cache):
         # data.json is not a valid current Modis data file
