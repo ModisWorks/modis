@@ -30,7 +30,7 @@ def start(loop):
     data.get()
 
     # Check the current version
-    logger.info(version.infostr())
+    # logger.info(version.infostr())
 
     # Create client
     logger.debug("Creating Discord client")
@@ -55,12 +55,12 @@ def start(loop):
         client.loop.run_until_complete(client.login(token))
     except Exception as e:
         # Login failed
-        logger.info("Could not connect to Discord")
+        logger.info("Could not login to Discord")
         logger.exception(e)
         statuslog.info("3")
     else:
-        # Connection lost
-        logger.debug("Login sucessful")
+        # Login successful
+        logger.debug("Login successful")
         try:
             # Try to reconnect
             logger.debug("Connecting to Discord...")
