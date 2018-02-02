@@ -28,8 +28,8 @@ async def on_message(message):
     package = message.content.split(" ")
     root = package.pop(0)[len(prefix):]
     aux = []
-    for arg in package:
-        if not arg.startswith("-"):
+    while len(package) > 0:
+        if not package[0].startswith("-"):
             break
         aux.append(package.pop(0)[1:])
     query = " ".join(package)
