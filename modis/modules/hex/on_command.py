@@ -1,5 +1,6 @@
 import logging
 
+from modis import main
 from . import api_hexconvert, ui_embed
 
 logger = logging.getLogger(__name__)
@@ -7,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 async def on_command(root, aux, query, msgobj):
     if root == "hex":
+        await main.client.send_typing(msgobj.channel)
         hex_strs = api_hexconvert.convert_hex_value(query)
 
         if len(hex_strs) > 0:

@@ -1,5 +1,6 @@
 import logging
 
+from modis import main
 from . import api_reddit, ui_embed
 
 logger = logging.getLogger(__name__)
@@ -7,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 async def on_command(root, aux, query, msgobj):
     if root == "gamedeals":
+        await main.client.send_typing(msgobj.channel)
         posts = api_reddit.get_top10()
         if posts:
             for post in posts:

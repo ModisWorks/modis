@@ -38,5 +38,4 @@ async def on_message(message):
         if root not in _data.cmd_db[module_name]["cmd"].keys():
             continue
 
-        await main.client.send_typing(message.channel)
         await _data.cmd_db[module_name]["eh"](root, aux, query, message)

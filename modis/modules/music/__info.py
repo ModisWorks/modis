@@ -68,7 +68,7 @@ COMMANDS = {
     },
     "front": {
         "level": 0
-    }
+    },
 }
 DATA_SERVER = {
     "topic_id": "",
@@ -172,9 +172,6 @@ HELP_DATAPACKS = {
     }, {
         "name": "movehere",
         "description": "Moves the music player to the front of the channel the command was sent from"
-    }, {
-        "name": "movevoice",
-        "description": "Moves Modis to the voice channel that the sender is in"
     }]
 }
 HELP_MARKDOWN = """"""

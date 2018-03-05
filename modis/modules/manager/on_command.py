@@ -1,4 +1,6 @@
 import logging
+
+from modis import main
 from modis.tools import data
 
 from . import api_manager, ui_embed
@@ -14,12 +16,14 @@ async def on_command(root, aux, query, msgobj):
             break
 
     if not is_admin:
+        await main.client.send_typing(msgobj.channel)
         reason = "You must have a role that has the permission 'Administrator'"
         embed = ui_embed.error(msgobj.channel, "Insufficient Permissions", reason)
         await embed.send()
         return
 
     if root == "prefix" and query:
+        await main.client.send_typing(msgobj.channel)
         new_prefix = query.replace(" ", "").strip()
         data.cache["servers"][msgobj.server.id]["prefix"] = new_prefix
         data.write()
@@ -31,15 +35,18 @@ async def on_command(root, aux, query, msgobj):
         try:
             warn_max = int(query)
             if warn_max > 0:
+                await main.client.send_typing(msgobj.channel)
                 data.cache["servers"][msgobj.server.id]["manager"]["warnings_max"] = warn_max
                 data.write()
                 embed = ui_embed.warning_max_changed(msgobj.channel, warn_max)
                 await embed.send()
             else:
+                await main.client.send_typing(msgobj.channel)
                 reason = "Maximum warnings must be greater than 0"
                 embed = ui_embed.error(msgobj.channel, "Error", reason)
                 await embed.send()
         except ValueError:
+            await main.client.send_typing(msgobj.channel)
             reason = "Warning maximum must be a number"
             embed = ui_embed.error(msgobj.channel, "Error", reason)
             await embed.send()

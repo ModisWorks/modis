@@ -66,14 +66,18 @@ async def on_command(root, aux, query, msgobj):
         topic_off = "off" in aux
 
         if topic_on and topic_off:
+            await main.client.send_typing(msgobj.channel)
             embed = ui_embed.error_message(channel, "Invalid Topic",
                                            "The topic aux command cannot contain both 'on' and 'off'")
             await embed.send()
         elif topic_on:
+            await main.client.send_typing(msgobj.channel)
             await _data.cache[server.id].set_topic_channel(channel)
         elif topic_off:
+            await main.client.send_typing(msgobj.channel)
             await _data.cache[server.id].clear_topic_channel(channel)
         else:
+            await main.client.send_typing(msgobj.channel)
             embed = ui_embed.error_message(channel, "Invalid Topic",
                                            "The topic aux command must be either 'on' or 'off'")
             await embed.send()

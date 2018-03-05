@@ -746,6 +746,7 @@ class MusicPlayer:
         self.logger.debug("Setting up gui")
 
         # Create gui
+        await main.client.send_typing(text_channel)
         self.mchannel = text_channel
         self.new_embed_ui()
         await self.embed.send()

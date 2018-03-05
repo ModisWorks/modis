@@ -1,6 +1,8 @@
 import logging
+
 import discord
 
+from modis import main
 from modis.tools import data
 from . import api_help, ui_embed
 
@@ -9,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 async def on_command(root, aux, query, msgobj):
     if root == "help":
+        await main.client.send_typing(msgobj.channel)
         prefix = data.cache["servers"][msgobj.server.id]["prefix"]
 
         if query:
