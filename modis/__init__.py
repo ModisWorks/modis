@@ -76,7 +76,11 @@ def gui(data_filepath=None):
     root.minsize(width=800, height=400)
     root.geometry("800x600")
     root.title("Modis Control Panel")
-    root.iconbitmap(__file__[:-11] + "assets/modis.ico")
+
+    try:
+        root.iconbitmap(__file__[:-11] + "assets/modis.ico")
+    except:
+        pass
 
     # Add elements
     main = window.RootFrame(root)
