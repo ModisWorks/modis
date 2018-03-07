@@ -114,6 +114,34 @@ def user_ban(channel, user):
     return gui
 
 
+def user_kick(channel, user):
+    """
+    Creates an embed UI containing an user warning message
+
+    Args:
+        channel (discord.Channel): The Discord channel to bind the embed to
+        user (discord.User): The user to ban
+
+    Returns:
+        gui (embed.UI): The embed UI object
+    """
+
+    username = user.name
+    if isinstance(user, discord.Member):
+        if user.nick is not None:
+            username = user.nick
+
+    # Create embed UI object
+    gui = embed.UI(
+        channel,
+        "Kicked {}".format(username),
+        "{} has been kicked from this server".format(username),
+        modulename="manager"
+    )
+
+    return gui
+
+
 def warning_max_changed(channel, max_warnings):
     """
     Creates an embed UI containing an error message

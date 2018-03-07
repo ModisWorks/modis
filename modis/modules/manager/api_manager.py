@@ -115,6 +115,12 @@ async def ban_user(channel, user):
 
     server_id = channel.server.id
 
+    # Set the user's warnings to 0
+    if "warnings" in data.cache["servers"][server_id]["modules"]["manager"]:
+        if user.id in data.cache["servers"][server_id]["manager"]["warnings"]:
+            data.cache["servers"][server_id]["manager"]["warnings"][user.id] = 0
+            data.write()
+
     try:
         await main.client.ban(user)
     except discord.errors.Forbidden:
@@ -123,14 +129,45 @@ async def ban_user(channel, user):
         await embed.send()
         return
 
+    await main.client.send_typing(channel)
+    embed = ui_embed.user_ban(channel, user)
+    await embed.send()
+
+    try:
+        response = "You have been banned from the server '{}' " \
+                   "contact the owners to resolve this issue.".format(channel.server.name)
+        await main.client.send_message(user, response)
+    except Exception as e:
+        logger.exception(e)
+
+
+async def kick_user(channel, user):
+    """
+    Kick a user from a server
+
+    Args:
+        channel: The channel to send the warning message in
+        user: The user to give the warning to
+    """
+
+    server_id = channel.server.id
+
     # Set the user's warnings to 0
     if "warnings" in data.cache["servers"][server_id]["modules"]["manager"]:
         if user.id in data.cache["servers"][server_id]["manager"]["warnings"]:
             data.cache["servers"][server_id]["manager"]["warnings"][user.id] = 0
             data.write()
 
+    try:
+        await main.client.kick(user)
+    except discord.errors.Forbidden:
+        await main.client.send_typing(channel)
+        embed = ui_embed.error(channel, "Kick Error", "I do not have the permissions to kick that person.")
+        await embed.send()
+        return
+
     await main.client.send_typing(channel)
-    embed = ui_embed.user_ban(channel, user)
+    embed = ui_embed.user_kick(channel, user)
     await embed.send()
 
     try:

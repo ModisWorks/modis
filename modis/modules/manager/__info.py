@@ -14,6 +14,9 @@ COMMANDS = {
     "warn": {
         "level": 0
     },
+    "kick": {
+        "level": 0
+    },
     "ban": {
         "level": 0
     },

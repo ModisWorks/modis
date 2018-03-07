@@ -55,6 +55,10 @@ async def on_command(root, aux, query, msgobj):
         for user in msgobj.mentions:
             await api_manager.warn_user(msgobj.channel, user)
 
+    if root == "kick" and query:
+        for user in msgobj.mentions:
+            await api_manager.kick_user(msgobj.channel, user)
+
     if root == "ban" and query:
         for user in msgobj.mentions:
             await api_manager.ban_user(msgobj.channel, user)
