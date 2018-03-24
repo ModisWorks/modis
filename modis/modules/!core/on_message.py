@@ -35,6 +35,9 @@ async def on_message(message):
     query = " ".join(package)
 
     for module_name in _data.cmd_db.keys():
+        if "cmd" not in _data.cmd_db[module_name]:
+            logger.error("Could not generate help for module: " + module_name)
+            continue
         if root not in _data.cmd_db[module_name]["cmd"].keys():
             continue
 
