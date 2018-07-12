@@ -12,7 +12,9 @@ If you want to run Modis for yourself there's a few things you'll need to instal
 
 Modis runs on Python 3.6. If you don't have a recent version of Python running on your machine, you'll need to get it on the [Official Python website](https://www.python.org/downloads/release).
 Any release starting with 3.6 should work.
-As of writing, the current latest 3.6 release is [3.6.3](https://www.python.org/downloads/release/python-363/).
+As of writing, the current latest 3.6 release is [3.6.6](https://www.python.org/downloads/release/python-366/).
+
+> Python 3.7 and later is not compatible with the `discord.py` API that Modis uses, and therefore Python 3.7 installations will not work with Modis.
 
 Once you've found the release you want, go to its download page and scroll down to find a bunch of installation files.
 Pick the one that matches your OS and architecture and install Python.
