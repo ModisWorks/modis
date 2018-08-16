@@ -6,7 +6,7 @@ data.json
 data.json.old
 modis/discord_modis/modules/pingpong/
 .songcache/
-.modis-venv/
+modis-venv/
 
 ######## PYCHARM ########
 .idea
