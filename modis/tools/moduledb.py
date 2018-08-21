@@ -55,39 +55,12 @@ def get_imports(filenames):
                 continue
             import_name = ".modules.{}.{}".format(module_name, file)
             logger.debug("Importing {} from {}".format(file, module_name))
-            imported_file = importlib.import_module(import_name, "modis")
-            imports[module_name][file] = imported_file
-
-    return imports
-
-
-# TODO Deprecate
-def get_by_eh(eh_names):
-    """Get a dictionary with imported Python module files organised by event
-    handler.
-
-    Args:
-        eh_names (list): The names to scan.
-
-    Returns:
-        imports (dict): The imported files.
-    """
-
-    # Setup imports dict
-    imports = {}
-    for eh in eh_names:
-        imports[eh] = []
-
-    # Import requested files for each module
-    for module_name in get_names():
-        for file in os.listdir("{}/{}".format(config.MODULES_DIR, module_name)):
-            file = file[:-3]
-            if file not in eh_names:
-                # File does not exist
-                continue
-            import_name = ".modules.{}.{}".format(module_name, file)
-            imported_file = importlib.import_module(import_name, "modis")
-            imports[file].append(imported_file)
+            try:
+                imported_file = importlib.import_module(import_name, "modis")
+            except:
+                logger.error("{} from {} failed to import".format(file, module_name))
+            else:
+                imports[module_name][file] = imported_file
 
     return imports
 
@@ -112,31 +85,3 @@ def get_import_specific(eh_name, module_name):
         return
     import_name = ".modules.{}.{}".format(module_name, eh_name)
     return importlib.import_module(import_name, "modis")
-
-
-# TODO Deprecate (unused)
-def get_path(filenames):
-    """Get a dictionary with file paths organised by file name.
-
-    Args:
-        filenames (list): The file names to scan.
-
-    Returns:
-        files (dict): The file paths.
-    """
-
-    # Setup files dict
-    files = {}
-    for filename in filenames:
-        files[filename] = []
-
-    # Get paths for each file
-    for module_name in get_names():
-        for file in os.listdir("{}/{}".format(config.MODULES_DIR, module_name)):
-            if file not in filenames:
-                # Requested file does not exist in module
-                continue
-            file_path = "{}/{}/{}".format(config.MODULES_DIR, module_name, file)
-            files[file].append(file_path)
-
-    return files
