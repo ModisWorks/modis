@@ -57,10 +57,11 @@ def get_imports(filenames):
             logger.debug("Importing {} from {}".format(file, module_name))
             try:
                 imported_file = importlib.import_module(import_name, "modis")
-            except:
+            except Exception as e:
                 logger.error("{} from {} failed to import".format(file, module_name))
-            else:
-                imports[module_name][file] = imported_file
+                logger.exception(e)
+                continue
+            imports[module_name][file] = imported_file
 
     return imports
 

@@ -44,8 +44,13 @@ def start(loop):
 
     # Register event handlers
     logger.debug("Registering event handlers")
-    for eh in eh_lib.keys():
-        client.event(_eh_create(eh, eh_lib))
+    for eh_type in config.EH_TYPES:
+        eh_list = []
+        for module_name in eh_lib.keys():
+            if eh_type in eh_lib[module_name].keys():
+                eh_list.append(eh_lib[module_name][eh_type])
+        if eh_list:
+            client.event(_eh_create(eh_type, eh_list))
 
     # Start the bot
     logger.info("Logging in to Discord...")
@@ -99,13 +104,13 @@ def start(loop):
         client.loop.close()
 
 
-def _eh_create(eh_type, eh_lib):
+def _eh_create(eh_type, eh_list):
     """Create a function that combines all the event handlers of a specific type
     into one.
 
     Args:
         eh_type (str): The event handler type to be bundled.
-        eh_lib (dict): The library of event handlers to pull from.
+        eh_list (list): The library of event handlers to pull from.
 
     Returns:
         func (function): A combined event handler function consisting of all the
@@ -113,12 +118,12 @@ def _eh_create(eh_type, eh_lib):
     """
 
     async def func(*args, **kwargs):
-        for eh_module in eh_lib[eh_type]:
+        for eh in eh_list:
             try:
-                module_event_handler_func = getattr(eh_module, eh_type)
+                module_event_handler_func = getattr(eh, eh_type)
                 await module_event_handler_func(*args, **kwargs)
             except Exception as e:
-                logger.warning("An uncaught error occured in " + eh_module.__name__)
+                logger.warning("An uncaught error occured in " + eh.__name__)
                 logger.exception(e)
     func.__name__ = eh_type
     return func
