@@ -34,11 +34,17 @@ async def on_message(message):
         aux.append(package.pop(0)[1:])
     query = " ".join(package)
 
+    # Process command
     for module_name in _data.cmd_db.keys():
+        # Check for commands existing for this module
         if "cmd" not in _data.cmd_db[module_name]:
-            logger.error("Could not generate help for module: " + module_name)
             continue
+        # Check for command in list of commands for this module
         if root not in _data.cmd_db[module_name]["cmd"].keys():
             continue
 
+        # PERMISSION CHECKS
+        # TODO permission checks
+
+        # Send command to module
         await _data.cmd_db[module_name]["eh"](root, aux, query, message)

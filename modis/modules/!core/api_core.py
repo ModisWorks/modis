@@ -82,3 +82,4 @@ def cmd_db_update():
             _data.cmd_db[module_name]["eh"] = cmd_db[module_name]["on_command"].on_command
         if "__info" in cmd_db[module_name].keys():
             _data.cmd_db[module_name]["cmd"] = cmd_db[module_name]["__info"].COMMANDS
+            # TODO also add to static database, implement checks to see if its already in there
