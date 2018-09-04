@@ -70,6 +70,35 @@ def write(new_data=None):
         json.dump(_sort(cache), file, indent=2)
 
 
+def edit(server, module_name, path, value):
+    """Edit a specific data point belonging to a module.
+
+    Args:
+        server (str): Server ID of desired server, edits global module database if not specified.
+        module_name (str): Name of module to edit database of.
+        path (list): List of strings describing the path to the desired data point.
+        value: Value to change the data point to.
+    """
+
+    global cache
+
+    if len(path) == 1:
+        cache["servers"][server]["modules"][module_name][path[0]] = value
+    else:
+
+
+    write()
+
+def _get_path(path):
+    """Gets the cache path to a datapoint given a list of keys to traverse.
+
+    Args:
+        path (list): List of keys to traverse.
+
+    Returns:
+        datapoint:
+    """
+
 def _create(template):
     """Create a new data.json file from the template.
 
