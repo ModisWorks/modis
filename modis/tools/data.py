@@ -85,7 +85,7 @@ def edit(server, module_name, path, value):
     if len(path) == 1:
         cache["servers"][server]["modules"][module_name][path[0]] = value
     else:
-
+        pass
 
     write()
 
