@@ -89,6 +89,7 @@ def edit(server, module_name, path, value):
 
     write()
 
+
 def _get_path(path):
     """Gets the cache path to a datapoint given a list of keys to traverse.
 
@@ -98,6 +99,7 @@ def _get_path(path):
     Returns:
         datapoint:
     """
+
 
 def _create(template):
     """Create a new data.json file from the template.

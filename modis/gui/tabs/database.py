@@ -32,7 +32,7 @@ class Frame(ttk.Frame):
         self.rowconfigure(0, weight=1)
 
     class DataTree(ttk.LabelFrame):
-        """The text box showing the logging output"""
+        """The database display"""
 
         def __init__(self, parent):
             """Create the tree.
@@ -41,7 +41,7 @@ class Frame(ttk.Frame):
                 parent: A tk or ttk object.
             """
 
-            super(Frame.DataTree, self).__init__(parent, padding=8, text="Data tree")
+            super(Frame.DataTree, self).__init__(parent, padding=8, text="Database tree")
 
             # Define variables
             self.datapath = tk.StringVar(value=config.DATAFILE)

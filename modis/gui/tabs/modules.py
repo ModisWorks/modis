@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class Frame(ttk.Frame):
-    """A tab containing UI pages for all the modules"""
+    """A tab containing tools to install and manage modules"""
 
     def __init__(self, parent):
         """Create the frame.
@@ -17,92 +17,106 @@ class Frame(ttk.Frame):
             parent: A tk or ttk object.
         """
 
-        super(Frame, self).__init__(parent)
-
-        # Configure styles
-        s = ttk.Style()
-        s.configure(
-            "modis2.TNotebook",
-            tabmargins=[0, 0, -1, 0],
-            tabposition="wn"
-        )
-        s.configure(
-            "modis2.TNotebook.Tab",
-            padding=4,
-            width=15
-        )
-        s.map(
-            "modis2.TNotebook.Tab",
-            expand=[
-                ("selected", [0, 0, 1, 0]),
-                ("active", [0, 0, 1, 0])
-            ]
-        )
+        super(Frame, self).__init__(parent, padding=8)
 
         # Add elements
-        self.nav = ttk.Notebook(self, style="modis2.TNotebook")
+        installed = self.Installed(self)
+        find = self.Find(self)
 
         # Grid elements
-        self.nav.grid(column=0, row=0, padx=0, pady=0, sticky="W E N S")
+        installed.grid(column=0, row=0, padx=8, pady=8, sticky="W E N S")
+        find.grid(column=1, row=0, padx=8, pady=8, sticky="E N S")
 
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=0)
         self.rowconfigure(0, weight=1)
 
-        self.scan()
+    class Installed(ttk.LabelFrame):
+        """List of installed modules"""
 
-    def scan(self):
-        modules = moduledb.get_imports(["__ui"])
-
-        for module_name in modules.keys():
-            if "__ui" not in modules[module_name].keys():
-                logger.debug("No module UI for " + module_name)
-                module_ui = None
-            else:
-                logger.debug("Module UI found for " + module_name)
-                module_ui = modules[module_name]["__ui"].ModuleUIFrame
-            module_frame = self.ModuleFrame(self.nav, module_name, module_ui)
-            self.nav.add(module_frame, text=module_name)
-
-    class ModuleFrame(ttk.Frame):
-        """The base frame for a module's UI."""
-
-        def __init__(self, parent, module_name, module_ui):
+        def __init__(self, parent):
             """Create the frame.
 
             Args:
                 parent: A tk or ttk object.
-                module_name (str): The name of the module.
-                module_frame (import): The __ui.py file to add for the module.
             """
 
-            super(Frame.ModuleFrame, self).__init__(parent, padding=8)
+            super(Frame.Installed, self).__init__(parent, padding=8, text="Manage module")
+
+            # Variables
+            self.moduledb = {}
+            self.module_ui_cache = {}
 
             # Add elements
-            if module_ui:
-                module_frame = module_ui(self)
-            else:
-                module_frame = ttk.Frame(self)
+            self.module_list = ttk.Treeview(self, show="tree")
+            self.module_list.bind("<<TreeviewSelect>>", self.module_select)
+            self.module_list.column("#0", width=100)
+            yscrollbar = ttk.Scrollbar(self, orient="vertical", command=self.module_list.yview)
+            self.module_list['yscrollcommand'] = yscrollbar.set
 
-            nav = ttk.Notebook(self)
-            help_frame = self.HelpFrame(self, module_name)
-            log_frame = self.LogFrame(self, module_name)
-            nav.add(help_frame, text="Help")
-            nav.add(log_frame, text="Log")
+            self.module_ui_container = ttk.Frame(self)
+            self.module_ui_container.columnconfigure(0, weight=1)
+            self.module_ui_container.rowconfigure(0, weight=1)
 
             # Grid elements
-            module_frame.grid(row=0, column=0, sticky="W E N S")
-            nav.grid(row=1, column=0, padx=8, pady=8, sticky="W E N S")
+            self.module_list.grid(column=0, row=0, padx=(4, 0), pady=4, sticky="W N S")
+            yscrollbar.grid(column=1, row=0, padx=(0, 4), pady=4, sticky="W N S")
+            self.module_ui_container.grid(column=2, row=0, sticky="W E N S")
 
             # Configure stretch ratios
-            self.columnconfigure(0, weight=1)
-            self.rowconfigure(0, weight=0)
-            self.rowconfigure(1, weight=1)
+            self.columnconfigure(0, weight=0)
+            self.columnconfigure(1, weight=0)
+            self.columnconfigure(2, weight=1)
+            self.rowconfigure(0, weight=1)
+
+            # Import module UIs
+            self.moduledb = moduledb.get_imports(["__ui"])
+
+            for module_name in self.moduledb.keys():
+                # Register module into module list
+                self.module_list.insert('', 'end', module_name, text=module_name)
+
+                # Create module frame
+                self.module_ui_cache[module_name] = ttk.Frame(self.module_ui_container)
+                self.module_ui_cache[module_name].grid(row=0, column=0, sticky="W E N S")
+                self.module_ui_cache[module_name].lower()
+
+                # Scan module database for module ui
+                if "__ui" not in self.moduledb[module_name].keys():
+                    logger.debug("No module UI for " + module_name)
+                else:
+                    logger.debug("Module UI found for " + module_name)
+
+                    # Add elements
+                    module_ui = self.moduledb[module_name]["__ui"].ModuleUIFrame(self.module_ui_cache[module_name])
+
+                    # Grid elements
+                    module_ui.grid(row=0, column=0, sticky="W E N S")
+
+                # Add elements
+                nav = ttk.Notebook(self.module_ui_cache[module_name])
+                help_frame = self.HelpFrame(nav, module_name)
+                log_frame = self.LogFrame(nav, module_name)
+                nav.add(help_frame, text="Help")
+                nav.add(log_frame, text="Log")
+
+                # Grid elements
+                nav.grid(row=1, column=0, padx=4, pady=4, sticky="W E N S")
+
+                # Configure stretch ratios
+                self.module_ui_cache[module_name].columnconfigure(0, weight=1)
+                self.module_ui_cache[module_name].rowconfigure(0, weight=0)
+                self.module_ui_cache[module_name].rowconfigure(1, weight=1)
+
+        def module_select(self, event):
+            selected = self.module_list.focus()
+            self.module_ui_cache[selected].lift()
 
         class HelpFrame(ttk.Frame):
             def __init__(self, parent, module_name):
 
-                super(Frame.ModuleFrame.HelpFrame, self).__init__(parent, padding=8)
+                super(Frame.Installed.HelpFrame, self).__init__(parent, padding=8)
 
                 # Add elements
                 help_panel = tk.Text(self)
@@ -126,7 +140,9 @@ class Frame(ttk.Frame):
 
                 # Configure stretch ratios
                 self.columnconfigure(0, weight=1)
+                self.columnconfigure(1, weight=0)
                 self.rowconfigure(0, weight=1)
+                self.rowconfigure(1, weight=0)
 
                 help_contents = help.get_raw(module_name)
                 help_panel.insert("end", "\n{}\n".format(module_name), "title")
@@ -164,7 +180,7 @@ class Frame(ttk.Frame):
                     parent: A tk or ttk object.
                 """
 
-                super(Frame.ModuleFrame.LogFrame, self).__init__(parent, padding=8)
+                super(Frame.Installed.LogFrame, self).__init__(parent, padding=8)
 
                 # Add elements
                 log_panel = tk.Text(self, wrap="none")
@@ -196,7 +212,9 @@ class Frame(ttk.Frame):
 
                 # Configure stretch ratios
                 self.columnconfigure(0, weight=1)
+                self.columnconfigure(1, weight=0)
                 self.rowconfigure(0, weight=1)
+                self.rowconfigure(1, weight=0)
 
             class PanelHandler(logging.Handler):
                 def __init__(self, text_widget):
@@ -207,10 +225,11 @@ class Frame(ttk.Frame):
 
                 def emit(self, record):
                     msg = self.format(record)
-                    msg_level = logging.Formatter("{levelname}",
-                                                  style="{").format(record)
+                    msg_level = logging.Formatter("{levelname}", style="{").format(record)
+
                     # Remove '.modis' from start of logs
                     msg = msg[:9] + msg[23:]
+
                     # Exceptions
                     if msg_level.startswith("ERROR"):
                         msg_level = "ERROR"
@@ -219,3 +238,50 @@ class Frame(ttk.Frame):
                     self.text_widget.insert("end", msg + "\n", msg_level)
                     self.text_widget.config(state=tk.DISABLED)
                     self.text_widget.see("end")
+
+    class Find(ttk.LabelFrame):
+        """Find modules off GitHub"""
+
+        def __init__(self, parent):
+            """Create the frame.
+
+            Args:
+                parent: A tk or ttk object.
+            """
+
+            super(Frame.Find, self).__init__(parent, padding=8, text="Module downloader")
+
+            # Variables
+            self.repo = tk.StringVar(value="modisworks")
+
+            # Add elements
+            repo_entry = ttk.Entry(self, textvariable=self.repo)
+            repo_scan = ttk.Button(self, command=self.scan, text="Scan repo")
+
+            self.module_list = ttk.Treeview(self, show="tree")
+            self.module_list.column("#0", width=100)
+            yscrollbar = ttk.Scrollbar(self, orient="vertical", command=self.module_list.yview)
+            self.module_list['yscrollcommand'] = yscrollbar.set
+
+            install_button = ttk.Button(self, command=self.install, text="Install")
+
+            # Grid elements
+            repo_entry.grid(column=0, columnspan=2, row=0, padx=4, pady=4, sticky="W E N")
+            repo_scan.grid(column=0, columnspan=2, row=1, padx=4, pady=4, sticky="E N")
+            self.module_list.grid(column=0, row=2, padx=(4, 0), pady=4, sticky="W E N S")
+            yscrollbar.grid(column=1, row=2, padx=(0, 4), pady=4, sticky="N S")
+            install_button.grid(column=0, columnspan=2, row=3, padx=4, pady=4, sticky="E S")
+
+            # Configure stretch ratios
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=0)
+            self.rowconfigure(0, weight=0)
+            self.rowconfigure(1, weight=0)
+            self.rowconfigure(2, weight=1)
+            self.rowconfigure(3, weight=0)
+
+        def scan(self):
+            pass
+
+        def install(self):
+            pass

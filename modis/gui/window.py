@@ -62,10 +62,10 @@ class RootFrame(ttk.Frame):
         statusbar = StatusBar(self)
 
         nav = ttk.Notebook(self, style="modis1.TNotebook")
-        from modis.gui.tabs import core, config, modules
-        nav.add(core.Frame(nav), text="Global")
-        nav.add(config.Frame(nav), text="Config")
+        from modis.gui.tabs import core, modules, database
+        nav.add(core.Frame(nav), text="Home")
         nav.add(modules.Frame(nav), text="Modules")
+        nav.add(database.Frame(nav), text="Database")
 
         # Grid elements
         statusbar.grid(column=0, row=1, sticky="W E S")
@@ -74,6 +74,7 @@ class RootFrame(ttk.Frame):
         # Configure stretch ratios
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=0)
 
 
 class StatusBar(ttk.Frame):
