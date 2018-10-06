@@ -1,5 +1,5 @@
 """
-This tool handles reading and saving data. Modis uses the JSON protocol to store
+This tool handles reading and editing the database. Modis uses the JSON protocol to store
 data to ensure easy accessibility.
 """
 
@@ -15,10 +15,61 @@ logger = logging.getLogger(__name__)
 cache = {}
 
 
-def get():
-    """Read the data.json file and updates the cache"""
+def get(server, module_name, path=None):
+    """Get a specific database entry belonging to a module.
 
-    logger.debug("Reading data")
+    Args:
+        server (str): Server ID of desired server, edits global module database if not specified.
+        module_name (str): Name of module to edit database entry of.
+        path (list): List of strings describing the path to the desired database entry.
+
+    Returns:
+        entry: The retrieved database entry.
+    """
+
+    global cache
+
+    entry = cache["servers"][server]["modules"][module_name]
+
+    if not path:
+        return entry
+
+    for key in path:
+        entry = entry[key]
+    return entry
+
+
+def edit(server, module_name, value, path=None):
+    """Edit a specific datapoint belonging to a module.
+
+    Args:
+        server (str): Server ID of desired server, edits global module database if not specified.
+        module_name (str): Name of module to edit the database entry of.
+        value: Value to change the database entry to.
+        path (list): List of strings describing the path to the desired database entry.
+    """
+
+    global cache
+
+    if path:
+        entry = cache["servers"][server]["modules"]
+        for key in path[:-1]:
+            entry = entry[key]
+        entry[path[-1]] = value
+    else:
+        cache["servers"][server]["modules"][module_name] = value
+
+    push()
+
+
+def pull():
+    """
+
+    Returns:
+
+    """
+
+    logger.debug("Pulling database from file")
 
     global cache
 
@@ -46,14 +97,14 @@ def get():
         _create(config.ROOT_TEMPLATE)
 
 
-def write(new_data=None):
+def push(new_data=None):
     """Update the data.json file.
 
     Args:
         new_data (dict): The updated data.json dict.
     """
 
-    logger.debug("Writing data")
+    logger.debug("Pushing database to file")
 
     global cache
 
@@ -68,37 +119,6 @@ def write(new_data=None):
 
     with open(config.DATAFILE, 'w') as file:
         json.dump(_sort(cache), file, indent=2)
-
-
-def edit(server, module_name, path, value):
-    """Edit a specific data point belonging to a module.
-
-    Args:
-        server (str): Server ID of desired server, edits global module database if not specified.
-        module_name (str): Name of module to edit database of.
-        path (list): List of strings describing the path to the desired data point.
-        value: Value to change the data point to.
-    """
-
-    global cache
-
-    if len(path) == 1:
-        cache["servers"][server]["modules"][module_name][path[0]] = value
-    else:
-        pass
-
-    write()
-
-
-def _get_path(path):
-    """Gets the cache path to a datapoint given a list of keys to traverse.
-
-    Args:
-        path (list): List of keys to traverse.
-
-    Returns:
-        datapoint:
-    """
 
 
 def _create(template):
