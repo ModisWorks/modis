@@ -19,7 +19,7 @@ LOGS_DIR = WORK_DIR + "/logs"
 # Discord
 EH_TYPES = [
     "on_ready",
-    "on_resume",
+    "on_resumed",
     "on_error",
     "on_message",
     "on_socket_raw_receive",

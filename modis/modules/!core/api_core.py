@@ -33,7 +33,7 @@ def server_update(server_id):
 
         print(data)
 
-        data.write()
+        data.push()
 
 
 def server_remove(server_id):
@@ -51,7 +51,7 @@ def server_remove(server_id):
         logger.warning("Server to be removed does not exist")
     else:
         logger.debug("Removed server {}".format(server_id))
-        data.write()
+        data.push()
 
 
 def server_clean():

@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 cache = {}
 
+# TODO Implement exception handling
+
 
 def get(server, module_name, path=None):
     """Get a specific database entry belonging to a module.
