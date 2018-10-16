@@ -75,11 +75,17 @@ def cmd_db_update():
 
     logger.debug("Updating command database")
 
+    # Retrive module "header" files and functions
     cmd_db = moduledb.get_imports(["__info", "on_command"])
+
     for module_name in cmd_db.keys():
         _data.cmd_db[module_name] = {}
+
         if "on_command" in cmd_db[module_name].keys():
+            # Enter module functions into database
             _data.cmd_db[module_name]["eh"] = cmd_db[module_name]["on_command"].on_command
+
         if "__info" in cmd_db[module_name].keys():
+            # Enter module "header" file into database
             _data.cmd_db[module_name]["cmd"] = cmd_db[module_name]["__info"].COMMANDS
             # TODO also add to static database, implement checks to see if its already in there

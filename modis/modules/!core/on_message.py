@@ -43,8 +43,18 @@ async def on_message(message):
         if root not in _data.cmd_db[module_name]["cmd"].keys():
             continue
 
-        # PERMISSION CHECKS
-        # TODO permission checks
+        # Permission checks
+        if "level" not in _data.cmd_db[module_name]["cmd"][root].keys():
+            # Send command to module
+            await _data.cmd_db[module_name]["eh"](root, aux, query, message)
+        else:
+            level = _data.cmd_db[module_name]["cmd"][root]["level"]
 
-        # Send command to module
-        await _data.cmd_db[module_name]["eh"](root, aux, query, message)
+            if isinstance(level, int):
+                # Permission is specified as role ranking
+                pass
+
+            elif isinstance(level, str):
+                # Permission is specified as specific Discord permission
+                pass
+        # TODO permission checks
