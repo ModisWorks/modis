@@ -1,6 +1,6 @@
-"""
-This tool handles reading and editing the database. Modis uses the JSON protocol to store
-data to ensure easy accessibility.
+"""THE DATABASE HANDLER
+
+This tool handles reading and editing of the data.json database. Modis uses the JSON protocol to store data to ensure easy readability and accessibility. The various functions in this file make it easy for modules to read and edit the database, and also provides an easy way to expand into more complex database technologies such as mongodb in the future.
 """
 
 import json
@@ -12,21 +12,25 @@ from modis.tools import config
 
 logger = logging.getLogger(__name__)
 
+# Create the cache object
 cache = {}
+# The cache dict is an exact copy of database.json, but stored in RAM. It makes it much easier for modules and framework to access the database without requiring disk reads and writes every time.
 
 # TODO Implement exception handling
 
 
 def get(server, module_name, path=None):
-    """Get a specific database entry belonging to a module.
+    """Gets a database entry.
+
+    Retreives a specific database entry belonging to a module. Under normal usage, this and `data.write()` should be the only functions you need.
 
     Args:
-        server (str): Server ID of desired server, edits global module database if not specified.
-        module_name (str): Name of module to edit database entry of.
+        server (str): Server ID of the server data to read.
+        module_name (str): Module name of the module data to read.
         path (list): List of strings describing the path to the desired database entry.
 
     Returns:
-        entry: The retrieved database entry.
+        The retrieved database entry.
     """
 
     global cache
@@ -42,11 +46,13 @@ def get(server, module_name, path=None):
 
 
 def edit(server, module_name, value, path=None):
-    """Edit a specific datapoint belonging to a module.
+    """Edits a database entry.
+
+    Edits a specific database entry belonging to a module. Under normal usage, this and `data.get()` should be the only functions you need.
 
     Args:
-        server (str): Server ID of desired server, edits global module database if not specified.
-        module_name (str): Name of module to edit the database entry of.
+        server (str): Server ID of the server data to edit.
+        module_name (str): Module name of the module data to edit.
         value: Value to change the database entry to.
         path (list): List of strings describing the path to the desired database entry.
     """
@@ -65,10 +71,9 @@ def edit(server, module_name, value, path=None):
 
 
 def pull():
-    """
+    """Updates cache from disk
 
-    Returns:
-
+    Updates the `cache` object with the current state of the data.json file.
     """
 
     logger.debug("Pulling database from file")
@@ -100,10 +105,12 @@ def pull():
 
 
 def push(new_data=None):
-    """Update the data.json file.
+    """Updates disk from cache
+
+    Updates the data.json file with the current state of the `cache` object.
 
     Args:
-        new_data (dict): The updated data.json dict.
+        new_data (dict): A custom dict to set data.json to. This argument is DANGEROUS and you could easily destroy your data.json if you're not careful.
     """
 
     logger.debug("Pushing database to file")
@@ -123,45 +130,52 @@ def push(new_data=None):
         json.dump(_sort(cache), file, indent=2)
 
 
-def _create(template):
-    """Create a new data.json file from the template.
+def _create(_template):
+    """Creates a new data.json file.
+
+    Creates a new data.json file from the template defined in modis.tools.config, or uses the `template` argument to create a custom data.json file.
 
     Args:
-        template (dict): The template dict to create data.json with.
+        _template (dict): The template dict to create data.json with.
     """
 
     logger.info("Creating new data.json")
 
     global cache
 
-    cache = template
+    cache = _template
 
     with open(config.DATAFILE, 'w') as file:
         json.dump(cache, file, indent=2)
 
 
-def _validate(_dict):
-    """Check if the current data is in the right format.
+def _validate(_template):
+    """Validates a data.json dictionary
+
+    Check if  the dictionary `_template` is in the right format for a data.json file using a hard-coded method, that will be changed to use the template defined in modis.tools.config in the future.
 
     Args:
-        _dict (dict): The data dictionary to validate.
+        _template (dict): The data dictionary to validate.
     """
 
-    if "keys" not in _dict:
+    # TODO make this not hard-coded
+    if "keys" not in _template:
         return False
-    if "discord_token" not in _dict["keys"]:
+    if "discord_token" not in _template["keys"]:
         return False
     return True
 
 
 def _sort(_dict):
-    """Recursively sort all elements in a dictionary.
+    """Sorts a dictionary.
+
+    Recursively sorts all elements in a dictionary to produce an OrderedDict.
 
     Args:
         _dict (dict): The dictionary to sort.
 
     Returns:
-        sorted_dict (OrderedDict): The sorted data dict.
+        An OrderedDict with its items sorted.
     """
 
     newdict = {}
@@ -177,13 +191,13 @@ def _sort(_dict):
 
 
 def _compare(_type):
-    """Give the order of the type for the dictionary.
+    """Defines a type order for a dictionary.
 
     Args:
         _type (type): The type to compare.
 
     Returns:
-        order (int): 1=dict/OrderedDict, 0=other
+        An integer where 1 = dict/OrderedDict, and 0 = other
     """
 
     if _type in [dict, OrderedDict]:
