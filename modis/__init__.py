@@ -1,17 +1,15 @@
 """WELCOME TO MODIS
 
-These docstrings will guide you through how Modis' internals work, and get you
-started with developing for Modis.
+These docstrings will guide you through how Modis' internals work, and get you started with developing for Modis.
 
-For more help, go to our website at https://modisworks.github.io/modis/ or join
-our discord (click "connect" in the Discord embed on the website) where other
-developers will be glad to help you out :)
+For more help, go to our website at https://modisworks.github.io/modis/ or join our discord (click "connect" in the Discord embed on the website) where other developers will be glad to help you out :)
 
 Have fun!
 """
 
-# Update data.json cache
 from modis.tools import data, config
+
+# Update data.json cache
 data.pull()
 
 
@@ -98,7 +96,7 @@ def gui(data_filepath=None):
 def _set_dir(data_dir=None):
     """Sets the data directory.
 
-    If the directory "data_dir" exists, sets the database directory to "data_dir".
+    If the directory `data_dir` exists, sets the database directory to `data_dir`.
 
     Args:
         data_dir (str): The directory the data.json file should be located in.

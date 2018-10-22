@@ -1,11 +1,8 @@
-"""
-This is the hub from which Modis runs all its modules.
+"""This is the hub from which Modis runs all its modules.
 
-start() is called by __init__.py if Modis is running in command line, or by the
-start button in the GUI if Modis is running in GUI.
+start() is called by __init__.py if Modis is running in command line, or by the start button in the GUI if Modis is running in GUI.
 
-_eh_create() combines multiple event handlers of the same type into one single
-function, so that they can be registered into the discord.py client.
+_eh_create() combines multiple event handlers of the same type into one single function, so that they can be registered into the discord.py client.
 """
 
 import logging
@@ -13,11 +10,21 @@ import logging
 logger = logging.getLogger(__name__)
 statuslog = logging.getLogger("globalstatus")
 
+
+# Create the client object
 client = None
+# The client object is what you use to interact with Discord. If you need to send anything to Discord, you will need to import this into your module with `from modis import main`, and then use `main.client` to do things.
+# For example, to send a message to a text channel, you would use `await main.client.send_message(...)`.
 
 
 def start(loop):
-    """Start the Discord client and log Modis into Discord."""
+    """Starts the bot
+
+    Starts the Discord client and logs Modis into Discord.
+
+    Args:
+        loop: An asyncio event loop for the bot to run on.
+    """
 
     logger.info("Loading Modis...")
 
@@ -27,9 +34,10 @@ def start(loop):
     from modis.tools import config, data, moduledb, version
 
     # Update data.json cache
-    data.get()
+    data.pull()
 
     # Check the current version
+    # TODO implement version check and display
     # logger.info(version.infostr())
 
     # Create client
@@ -52,7 +60,7 @@ def start(loop):
         if eh_list:
             client.event(_eh_create(eh_type, eh_list))
 
-    # Start the bot
+    # CONNECTION STACK
     logger.info("Logging in to Discord...")
     try:
         # Login to Discord
@@ -105,16 +113,16 @@ def start(loop):
 
 
 def _eh_create(eh_type, eh_list):
-    """Create a function that combines all the event handlers of a specific type
-    into one.
+    """Creates a compiled event handler
+
+    Creates a function that combines all the event handlers of a specific type into one.
 
     Args:
         eh_type (str): The event handler type to be bundled.
         eh_list (list): The library of event handlers to pull from.
 
     Returns:
-        func (function): A combined event handler function consisting of all the
-        event handlers in its category.
+        A combined event handler function consisting of all the event handlers in its category.
     """
 
     async def func(*args, **kwargs):
