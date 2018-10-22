@@ -57,10 +57,10 @@ class Frame(ttk.Frame):
 
             # Add elements
             def hyperlink_website(event):
-                webbrowser.open_new("https://infraxion.github.io/modis/")
+                webbrowser.open_new("https://modisworks.github.io/")
 
             def hyperlink_discord(event):
-                webbrowser.open_new("https://infraxion.github.io/modis/")
+                webbrowser.open_new("https://discord.gg/z83UGvK/")
 
             def hyperlink_invite(event):
                 client_id = self.invite_text.get()

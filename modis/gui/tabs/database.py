@@ -142,14 +142,14 @@ class Frame(ttk.Frame):
 
             from modis.tools import data
 
-            def recursive_add(data, parent=""):
-                for key in data:
-                    if type(data[key]) is dict:
+            def recursive_add(entry, parent=""):
+                for key in entry:
+                    if type(entry[key]) is dict:
                         new_item = self.tree.insert(parent, "end", text=key)
                         self.all_items.append(new_item)
-                        recursive_add(data[key], new_item)
+                        recursive_add(entry[key], new_item)
                     else:
-                        new_item = self.tree.insert(parent, "end", text=key, values=str(data[key]))
+                        new_item = self.tree.insert(parent, "end", text=key, values=str(entry[key]))
                         self.all_items.append(new_item)
 
             recursive_add(data.cache)
@@ -203,7 +203,7 @@ class Frame(ttk.Frame):
             logger.warning("Updating {} to {}".format(self.selected_key_var.get(), self.selected_val_var.get()))
             exec("data.cache{} = self.selected_val_var.get()".format(pathstr))
 
-            data.write()
+            data.push()
             self.tree_update()
             messagebox.showinfo(title="Edit value", message="Edit successful.")
 
@@ -227,7 +227,7 @@ class Frame(ttk.Frame):
             config.DATAFILE = newpath
 
             try:
-                data.get()
+                data.pull()
             except json.decoder.JSONDecodeError:
                 # Chosen file invalid
                 logger.error("Chosen file is not a valid json; reverting changes")
@@ -235,7 +235,7 @@ class Frame(ttk.Frame):
 
                 # Try again
                 config.DATAFILE = oldpath
-                data.get()
+                data.pull()
                 self.set_data_location()
                 return
 

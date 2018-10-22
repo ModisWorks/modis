@@ -80,7 +80,7 @@ def init_print(target_logger):
     # Set log level
     if "log_level" not in data.cache:
         data.cache["log_level"] = "INFO"
-        data.write()
+        data.push()
     target_logger.setLevel(data.cache["log_level"])
 
     # Setup format
@@ -108,7 +108,7 @@ def init_file(target_logger):
     # Set log level
     if "log_level" not in data.cache:
         data.cache["log_level"] = "INFO"
-        data.write()
+        data.push()
     target_logger.setLevel(data.cache["log_level"])
 
     # Setup format
