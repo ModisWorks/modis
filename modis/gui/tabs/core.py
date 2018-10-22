@@ -60,7 +60,7 @@ class Frame(ttk.Frame):
                 webbrowser.open_new("https://modisworks.github.io/")
 
             def hyperlink_discord(event):
-                webbrowser.open_new("https://discord.gg/z83UGvK/")
+                webbrowser.open_new("https://modisworks.github.io/#getting-started")
 
             def hyperlink_invite(event):
                 client_id = self.invite_text.get()
