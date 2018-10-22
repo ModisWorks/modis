@@ -75,7 +75,10 @@ def gui(data_filepath=None):
     root.minsize(width=800, height=400)
     root.geometry("800x600")
     root.title("Modis Control Panel")
-    root.iconbitmap("{}/assets/modis.ico".format(config.WORK_DIR))
+    try:
+        root.iconbitmap("{}/assets/modis.ico".format(__file__[:-11]))
+    except tk.TclError:
+        logger.warning("Could not resolve asset path")
 
     # Add elements
     main = window.RootFrame(root)
