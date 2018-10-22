@@ -1,34 +1,33 @@
-"""
-WELCOME TO MODIS
+"""WELCOME TO MODIS
 
 These docstrings will guide you through how Modis' internals work, and get you
 started with developing for Modis.
 
-For more help, go to our website at https://infraxion.github.io/modis/ or join
+For more help, go to our website at https://modisworks.github.io/modis/ or join
 our discord (click "connect" in the Discord embed on the website) where other
-developers will be more than happy to help you.
+developers will be glad to help you out :)
 
 Have fun!
 """
 
 # Update data.json cache
-from modis.tools import data
-data.get()
+from modis.tools import data, config
+data.pull()
 
 
 def cmd(data_filepath=None):
-    """Start Modis in command line.
+    """Starts Modis in command line.
+
+    Starts Modis barebones in the console, without a graphical interface.
 
     Args:
-        data_filepath (str): The data.json filepath.
+        data_filepath (str): The path to the folder containing the data.json file.
     """
 
-    # TODO switch to configtools
-    # Set data.json filepath
+    # Set data.json filepath if specified
     if data_filepath:
-        set_dir(data_filepath)
+        _set_dir(data_filepath)
 
-    # TODO move to logtools
     # Setup logger
     import logging
     from modis.tools import log
@@ -37,28 +36,30 @@ def cmd(data_filepath=None):
     log.init_file(logger)
     logger.info("Starting Modis")
 
-    # Start Modis
+    # Setup Modis event loop
     import asyncio
     from modis import main
 
     loop = asyncio.get_event_loop()
     asyncio.set_event_loop(loop)
+
+    # Start Modis
     main.start(loop)
 
 
 def gui(data_filepath=None):
-    """Start Modis with GUI.
+    """Starts Modis with GUI.
+
+    Starts the Modis graphical interface, which will let you launch the bot, edit the database and download modules in an easy to use launcher program.
 
     Args:
-        data_filepath: The data.json filepath.
+        data_filepath: The path to the folder containing the data.json file.
     """
 
-    # TODO switch to configtools
     # Set data.json filepath
     if data_filepath:
-        set_dir(data_filepath)
+        _set_dir(data_filepath)
 
-    # TODO move to logtools
     # Setup the logger
     import logging
     from modis.tools import log
@@ -76,11 +77,7 @@ def gui(data_filepath=None):
     root.minsize(width=800, height=400)
     root.geometry("800x600")
     root.title("Modis Control Panel")
-
-    try:
-        root.iconbitmap(__file__[:-11] + "assets/modis.ico")
-    except:
-        pass
+    root.iconbitmap("{}/assets/modis.ico".format(config.WORK_DIR))
 
     # Add elements
     main = window.RootFrame(root)
@@ -98,17 +95,19 @@ def gui(data_filepath=None):
     root.mainloop()
 
 
-def set_dir(data_dir=None):
-    """Set the data directory.
+def _set_dir(data_dir=None):
+    """Sets the data directory.
+
+    If the directory "data_dir" exists, sets the database directory to "data_dir".
 
     Args:
-        data_dir: The new directory to store data in.
+        data_dir (str): The directory the data.json file should be located in.
     """
 
     import os
 
     if not os.path.isdir(data_dir):
-        raise NotADirectoryError("Data dir {} does not exist".format(data_dir))
+        raise NotADirectoryError("The path {} does not exist".format(data_dir))
     else:
         from modis.tools import config
         config.WORK_DIR = data_dir
