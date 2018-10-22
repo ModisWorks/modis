@@ -181,7 +181,7 @@ class Frame(ttk.Frame):
             config.DATAFILE = newpath
 
             try:
-                data.get()
+                data.pull()
             except json.decoder.JSONDecodeError:
                 # Chosen file invalid
                 logger.error("Chosen file is not a valid json; reverting changes")
@@ -189,7 +189,7 @@ class Frame(ttk.Frame):
 
                 # Try again
                 config.DATAFILE = oldpath
-                data.get()
+                data.pull()
                 self.set_data_location()
                 return
 
@@ -217,7 +217,7 @@ class Frame(ttk.Frame):
             statuslog.info("1")
 
             data.cache["keys"]["discord_token"] = self.token.get()
-            data.write()
+            data.push()
 
             from modis import main
             loop = asyncio.new_event_loop()
