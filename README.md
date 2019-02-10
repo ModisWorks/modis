@@ -8,7 +8,11 @@ Modis is a Discord bot that runs with a graphical UI and is designed to be both 
 
 For those who aren't interested in development, Modis' graphical console window makes hosting your own fully featured Discord bot easy and fun, with the stock modules providing incredible features such as the music module's in-channel graphical interface, complete with progress bars and buttons.
 
-## Current Modules
+## Installation
+
+temp
+
+## ModisWorks Modules
 
 ModisWorks develops 4 core modules for Modis that will give you base functionality for your bot.
 - `!core` - Manages all the behind the scenes stuff that runs the internal APIs the modules use. Be careful not to remove this module! A lot of other modules need this module to work properly.
