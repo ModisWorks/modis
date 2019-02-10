@@ -13,7 +13,7 @@ python -m pip install --upgrade pip
 echo(
 echo Installing Modis Python package requirements...
 pip install tkinter
-pip install discord.py
+pip install -U discord.py[voice]
 pip install youtube-dl
 pip install soundcloud
 pip install pynacl

@@ -22,7 +22,7 @@ cache = {}
 def get(server, module_name, path=None):
     """Gets a database entry.
 
-    Retreives a specific database entry belonging to a module. Under normal usage, this and `data.write()` should be the only functions you need.
+    Retreives a specific database entry belonging to a module. Under normal usage, this and `data.edit()` should be the only functions you need.
 
     Args:
         server (str): Server ID of the server data to read.
