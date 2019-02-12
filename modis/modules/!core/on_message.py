@@ -8,24 +8,24 @@ from . import _data
 logger = logging.getLogger(__name__)
 
 
-async def on_message(message):
+async def on_message(msgobj):
     """Parses commands into arrays
 
     Args:
-        message: (discord.Message): Input message
+        msgobj: (discord.Message): Input message
     """
 
     # Don't reply to myself
-    if message.author == message.channel.server.me:
+    if msgobj.author == msgobj.channel.server.me:
         return
 
     # Check prefix
-    prefix = data.cache["servers"][message.server.id]["prefix"]
-    if not message.content.startswith(prefix):
+    prefix = data.cache["servers"][msgobj.server.id]["prefix"]
+    if not msgobj.content.startswith(prefix):
         return
 
-    # Parse message
-    package = message.content.split(" ")
+    # Parse msgobj
+    package = msgobj.content.split(" ")
     root = package.pop(0)[len(prefix):]
     aux = []
     while len(package) > 0:
@@ -39,22 +39,41 @@ async def on_message(message):
         # Check for commands existing for this module
         if "cmd" not in _data.cmd_db[module_name]:
             continue
-        # Check for command in list of commands for this module
+
+        # Check for this command in list of commands for this module
         if root not in _data.cmd_db[module_name]["cmd"].keys():
             continue
 
-        # Permission checks
+        # Check for this command having permissions defined
         if "level" not in _data.cmd_db[module_name]["cmd"][root].keys():
-            # Send command to module
-            await _data.cmd_db[module_name]["eh"](root, aux, query, message)
+            await _data.cmd_db[module_name]["eh"](root, aux, query, msgobj)
+            continue
+
+        # Check permissions
+        level = _data.cmd_db[module_name]["cmd"][root]["level"]
+
+        if isinstance(level, int):
+            # Permission is specified as role ranking
+            if msgobj.author.server.owner == msgobj.author:
+                role = 0
+            else:
+                role = len(msgobj.server.roles) - msgobj.author.top_role.position
+            # Highest role = 1, server owner = 0, everyone = -1
+
+            if level < 0 or role <= level:
+                await _data.cmd_db[module_name]["eh"](root, aux, query, msgobj)
+            else:
+                # TODO permission notification gui
+                continue
+
+        elif isinstance(level, str):
+            # Permission is specified as specific Discord permission
+            if _data.perm_db[level] <= msgobj.channel.permissions_for(msgobj.author):
+                await _data.cmd_db[module_name]["eh"](root, aux, query, msgobj)
+            else:
+                # TODO permission notification gui
+                continue
+
         else:
-            level = _data.cmd_db[module_name]["cmd"][root]["level"]
-
-            if isinstance(level, int):
-                # Permission is specified as role ranking
-                pass
-
-            elif isinstance(level, str):
-                # Permission is specified as specific Discord permission
-                pass
-        # TODO permission checks
+            # TODO bad perm definition handling
+            continue
