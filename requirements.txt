@@ -15,6 +15,7 @@
     discord.py[voice]
     youtube-dl
     # ffmpeg/bin/ in system PATH variables
+    PyGithub
 
 # music module:
     youtube-dl

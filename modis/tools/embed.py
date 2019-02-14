@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 URL = "https://musicbyango.com/modis/"
 ICON = "http://musicbyango.com/modis/dp/modis64t.png"
+# TODO Update to ModisWorks url
 
 
 class UI:
