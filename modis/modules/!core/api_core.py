@@ -7,19 +7,19 @@ from . import _data
 logger = logging.getLogger(__name__)
 
 
-def server_update(server_id):
-    """Updates the server info in data.json for the given server.
+def guild_update(guild_id):
+    """Updates a guild's info in the database.
 
     Args:
-        server_id (str): The Discord server to update info for.
+        guild_id (str): The guild to update.
     """
 
-    logger.debug("Updating server {}".format(server_id))
+    logger.debug("Updating guild {}".format(guild_id))
 
-    # Add the server to server data if it doesn't yet exist
-    if server_id not in data.cache["servers"]:
-        logger.debug("Adding new server to data.json")
-        data.cache["servers"][server_id] = config.SERVER_TEMPLATE
+    # Add the guild to database if it doesn't yet exist
+    if guild_id not in data.cache["servers"]:
+        logger.debug("Adding guild {} to database".format(guild_id))
+        data.cache["servers"][guild_id] = config.SERVER_TEMPLATE
 
         # Register slots for per-server module specific data
         module_names = moduledb.get_names()
@@ -27,7 +27,7 @@ def server_update(server_id):
             info = moduledb.get_import_specific("__info", module_name)
             try:
                 if info.DATA_SERVER:
-                    data.cache["servers"][server_id]["modules"][module_name] = info.DATA_SERVER
+                    data.cache["servers"][guild_id]["modules"][module_name] = info.DATA_SERVER
             except AttributeError:
                 logger.debug("Server data slot not requested for " + module_name)
 
@@ -36,38 +36,34 @@ def server_update(server_id):
         data.push()
 
 
-def server_remove(server_id):
-    """Remove a server from data.json.
+def guild_remove(guild_id):
+    """Removes a guild from the database.
 
     Args:
-        server_id (str): The server to remove.
+        guild_id (int): The guild to remove.
     """
 
-    logger.debug("Removing server from data.json")
+    logger.debug("Removing guild {} from database".format(guild_id))
 
     try:
-        data.cache["servers"].pop(server_id)
+        data.cache["servers"].pop(guild_id)
     except KeyError:
-        logger.warning("Server to be removed does not exist")
+        logger.warning("Guild {} is nonexistent in database".format(guild_id))
     else:
-        logger.debug("Removed server {}".format(server_id))
         data.push()
 
 
-def server_clean():
-    """Checks all servers, removing any that Modis isn't part of any more"""
+def guild_clean():
+    """Removes from the database guilds that Modis is no longer part of."""
 
-    logger.debug("Cleaning servers")
+    logger.debug("Cleaning guilds...")
 
-    serverlist = list(data.cache["servers"].keys())
+    guilds_old = list(data.cache["servers"].keys())
+    guilds_new = [guild.id for guild in main.client.guilds]
 
-    for server_id in serverlist:
-        exists = False
-        for server_obj in main.client.servers:
-            if server_obj.id == server_id:
-                exists = True
-        if not exists:
-            server_remove(server_id)
+    for guild_id in guilds_old:
+        if guild_id not in guilds_new:
+            guild_remove(guild_id)
 
 
 def cmd_db_update():

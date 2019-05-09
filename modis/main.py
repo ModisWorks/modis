@@ -78,7 +78,6 @@ def start(loop):
         client.loop.close()
     else:
         # Login successful
-        logger.debug("Login successful")
         logger.info("Connecting...")
         client.loop.run_until_complete(client.connect(reconnect=True))
 
