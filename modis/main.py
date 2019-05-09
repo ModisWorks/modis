@@ -48,7 +48,7 @@ def start(loop):
     logger.debug("Creating Discord client")
     asyncio.set_event_loop(loop)
     global client
-    client = discord.Client()
+    client = discord.AutoShardedClient()
 
     # Import event handlers
     logger.debug("Importing event handlers")
@@ -65,55 +65,22 @@ def start(loop):
             client.event(_eh_create(eh_type, eh_list))
 
     # CONNECTION STACK
-    logger.info("Logging in to Discord...")
+    logger.info("Logging in...")
     try:
-        # Login to Discord
+        # Attempt login
         token = data.cache["keys"]["discord_token"]
         client.loop.run_until_complete(client.login(token))
     except Exception as e:
         # Login failed
-        logger.info("Could not login to Discord")
+        logger.critical("Login failed")
         logger.exception(e)
         statuslog.info("3")
+        client.loop.close()
     else:
         # Login successful
         logger.debug("Login successful")
-        try:
-            # Try to reconnect
-            logger.debug("Connecting to Discord...")
-            client.loop.run_until_complete(client.connect())
-        except KeyboardInterrupt:
-            # Reconnect cancelled
-            logger.warning("Connection cancelled")
-            client.loop.run_until_complete(client.logout())
-
-            # Cancel all pending tasks
-            pending = asyncio.Task.all_tasks(loop=client.loop)
-            gathered = asyncio.gather(*pending, loop=client.loop)
-            try:
-                gathered.cancel()
-                client.loop.run_until_complete(gathered)
-                gathered.exception()
-            except Exception as e:
-                logger.exception(e)
-        except Exception as e:
-            # Reconnect failed
-            logger.error("Connection failed")
-            logger.exception(e)
-            pending = asyncio.Task.all_tasks(loop=client.loop)
-            gathered = asyncio.gather(*pending, loop=client.loop)
-            gathered.exception()
-    finally:
-        # Bot shutdown
-        logger.info("Logging out of Discord")
-        try:
-            client.loop.run_until_complete(client.logout())
-        except Exception as e:
-            logger.exception(e)
-
-        logger.critical("Bot stopped")
-        statuslog.info("0")
-        client.loop.close()
+        logger.info("Connecting...")
+        client.loop.run_until_complete(client.connect(reconnect=True))
 
 
 def _eh_create(eh_type, eh_list):
