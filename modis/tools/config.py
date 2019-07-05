@@ -53,7 +53,7 @@ EH_TYPES = [
     "on_member_update",
     "on_guild_join",
     "on_guild_remove",
-    "on_server_update",
+    "on_guild_update",
     "on_guild_role_create",
     "on_guild_role_delete",
     "on_guild_role_update",
