@@ -6,7 +6,7 @@ CONTRIBUTORS = {
 BLURB = "Manages all the behind the scenes stuff that runs the internal APIs the modules use."
 
 COMMANDS = {}
-DATA_SERVER = {}
+DATA_GUILD = {}
 DATA_GLOBAL = {}
 
 HELP_DATAPACKS = {}

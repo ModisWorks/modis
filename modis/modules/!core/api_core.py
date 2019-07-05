@@ -11,15 +11,15 @@ def guild_update(guild_id):
     """Updates a guild's info in the database.
 
     Args:
-        guild_id (str): The guild to update.
+        guild_id (int): The guild to update.
     """
 
     logger.debug("Updating guild {}".format(guild_id))
 
     # Add the guild to database if it doesn't yet exist
-    if guild_id not in data.cache["guilds"]:
+    if str(guild_id) not in data.cache["guilds"]:
         logger.debug("Adding guild {} to database".format(guild_id))
-        data.cache["guilds"][guild_id] = config.GUILD_TEMPLATE
+        data.cache["guilds"][str(guild_id)] = config.GUILD_TEMPLATE
 
         # Register slots for per-guild module specific data
         module_names = moduledb.get_names()
@@ -27,7 +27,7 @@ def guild_update(guild_id):
             info = moduledb.get_import_specific("__info", module_name)
             try:
                 if info.DATA_GUILD:
-                    data.cache["guilds"][guild_id]["modules"][module_name] = info.DATA_GUILD
+                    data.cache["guilds"][str(guild_id)]["modules"][module_name] = info.DATA_GUILD
             except AttributeError:
                 logger.debug("Guild data slot not requested for " + module_name)
 
@@ -46,7 +46,7 @@ def guild_remove(guild_id):
     logger.debug("Removing guild {} from database".format(guild_id))
 
     try:
-        data.cache["guilds"].pop(guild_id)
+        data.cache["guilds"].pop(str(guild_id))
     except KeyError:
         logger.warning("Guild {} is nonexistent in database".format(guild_id))
     else:

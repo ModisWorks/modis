@@ -16,11 +16,11 @@ async def on_message(msgobj):
     """
 
     # Don't reply to myself
-    if msgobj.author == msgobj.channel.server.me:
+    if msgobj.author == main.client.user:
         return
 
     # Check prefix
-    prefix = data.cache["servers"][msgobj.server.id]["prefix"]
+    prefix = data.cache["guilds"][str(msgobj.guild.id)]["prefix"]
     if not msgobj.content.startswith(prefix):
         return
 
@@ -54,11 +54,11 @@ async def on_message(msgobj):
 
         if isinstance(level, int):
             # Permission is specified as role ranking
-            if msgobj.author.server.owner == msgobj.author:
+            if msgobj.author.guild.owner == msgobj.author:
                 role = 0
             else:
-                role = len(msgobj.server.roles) - msgobj.author.top_role.position
-            # Highest role = 1, server owner = 0, everyone = -1
+                role = len(msgobj.guild.roles) - msgobj.author.top_role.position
+            # Highest role = 1, guild owner = 0, everyone = -1
 
             if level < 0 or role <= level:
                 await _data.cmd_db[module_name]["eh"](root, aux, query, msgobj)
