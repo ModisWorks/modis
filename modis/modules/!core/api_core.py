@@ -17,19 +17,19 @@ def guild_update(guild_id):
     logger.debug("Updating guild {}".format(guild_id))
 
     # Add the guild to database if it doesn't yet exist
-    if guild_id not in data.cache["servers"]:
+    if guild_id not in data.cache["guilds"]:
         logger.debug("Adding guild {} to database".format(guild_id))
-        data.cache["servers"][guild_id] = config.SERVER_TEMPLATE
+        data.cache["guilds"][guild_id] = config.GUILD_TEMPLATE
 
-        # Register slots for per-server module specific data
+        # Register slots for per-guild module specific data
         module_names = moduledb.get_names()
         for module_name in module_names:
             info = moduledb.get_import_specific("__info", module_name)
             try:
-                if info.DATA_SERVER:
-                    data.cache["servers"][guild_id]["modules"][module_name] = info.DATA_SERVER
+                if info.DATA_GUILD:
+                    data.cache["guilds"][guild_id]["modules"][module_name] = info.DATA_GUILD
             except AttributeError:
-                logger.debug("Server data slot not requested for " + module_name)
+                logger.debug("Guild data slot not requested for " + module_name)
 
         print(data)
 
@@ -46,7 +46,7 @@ def guild_remove(guild_id):
     logger.debug("Removing guild {} from database".format(guild_id))
 
     try:
-        data.cache["servers"].pop(guild_id)
+        data.cache["guilds"].pop(guild_id)
     except KeyError:
         logger.warning("Guild {} is nonexistent in database".format(guild_id))
     else:
@@ -58,7 +58,7 @@ def guild_clean():
 
     logger.debug("Cleaning guilds...")
 
-    guilds_old = list(data.cache["servers"].keys())
+    guilds_old = list(data.cache["guilds"].keys())
     guilds_new = [guild.id for guild in main.client.guilds]
 
     for guild_id in guilds_old:

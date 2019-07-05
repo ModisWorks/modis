@@ -79,7 +79,7 @@ ROOT_TEMPLATE = {
     },
     "guilds": {}
 }
-SERVER_TEMPLATE = {
+GUILD_TEMPLATE = {
     "prefix": "!",
     "activation": {},
     "commands": {},
