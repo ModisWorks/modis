@@ -65,6 +65,10 @@ def guild_clean():
         if guild_id not in guilds_new:
             guild_remove(guild_id)
 
+    for guild_id in guilds_new:
+        if guild_id not in guilds_old:
+            guild_update(guild_id)
+
 
 def cmd_db_update():
     """Updates the command database"""
