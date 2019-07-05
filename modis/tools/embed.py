@@ -24,7 +24,7 @@ class UI:
         """Initialise variables and build the embed.
 
         Args:
-            channel (discord.Channel): Channel to lock UI to
+            channel (discord.TextChannel): Channel to lock UI to
             title (str): GUI title, in bold
             description (str): GUI description
             modulename (str): Name of your module, default "Modis"
@@ -80,14 +80,14 @@ class UI:
     async def send(self):
         """Send the embed message."""
 
-        await main.client.send_typing(self.channel)
-        self.sent_embed = await main.client.send_message(self.channel, embed=self.built_embed)
+        await self.channel.typing()
+        self.sent_embed = await self.channel.send(embed=self.built_embed)
 
     async def usend(self):
         """Update the existing embed."""
 
         try:
-            await main.client.edit_message(self.sent_embed, embed=self.built_embed)
+            await self.sent_embed.edit(embed=self.built_embed)
         except Exception as e:
             # TODO Add exceptions
             logger.exception(e)
@@ -96,7 +96,7 @@ class UI:
         """Delete the existing embed."""
 
         try:
-            await main.client.delete_message(self.sent_embed)
+            await self.sent_embed.delete()
         except Exception as e:
             # TODO Add exceptions
             logger.exception(e)
