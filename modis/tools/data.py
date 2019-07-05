@@ -35,7 +35,7 @@ def get(guild, module_name, path=None):
 
     global cache
 
-    entry = cache["guilds"][guild]["modules"][module_name]
+    entry = cache["guilds"][str(guild)]["modules"][module_name]
 
     if not path:
         return entry
@@ -60,7 +60,7 @@ def edit(guild, module_name, value, path=None):
     global cache
 
     if path:
-        entry = cache["guilds"][guild]["modules"]
+        entry = cache["guilds"][str(guild)]["modules"]
         for key in path[:-1]:
             entry = entry[key]
         entry[path[-1]] = value
