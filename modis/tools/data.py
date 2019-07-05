@@ -19,13 +19,13 @@ cache = {}
 # TODO Implement exception handling
 
 
-def get(server, module_name, path=None):
+def get(guild, module_name, path=None):
     """Gets a database entry.
 
     Retreives a specific database entry belonging to a module. Under normal usage, this and `data.edit()` should be the only functions you need.
 
     Args:
-        server (str): Server ID of the server data to read.
+        guild (str): Guild ID of the guild data to read.
         module_name (str): Module name of the module data to read.
         path (list): List of strings describing the path to the desired database entry.
 
@@ -35,7 +35,7 @@ def get(server, module_name, path=None):
 
     global cache
 
-    entry = cache["servers"][server]["modules"][module_name]
+    entry = cache["guilds"][guild]["modules"][module_name]
 
     if not path:
         return entry
@@ -45,13 +45,13 @@ def get(server, module_name, path=None):
     return entry
 
 
-def edit(server, module_name, value, path=None):
+def edit(guild, module_name, value, path=None):
     """Edits a database entry.
 
     Edits a specific database entry belonging to a module. Under normal usage, this and `data.get()` should be the only functions you need.
 
     Args:
-        server (str): Server ID of the server data to edit.
+        guild (str): Guild ID of the guild data to edit.
         module_name (str): Module name of the module data to edit.
         value: Value to change the database entry to.
         path (list): List of strings describing the path to the desired database entry.
@@ -60,12 +60,12 @@ def edit(server, module_name, value, path=None):
     global cache
 
     if path:
-        entry = cache["servers"][server]["modules"]
+        entry = cache["guilds"][guild]["modules"]
         for key in path[:-1]:
             entry = entry[key]
         entry[path[-1]] = value
     else:
-        cache["servers"][server]["modules"][module_name] = value
+        cache["guilds"][guild]["modules"][module_name] = value
 
     push()
 
