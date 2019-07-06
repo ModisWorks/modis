@@ -3,8 +3,12 @@
 TestModis.py
 OfficialModis.py
 data.json
+data.json.old
 modis/discord_modis/modules/pingpong/
 .songcache/
+modis-venv/
+modis/modules/*
+!modis/modules/!core
 
 ######## PYCHARM ########
 .idea
@@ -19,7 +23,7 @@ ehthumbs.db
 ehthumbs_vista.db
 
 # Windows batch and build files
-*.bat
+# *.bat
 *.vbs
 
 # Dump file
