@@ -10,30 +10,29 @@ Thats it! Whenever an event is triggered on the client object, it will now be se
 """
 
 import logging
+import asyncio
+import discord
 
 logger = logging.getLogger(__name__)
 statuslog = logging.getLogger("globalstatus")
 
 
 # Create the client object
-client = None
+client: discord.AutoShardedClient = None
 # The client object is what you use to interact with Discord. If you need to send anything to Discord, you will need to import this into your module with `from modis import main`, and then use `main.client` to do things.
 # For example, to send a message to a text channel, you would use `await main.client.send_message(...)`.
 
 
-def start(loop):
+def start(loop: asyncio.AbstractEventLoop):
     """Starts the bot
 
     Starts the Discord client and logs Modis into Discord.
 
     Args:
-        loop: An asyncio event loop for the bot to run on.
+        loop (asyncio.AbstractEventLoop): An asyncio event loop for the bot to run on.
     """
 
     logger.info("Loading Modis...")
-
-    import discord
-    import asyncio
 
     from modis.tools import config, data, moduledb, version
 
@@ -82,7 +81,7 @@ def start(loop):
         client.loop.run_until_complete(client.connect(reconnect=True))
 
 
-def _eh_create(eh_type, eh_list):
+def _eh_create(eh_type: str, eh_list: list):
     """Creates a compiled event handler
 
     Creates a function that combines all the event handlers of a specific type into one.
