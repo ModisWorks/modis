@@ -7,26 +7,29 @@ import json
 import logging
 import os
 from collections import OrderedDict
+import typing
 
 from modis.tools import config
 
 logger = logging.getLogger(__name__)
 
 # Create the cache object
-cache = {}
+cache: typing.Dict[str, typing.Any] = {}
 # The cache dict is an exact copy of database.json, but stored in RAM. It makes it much easier for modules and framework to access the database without requiring disk reads and writes every time.
 
 # TODO Implement exception handling
 
 
-def get(guild, module_name, path=None):
+def get(guild: int,
+        module: str,
+        path: typing.List[str] = None) -> typing.Any:
     """Gets a database entry.
 
     Retreives a specific database entry belonging to a module. Under normal usage, this and `data.edit()` should be the only functions you need.
 
     Args:
-        guild (str): Guild ID of the guild data to read.
-        module_name (str): Module name of the module data to read.
+        guild (int): Guild ID of the guild data to read.
+        module (str): Module name of the module data to read.
         path (list): List of strings describing the path to the desired database entry.
 
     Returns:
@@ -35,7 +38,7 @@ def get(guild, module_name, path=None):
 
     global cache
 
-    entry = cache["guilds"][str(guild)]["modules"][module_name]
+    entry = cache["guilds"][str(guild)]["modules"][module]
 
     if not path:
         return entry
@@ -45,14 +48,17 @@ def get(guild, module_name, path=None):
     return entry
 
 
-def edit(guild, module_name, value, path=None):
+def edit(guild: int,
+         module: str,
+         value,
+         path: typing.List[str] = None) -> None:
     """Edits a database entry.
 
     Edits a specific database entry belonging to a module. Under normal usage, this and `data.get()` should be the only functions you need.
 
     Args:
-        guild (str): Guild ID of the guild data to edit.
-        module_name (str): Module name of the module data to edit.
+        guild (int): Guild ID of the guild data to edit.
+        module (str): Module name of the module data to edit.
         value: Value to change the database entry to.
         path (list): List of strings describing the path to the desired database entry.
     """
@@ -65,12 +71,12 @@ def edit(guild, module_name, value, path=None):
             entry = entry[key]
         entry[path[-1]] = value
     else:
-        cache["guilds"][guild]["modules"][module_name] = value
+        cache["guilds"][guild]["modules"][module] = value
 
     push()
 
 
-def pull():
+def pull() -> None:
     """Updates cache from disk
 
     Updates the `cache` object with the current state of the data.json file.
@@ -104,7 +110,7 @@ def pull():
         _create(config.ROOT_TEMPLATE)
 
 
-def push(new_data=None):
+def push(new_data: dict = None) -> None:
     """Updates disk from cache
 
     Updates the data.json file with the current state of the `cache` object.
@@ -130,7 +136,7 @@ def push(new_data=None):
         json.dump(_sort(cache), file, indent=2)
 
 
-def _create(_template):
+def _create(_template: dict) -> None:
     """Creates a new data.json file.
 
     Creates a new data.json file from the template defined in modis.tools.config, or uses the `template` argument to create a custom data.json file.
@@ -149,13 +155,16 @@ def _create(_template):
         json.dump(cache, file, indent=2)
 
 
-def _validate(_template):
+def _validate(_template: dict) -> bool:
     """Validates a data.json dictionary
 
     Check if  the dictionary `_template` is in the right format for a data.json file using a hard-coded method, that will be changed to use the template defined in modis.tools.config in the future.
 
     Args:
         _template (dict): The data dictionary to validate.
+
+    Returns:
+        Bool of whether or not the database is valid
     """
 
     # TODO make this not hard-coded
@@ -166,7 +175,7 @@ def _validate(_template):
     return True
 
 
-def _sort(_dict):
+def _sort(_dict: dict) -> OrderedDict:
     """Sorts a dictionary.
 
     Recursively sorts all elements in a dictionary to produce an OrderedDict.
@@ -190,7 +199,7 @@ def _sort(_dict):
     return OrderedDict(sorted(newdict.items(), key=lambda item: (_compare(type(item[1])), item[0])))
 
 
-def _compare(_type):
+def _compare(_type: type) -> int:
     """Defines a type order for a dictionary.
 
     Args:
