@@ -59,7 +59,7 @@ def guild_clean():
     logger.debug("Cleaning guilds...")
 
     guilds_old = list(data.cache["guilds"].keys())
-    guilds_new = [guild.id for guild in main.client.guilds]
+    guilds_new = [str(guild.id) for guild in main.client.guilds]
 
     for guild_id in guilds_old:
         if guild_id not in guilds_new:
@@ -67,7 +67,7 @@ def guild_clean():
 
     for guild_id in guilds_new:
         if guild_id not in guilds_old:
-            guild_update(guild_id)
+            guild_update(int(guild_id))
 
 
 def cmd_db_update():

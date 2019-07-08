@@ -3,11 +3,11 @@
 This tool handles reading and editing of the data.json database. Modis uses the JSON protocol to store data to ensure easy readability and accessibility. The various functions in this file make it easy for modules to read and edit the database, and also provides an easy way to expand into more complex database technologies such as mongodb in the future.
 """
 
+import typing
 import json
 import logging
 import os
 from collections import OrderedDict
-import typing
 
 from modis.tools import config
 
@@ -195,7 +195,7 @@ def _sort(_dict: dict) -> OrderedDict:
         else:
             newdict[i[0]] = i[1]
 
-    # TODO check if it should be _compare_type(type(item[1]), type(item[0]))
+    # TODO check if it should be _compare(type(item[1]), type(item[0]))
     return OrderedDict(sorted(newdict.items(), key=lambda item: (_compare(type(item[1])), item[0])))
 
 
