@@ -80,7 +80,7 @@ class UI:
     async def send(self):
         """Send the embed message."""
 
-        self.channel.trigger_typing()
+        await self.channel.trigger_typing()
         self.sent_embed = await self.channel.send(embed=self.built_embed)
 
     async def usend(self):
