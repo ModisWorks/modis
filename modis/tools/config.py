@@ -11,8 +11,8 @@ NICKNAME = "CHOPIN"
 
 # Directory
 ROOT_DIR = _os.path.dirname(_os.path.dirname(_os.path.realpath(__file__)))
-MODULES_DIR = ROOT_DIR + "/modules"
 WORK_DIR = _os.getcwd()
+MODULES_DIR = ROOT_DIR + "/modules"
 LOGS_DIR = WORK_DIR + "/logs"
 
 # Discord
