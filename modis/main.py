@@ -19,14 +19,13 @@ statuslog = logging.getLogger("globalstatus")
 
 # Create the client object
 client: discord.AutoShardedClient = None
-# The client object is what you use to interact with Discord. If you need to send anything to Discord, you will need to import this into your module with `from modis import main`, and then use `main.client` to do things.
-# For example, to send a message to a text channel, you would use `await main.client.send_message(...)`.
+"""In Discord.py 1.0+, the client object is used for global Discord stuff, like listing guilds you're part of etc.
+To use it, do `from modis import main`, and then use `main.client`.
+"""
 
 
-def start(loop: asyncio.AbstractEventLoop):
-    """Starts the bot
-
-    Starts the Discord client and logs Modis into Discord.
+def start(loop: asyncio.AbstractEventLoop) -> None:
+    """Starts the Discord client and logs Modis into Discord.
 
     Args:
         loop (asyncio.AbstractEventLoop): An asyncio event loop for the bot to run on.
@@ -50,7 +49,7 @@ def start(loop: asyncio.AbstractEventLoop):
     client = discord.AutoShardedClient()
 
     # Import event handlers
-    logger.debug("Importing event handlers")
+    logger.info("Importing modules...")
     eh_lib = moduledb.get_imports(config.EH_TYPES)
 
     # Register event handlers
@@ -81,7 +80,7 @@ def start(loop: asyncio.AbstractEventLoop):
         client.loop.run_until_complete(client.connect(reconnect=True))
 
 
-def _eh_create(eh_type: str, eh_list: list):
+def _eh_create(eh_type: str, eh_list: list) -> staticmethod:
     """Creates a compiled event handler
 
     Creates a function that combines all the event handlers of a specific type into one.
@@ -91,10 +90,12 @@ def _eh_create(eh_type: str, eh_list: list):
         eh_list (list): The library of event handlers to pull from.
 
     Returns:
-        A combined event handler function consisting of all the event handlers in its category.
+        func (staticmethod) A combined event handler function consisting of all the event handlers in its category.
     """
 
-    async def func(*args, **kwargs):
+    # Create the combiner function
+    async def func(*args, **kwargs) -> None:
+        """A function that executes a specific event handler in all modules"""
         for eh in eh_list:
             try:
                 module_event_handler_func = getattr(eh, eh_type)
@@ -102,5 +103,8 @@ def _eh_create(eh_type: str, eh_list: list):
             except Exception as e:
                 logger.warning("An uncaught error occured in " + eh.__name__)
                 logger.exception(e)
+
+    # Rename the combiner function to the name of the event handler
     func.__name__ = eh_type
+
     return func
