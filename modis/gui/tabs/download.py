@@ -5,11 +5,11 @@ import threading
 
 from modis.tools import data
 
-from github import Github
+import github
 
 logger = logging.getLogger(__name__)
 
-githubapi = Github(data.cache["keys"]["github_token"])
+githubapi = github.Github()
 
 # TODO pip requirements listing, installation and uninstallation
 # TODO live module refresh
@@ -99,7 +99,7 @@ class Frame(ttk.Frame):
             self.panel_listing.grid_remove()
 
             repo_scanner = self.RepoScanner(self.name_entry.get(), self.scan_done)
-            repo_scanner.run()
+            repo_scanner.start()
 
         def scan_done(self, repos):
             """Pass found repos to the repo listing panel.
@@ -195,15 +195,17 @@ class Frame(ttk.Frame):
                 """Start the thread."""
 
                 try:
-                    repos = githubapi.get_organization(self.query).get_repos()
+                    repos = githubapi.get_user(self.query).get_repos()
+                except github.UnknownObjectException:
+                    # TODO Bad user indicator
+                    # self.bad_user()
+                    print("Bad user")
+                except github.RateLimitExceededException:
+                    # TODO Rate limit indicator
+                    # self.rate_limit
+                    print("Slow down!")
+                else:
                     self.after(repos)
-                except:
-                    try:
-                        repos = githubapi.get_user(self.query).get_repos()
-                        self.after(repos)
-                    except:
-                        # TODO Bad user indicator
-                        print("Bad user")
 
     class Info(ttk.LabelFrame):
         """A panel displaying info about the currently selected module."""
