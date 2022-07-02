@@ -6,7 +6,7 @@ start() is called by __init__.py if Modis is running in command line, or by the 
 
 start() will then import all the event handlers of all the modules, and use _eh_create() to compile all event handlers of one type into one function. After that's done, it will add those compiled event handlers to the `client` object, and then log in to Discord.
 
-Thats it! Whenever an event is triggered on the client object, it will now be sent to all modules that have an event handler for that specific event.
+That's it! Whenever an event is triggered on the client object, it will now be sent to all modules that have an event handler for that specific event.
 """
 
 import logging

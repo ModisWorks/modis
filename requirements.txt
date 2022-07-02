@@ -6,7 +6,7 @@
         pynacl
         google-api-python-client
         requests
-        lxml
+        # lxml
         praw
     # ffmpeg/bin/ in system PATH variables
 
@@ -26,11 +26,10 @@
 
 # chatbot module:
     requests
-    lxml
+    # lxml
 
 # gamedeals module:
     praw
 
 # rocketleague module:
     requests
-    lxml
