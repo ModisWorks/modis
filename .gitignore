@@ -12,6 +12,7 @@ modis/modules/*
 
 ######## PYCHARM ########
 .idea
+.fleet
 
 ######## GITHUB ########
 docs/_site/

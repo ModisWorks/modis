@@ -18,7 +18,7 @@ statuslog = logging.getLogger("globalstatus")
 
 
 # Create the client object
-client: discord.AutoShardedClient = None
+client = discord.Client
 """In Discord.py 1.0+, the client object is used for global Discord stuff, like listing guilds you're part of etc.
 To use it, do `from modis import main`, and then use `main.client`.
 """
@@ -45,8 +45,10 @@ def start(loop: asyncio.AbstractEventLoop) -> None:
     # Create client
     logger.debug("Creating Discord client")
     asyncio.set_event_loop(loop)
+    intents = discord.Intents.default()
+    intents.message_content = True
     global client
-    client = discord.AutoShardedClient()
+    client = discord.Client(intents=intents)
 
     # Import event handlers
     logger.info("Importing modules...")
@@ -64,20 +66,34 @@ def start(loop: asyncio.AbstractEventLoop) -> None:
 
     # CONNECTION STACK
     logger.info("Logging in...")
+
+    async def client_start():
+        async with client:
+            await client.start(token)
+
+    async def client_close():
+        async with client:
+            await client.loop.close()
+
+    async def client_run_until_complete():
+        async with client:
+            await client.loop.run_until_complete(client.connect(reconnect=True))
+
     try:
         # Attempt login
         token = data.cache["keys"]["discord_token"]
-        client.loop.run_until_complete(client.login(token))
+        asyncio.run(client_start())
+        # client.loop.run_until_complete(client.login(token))
     except Exception as e:
         # Login failed
         logger.critical("Login failed")
         logger.exception(e)
         statuslog.info("3")
-        client.loop.close()
+        asyncio.run(client_close())
     else:
         # Login successful
         logger.info("Connecting...")
-        client.loop.run_until_complete(client.connect(reconnect=True))
+        asyncio.run(client_run_until_complete())
 
 
 def _eh_create(eh_type: str, eh_list: list) -> staticmethod:

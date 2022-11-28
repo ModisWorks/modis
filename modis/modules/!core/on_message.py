@@ -49,6 +49,10 @@ async def on_message(msgobj):
             await _data.cmd_db[module_name]["eh"](root, aux, query, msgobj)
             continue
 
+        await _data.cmd_db[module_name]["eh"](root, aux, query, msgobj)
+        continue
+        # TODO ^^^ why is this suddenly needed now???
+
         # Check permissions
         level = _data.cmd_db[module_name]["cmd"][root]["level"]
 

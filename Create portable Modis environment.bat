@@ -12,6 +12,7 @@ echo Updating pip...
 python -m pip install --upgrade pip
 echo(
 echo Installing Modis Python package requirements...
+pip install wheel
 pip install tkinter
 pip install -U discord.py[voice]
 pip install PyGithub
